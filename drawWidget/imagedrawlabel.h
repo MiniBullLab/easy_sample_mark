@@ -1,4 +1,4 @@
-#ifndef IMAGEDRAWLABEL_H
+﻿#ifndef IMAGEDRAWLABEL_H
 #define IMAGEDRAWLABEL_H
 
 #include <QLabel>

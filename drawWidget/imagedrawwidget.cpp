@@ -1,4 +1,4 @@
-#include "imagedrawwidget.h"
+﻿#include "imagedrawwidget.h"
 
 ImageDrawWidget::ImageDrawWidget()
 {

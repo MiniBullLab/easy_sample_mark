@@ -188,18 +188,21 @@ void EditableLabel::wheelEvent(QWheelEvent * event)
 
 void EditableLabel::paintEvent(QPaintEvent *e)
 {
-    QLabel::paintEvent(e);
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    float scale = this->zoomValue / 100.0f;
-    painter.scale(scale, scale);
-    painter.translate(this->offsetToCenter());
-    painter.drawPixmap(QPoint(0,0), tempPixmap);
-    painter.end();
-    this->resize(tempPixmap.width() * scale, tempPixmap.height() * scale);
-    this->setAutoFillBackground(true);
+    if(!tempPixmap.isNull())
+    {
+        QPainter painter;
+        painter.begin(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        float scale = this->zoomValue / 100.0f;
+        painter.scale(scale, scale);
+        painter.translate(this->offsetToCenter());
+        painter.drawPixmap(QPoint(0,0), tempPixmap);
+        painter.end();
+        this->resize(tempPixmap.width() * scale, tempPixmap.height() * scale);
+        this->setAutoFillBackground(true);
+    }
     QLabel::paintEvent(e);
 }
 
@@ -214,20 +217,25 @@ void EditableLabel::setDrawShapeObjects()
 
 void EditableLabel::drawPixmap()
 {
-    QPainter painter;
-    tempPixmap = mp.copy();
-    painter.begin(&tempPixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
-
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    if(!mp.isNull())
     {
-        drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
-        drawList[drawIterator.key()]->drawPixmap(this->shapeType, painter);
+        QPainter painter;
+        tempPixmap = mp.copy();
+        painter.begin(&tempPixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        painter.setPen(QPen(QColor("#3CFF55")));
+        QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+        for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+        {
+            painter.save();
+            drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
+            drawList[drawIterator.key()]->drawPixmap(this->shapeType, painter);
+            painter.restore();
+        }
+        painter.end();
     }
-    painter.end();
     this->update();
 }
 

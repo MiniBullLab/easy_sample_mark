@@ -26,7 +26,8 @@ void ImageDrawLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::RECT_SHAPE)
+        if(object.getShapeType() == ShapeType::RECT_SHAPE ||
+                object.getShapeType() == ShapeType::INSTANCE_SEGMENT_SHAPE)
         {
             rectObejcts.append(object);
         }

@@ -448,10 +448,10 @@ void MainWindow::initAction()
     //file
     openImageDirAction = new QAction(tr("打开图片文件夹"), this);
     openImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
-    openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
-    openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
     openSegmentImageDirAction = new QAction(tr("打开图片分割文件夹"), this);
     openSegmentImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
+    openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
+    openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
     openPCDDirAction = new QAction(tr("打开PCD文件夹"), this);
     openPCDDirAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
     exitAction = new QAction(tr("退出系统"), this);
@@ -510,20 +510,24 @@ void MainWindow::initMenuBar()
     //file
     fileMenu = new QMenu(tr("文件"), this);
     fileMenu->addAction(openImageDirAction);
-    fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openSegmentImageDirAction);
+#if EDGE_TOOL == 0
+    fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openPCDDirAction);
+#endif
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
     //setting
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
     settingMenu->addAction(segmentParamterAction);
+#if EDGE_TOOL == 0
     settingMenu->addAction(videoMarkParamterAction);
     settingMenu->addSeparator();
     settingMenu->addAction(autoParamterAction);
     settingMenu->addSeparator();
     settingMenu->addAction(pointcloudParamterAction);
+#endif
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
     autoMarkMenu->addAction(autoMarkAction);
@@ -536,10 +540,12 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(videoCuttingAction);
     toolMenu->addAction(videoCroppingAction);
     toolMenu->addAction(imageConverterAction);
+#if EDGE_TOOL == 0
     toolMenu->addAction(cameraAction);
     toolMenu->addSeparator();
     toolMenu->addAction(pcdConverterAction);
     toolMenu->addAction(pcdFilterAction);
+#endif
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -547,7 +553,9 @@ void MainWindow::initMenuBar()
 
     this->menuBar()->addMenu(fileMenu);
     this->menuBar()->addMenu(settingMenu);
+#if EDGE_TOOL == 0
     this->menuBar()->addMenu(autoMarkMenu);
+#endif
     this->menuBar()->addMenu(toolMenu);
     this->menuBar()->addMenu(aboutMenu);
 
@@ -560,9 +568,11 @@ void MainWindow::initToolBar()
     fileTool = new QToolBar(tr("文件"));
     fileTool->setIconSize(QSize(30, 30));
     fileTool->addAction(openImageDirAction);
-    fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openSegmentImageDirAction);
+#if EDGE_TOOL == 0
+    fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openPCDDirAction);
+#endif
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
     autoMarkTool->setIconSize(QSize(30, 30));
@@ -572,7 +582,9 @@ void MainWindow::initToolBar()
     shapeTool->addWidget(shapeWidget);
 
     this->addToolBar(fileTool);
+#if EDGE_TOOL == 0
     this->addToolBar(autoMarkTool);
+#endif
     this->addToolBar(shapeTool);
 }
 

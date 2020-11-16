@@ -205,17 +205,20 @@ void SegmentLabel::wheelEvent(QWheelEvent * event)
 
 void SegmentLabel::paintEvent(QPaintEvent *e)
 {
-    QLabel::paintEvent(e);
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    painter.scale(this->scale, this->scale);
-    painter.translate(this->offsetToCenter());
-    painter.drawPixmap(QPoint(0,0), tempPixmap);
-    painter.end();
-    this->resize(tempPixmap.width() * this->scale, tempPixmap.height() * this->scale);
-    this->setAutoFillBackground(true);
+    if(!tempPixmap.isNull())
+    {
+        QPainter painter;
+        painter.begin(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        painter.scale(this->scale, this->scale);
+        painter.translate(this->offsetToCenter());
+        painter.drawPixmap(QPoint(0,0), tempPixmap);
+        painter.end();
+        this->resize(tempPixmap.width() * this->scale, tempPixmap.height() * this->scale);
+        this->setAutoFillBackground(true);
+    }
     QLabel::paintEvent(e);
 }
 
@@ -223,39 +226,49 @@ void SegmentLabel::setDrawShapeObjects()
 {
     drawList[ShapeType::POLYGON_SEGMENT_SHAPE]->setObjectList(polygonSegObejcts);
     drawList[ShapeType::LANE_SEGMENT_SHAPE]->setObjectList(laneSegObejcts);
+    drawList[ShapeType::INSTANCE_SEGMENT_SHAPE]->setObjectList(rectObejcts);
     drawPixmap();
 }
 
 void SegmentLabel::drawPixmap()
 {
-    QPainter painter;
-    tempPixmap = mp.copy();
-    painter.begin(&tempPixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    if(!mp.isNull())
     {
-        drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
-        drawList[drawIterator.key()]->drawPixmap(this->shapeType, painter);
+        QPainter painter;
+        tempPixmap = mp.copy();
+        painter.begin(&tempPixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        painter.setPen(QPen(QColor("#3CFF55")));
+        QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+        for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+        {
+            painter.save();
+            drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
+            drawList[drawIterator.key()]->drawPixmap(this->shapeType, painter);
+            painter.restore();
+        }
+        drawSegmentMask(painter);
+        painter.end();
     }
-    drawSegmentMask(painter);
-    painter.end();
     this->update();
 }
 
 void SegmentLabel::drawSegmentMask(QPainter &painter)
 {
-    const int height = painter.device()->height();
-    const int width = painter.device()->width();
+    const int height = mp.height();
+    const int width = mp.width();
     QList<MyObject> result = getObjects();
-    if(!this->isEnabled() && maskImage != NULL && result.count() == 0)
+    if(!this->isEnabled() && result.count() == 0)
     {
-        painter.save();
-        painter.setOpacity(0.35);
-        painter.drawImage(QPoint(0, 0), *maskImage);
-        painter.restore();
+        if(maskImage != NULL)
+        {
+            painter.save();
+            painter.setOpacity(0.3);
+            painter.drawImage(QPoint(0, 0), *maskImage);
+            painter.restore();
+        }
     }
     else
     {
@@ -325,6 +338,8 @@ void SegmentLabel::initData()
                     new DrawPolygonShape(MarkDataType::SEGMENT, true));
     drawList.insert(ShapeType::LANE_SEGMENT_SHAPE,
                     new DrawLaneShape(MarkDataType::SEGMENT, true));
+    drawList.insert(ShapeType::INSTANCE_SEGMENT_SHAPE,
+                    new DrawInstanceShape(MarkDataType::SEGMENT, true));
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {

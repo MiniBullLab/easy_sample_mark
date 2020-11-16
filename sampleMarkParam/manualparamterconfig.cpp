@@ -14,8 +14,8 @@
 
 #include "drawmarkcolor.h"
 
-int ManualParamterConfig::MIN_WIDTH = 1;
-int ManualParamterConfig::MIN_HEIGHT = 1;
+int ManualParamterConfig::MIN_WIDTH = 10;
+int ManualParamterConfig::MIN_HEIGHT = 10;
 int ManualParamterConfig::NEAR_POINT_LENGTH = 5;
 int ManualParamterConfig::MAX_SCALE = 300;
 int ManualParamterConfig::MIN_SCALE = 50;

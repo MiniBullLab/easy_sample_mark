@@ -76,7 +76,7 @@ SOURCES += main.cpp\
     videoTools/segmentationlabelconvertthread.cpp \
     saveMarkData/segmentationmaskprocess.cpp \
     drawShape/drawimagemask.cpp \
-    drawShape/drawinstancesegmentshape.cpp
+    drawShape/drawinstanceshape.cpp
 
 HEADERS  += controlwindow.h \
     markclasswindow.h \
@@ -134,7 +134,7 @@ HEADERS  += controlwindow.h \
     videoTools/segmentationlabelconvertthread.h \
     saveMarkData/segmentationmaskprocess.h \
     drawShape/drawimagemask.h \
-    drawShape/drawinstancesegmentshape.h
+    drawShape/drawinstanceshape.h
 
 RESOURCES += \
     style.qrc \
@@ -660,7 +660,7 @@ LIBS+=-L/home/lpj/Software/opencv34/lib \
     -lopencv_core
 
 #Eigen
-INCLUDEPATH += /usr/include/eigen3
+INCLUDEPATH += /usr/local/include/eigen3
 
 #Boost
 INCLUDEPATH += /usr/include/boost

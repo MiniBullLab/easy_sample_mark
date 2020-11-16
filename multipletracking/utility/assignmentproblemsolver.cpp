@@ -452,7 +452,12 @@ void AssignmentProblemSolver::assignmentsuboptimal1(int *assignment, double *cos
 {
     bool infiniteValueFound, finiteValueFound;
     bool repeatSteps, allSinglyValidated, singleValidationFound;
-    int n, row, col, tmpRow, tmpCol, nOfElements;
+    int n = 0;
+    int row = 0;
+    int col = 0;
+    int tmpRow = 0;
+    int tmpCol = 0;
+    int nOfElements = 0;
     int *nOfValidObservations, *nOfValidTracks;
     double value, minValue, *distMatrix;
 

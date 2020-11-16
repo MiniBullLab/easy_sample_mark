@@ -35,9 +35,11 @@ QMap<int, QString> MyShape::getImageShape() const
     QMap<int, QString> result;
     result.clear();
     result.insert(ShapeType::RECT_SHAPE, this->shape[ShapeType::RECT_SHAPE]);
+#if EDGE_TOOL == 0
     result.insert(ShapeType::LINE_SHAPE, this->shape[ShapeType::LINE_SHAPE]);
     result.insert(ShapeType::POLYGON_SHAPE, this->shape[ShapeType::POLYGON_SHAPE]);
     result.insert(ShapeType::POLYLINE_SHAPE, this->shape[ShapeType::POLYLINE_SHAPE]);
+#endif
     return result;
 }
 
@@ -46,7 +48,10 @@ QMap<int, QString> MyShape::getSegmentShape() const
     QMap<int, QString> result;
     result.clear();
     result.insert(ShapeType::POLYGON_SEGMENT_SHAPE, QObject::tr("多边形分割"));
+#if EDGE_TOOL == 0
     result.insert(ShapeType::LANE_SEGMENT_SHAPE, QObject::tr("折线分割"));
+    result.insert(ShapeType::INSTANCE_SEGMENT_SHAPE, this->shape[ShapeType::INSTANCE_SEGMENT_SHAPE]);
+#endif
     return result;
 }
 
@@ -57,4 +62,5 @@ void MyShape::init()
     shape.insert(ShapeType::LINE_SHAPE, QObject::tr("直线"));
     shape.insert(ShapeType::POLYGON_SHAPE, QObject::tr("多边形"));
     shape.insert(ShapeType::POLYLINE_SHAPE, QObject::tr("折线"));
+    shape.insert(ShapeType::INSTANCE_SEGMENT_SHAPE, QObject::tr("实例分割"));
 }

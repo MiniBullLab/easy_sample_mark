@@ -25,6 +25,7 @@ void DrawPolygonShape::initDraw()
     finishDrawPolygon = false;
     nearFirstPoint = false;
     firstPoint = QPoint(-1, -1);
+    currentPolygon.clear();
 
     nearPolygonIndex = -1;
     polygonPointIndex = 0;

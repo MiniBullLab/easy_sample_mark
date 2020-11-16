@@ -315,6 +315,7 @@ void ControlWindow::initMarkData(const QString dirPath, const MarkDataType dataT
     this->isMark = false;
     this->currentIndex = -1;
     this->currentImage = QImage(tr(":/images/images/play.png"));
+    this->jsonProcess.setMarkData(dataType);
 }
 
 void ControlWindow::initMarkClassBox()

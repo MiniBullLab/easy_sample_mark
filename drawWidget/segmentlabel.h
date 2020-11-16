@@ -8,12 +8,13 @@
 
 #include "drawShape/drawpolygonshape.h"
 #include "drawShape/drawlaneshape.h"
+#include "drawShape/drawinstanceshape.h"
 
 class SegmentLabel : public ImageDrawLabel
 {
 public:
     SegmentLabel(QWidget *parent = 0);
-    ~SegmentLabel();
+    ~SegmentLabel() override;
 
     void clearDraw() override;
     void setNewQImage(QImage &image) override;

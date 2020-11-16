@@ -22,7 +22,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
 {
     if (objects.size() <= 0)
     {
-        for (int i = 0; i < listTrackers.size(); i++)
+        for (size_t i = 0; i < listTrackers.size(); i++)
         {
             listTrackers[i]->addSkippedFrame(1);
             if (listTrackers[i]->getSkippedFrame() > maxAllowedSkippedFrames)
@@ -33,7 +33,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
                 i--;
             }
         }
-        for (int i = 0; i < listTrackers.size(); i++)
+        for (size_t i = 0; i < listTrackers.size(); i++)
         {
             listTrackers[i]->kalmanPrediction();
             if (listTrackers[i]->getTraceSize() > maxTraceLength)
@@ -48,7 +48,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     if (listTrackers.size() == 0)
     {
         // If no tracks yet,every point setup tracker
-        for (int i = 0; i < objects.size(); i++)
+        for (size_t i = 0; i < objects.size(); i++)
         {
             TrackingObject object = objects[i];
             KalmanTracker* tracker = new KalmanTracker(object);
@@ -63,9 +63,9 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     std::vector<int> assignment;
 
     float dist = 0;
-    for (int i = 0; i<listTrackers.size(); i++)
+    for (size_t i = 0; i<listTrackers.size(); i++)
     {
-        for (int j = 0; j < objects.size(); j++)
+        for (size_t j = 0; j < objects.size(); j++)
         {
             dist = computeRectDistance(listTrackers[i]->getPredictObject(), objects[j]);
             cost[i][j] = static_cast<double>(dist);
@@ -80,7 +80,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     // not assigned trackers
     std::vector<int> not_assigned_tracks;
 
-    for (int i = 0; i<assignment.size(); i++)
+    for (size_t i = 0; i<assignment.size(); i++)
     {
         if (assignment[i] != -1)
         {
@@ -102,7 +102,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     }
 
     // If tracker didn't get detects long time, remove it.
-    for (int i = 0; i<listTrackers.size(); i++)
+    for (size_t i = 0; i < listTrackers.size(); i++)
     {
         if (listTrackers[i]->getSkippedFrame() > maxAllowedSkippedFrames)
         {
@@ -117,7 +117,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     // Search for unassigned detects
     std::vector<int> not_assigned_detections;
     std::vector<int>::iterator it;
-    for (int i = 0; i < objects.size(); i++)
+    for (size_t i = 0; i < objects.size(); i++)
     {
         it = std::find(assignment.begin(), assignment.end(), i);
         if (it == assignment.end())
@@ -129,7 +129,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     // and start new trackers for them.
     if (not_assigned_detections.size() != 0)
     {
-        for (int i = 0; i<not_assigned_detections.size(); i++)
+        for (size_t i = 0; i<not_assigned_detections.size(); i++)
         {
             TrackingObject object = objects[not_assigned_detections[i]];
             KalmanTracker* tracker = new KalmanTracker(object);
@@ -138,7 +138,7 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     }
 
     // Update Kalman Filters state
-    for (int i = 0; i<assignment.size(); i++)
+    for (size_t i = 0; i < assignment.size(); i++)
     {
         if (assignment[i] != -1) // If we have assigned detect, then update using its coordinates,
         {
@@ -213,7 +213,7 @@ void KalmanMultipleTracker::drawTrack(cv::Mat& inFrame)
         if (listTrackers[i]->getTraceSize() > 1)
         {
             std::vector<cv::Point> trace = listTrackers[i]->getTrace();
-            for (int j = 0; j<trace.size() - 1; j++)
+            for (size_t j = 0; j<trace.size() - 1; j++)
             {
                 cv::line(inFrame, trace[j], trace[j + 1], cv::Scalar(0,0,255), 2, cv::LINE_AA);
             }

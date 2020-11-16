@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include "dataType/mark_data_type.h"
 #include "dataType/myobject.h"
 
 class JSONProcess : public QObject
@@ -20,6 +21,8 @@ public:
                    const int inageHeight, const QList<MyObject> &objects);
 
     int readJSON(const QString &jsonFilePath, QList<MyObject> &objects);
+
+    void setMarkData(MarkDataType dataType);
 
 signals:
 
@@ -45,8 +48,10 @@ protected:
     int writeSegmentData(const QList<MyObject>& objects, QJsonObject &jsonData);
     int readSegmentData(const QJsonArray &value, QList<MyObject>& objects);
 
-
     int readRect3Ddata(const QJsonArray &value, QList<MyObject>& objects);
+
+protected:
+    MarkDataType markDataType;
 
 };
 

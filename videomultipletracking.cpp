@@ -61,6 +61,8 @@ void VideoMultipletracking::tracking(const cv::Mat preFrame, const cv::Mat &next
                 multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
             }
             break;
+        default:
+            break;
         }
     }
     else

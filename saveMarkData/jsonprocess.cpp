@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "jsonprocess.h"
 #include <QJsonParseError>
 #include <QFile>
@@ -8,7 +10,7 @@
 
 JSONProcess::JSONProcess(QObject *parent) : QObject(parent)
 {
-
+    this->markDataType = MarkDataType::IMAGE;
 }
 
 JSONProcess::~JSONProcess()
@@ -140,21 +142,40 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
     return 0;
 }
 
+void JSONProcess::setMarkData(MarkDataType dataType)
+{
+    this->markDataType = dataType;
+}
+
 int JSONProcess::writeRectData(const QList<MyObject>& objects, QJsonObject &jsonData)
 {
     QJsonArray objectArrays;
     int index = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::RECT_SHAPE)
+        if(objects[loop].getShapeType() == ShapeType::RECT_SHAPE ||
+                objects[loop].getShapeType() == ShapeType::INSTANCE_SEGMENT_SHAPE)
         {
             const QRect rect = objects[loop].getBox();
+            const QPolygon mask = objects[loop].getMask();
             QJsonObject objectData;
+            QJsonArray maskData;
+            int tempIndex = 0;
             objectData.insert("minX", rect.topLeft().x());
             objectData.insert("minY", rect.topLeft().y());
             objectData.insert("maxX", rect.bottomRight().x());
             objectData.insert("maxY", rect.bottomRight().y());
             objectData.insert("class", objects[loop].getObjectClass());
+            if(mask.count() > 0)
+            {
+                objectData.insert("pointCount", mask.count());
+                for(int index = 0; index < mask.count(); index++)
+                {
+                    maskData.insert(tempIndex++, mask[index].x());
+                    maskData.insert(tempIndex++, mask[index].y());
+                }
+                objectData.insert("mask", maskData);
+            }
             objectArrays.insert(index, objectData);
             index++;
         }
@@ -176,9 +197,31 @@ int JSONProcess::readRectData(const QJsonArray &value, QList<MyObject>& objects)
         int minY = objectData.take("minY").toVariant().toInt();
         int maxX = objectData.take("maxX").toVariant().toInt();
         int maxY = objectData.take("maxY").toVariant().toInt();
+        QPolygon mask;
+        mask.clear();
+        if(objectData.contains("mask"))
+        {
+            QJsonArray dataList = objectData.take("mask").toArray();
+            for(int index = 0; index < dataList.size(); index++)
+            {
+                QPoint point;
+                point.setX(dataList.at(index).toInt());
+                index++;
+                point.setY(dataList.at(index).toInt());
+                mask.append(point);
+            }
+        }
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setBox(QRect(QPoint(minX, minY), QPoint(maxX, maxY)));
-        object.setShapeType(ShapeType::RECT_SHAPE);
+        object.setMask(mask);
+        if(this->markDataType == MarkDataType::SEGMENT)
+        {
+            object.setShapeType(ShapeType::INSTANCE_SEGMENT_SHAPE);
+        }
+        else
+        {
+            object.setShapeType(ShapeType::RECT_SHAPE);
+        }
         objects.append(object);
     }
 

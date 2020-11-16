@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "manualparamterconfigwindow.h"
 #include <QColorDialog>
 #include <QMessageBox>
@@ -192,6 +194,6 @@ void ManualParamterConfigWindow::loadDefaultValue()
         markClassTable->setItem(row, 1, tableItem1);
         row++;
     }
-    minWidthBox->setValue(20);
-    minHeightBox->setValue(20);
+    minWidthBox->setValue(10);
+    minHeightBox->setValue(10);
 }

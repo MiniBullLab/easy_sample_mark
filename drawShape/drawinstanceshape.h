@@ -1,14 +1,14 @@
-#ifndef DRAWINSTANCESEGMENTSHAPE_H
-#define DRAWINSTANCESEGMENTSHAPE_H
+#ifndef DRAWINSTANCESHAPE_H
+#define DRAWINSTANCESHAPE_H
 
 #include "drawShape/drawshape.h"
 
-class DrawInstanceSegmentShape : public DrawShape
+class DrawInstanceShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawInstanceSegmentShape(MarkDataType dataType, QObject *parent = 0);
-    ~DrawInstanceSegmentShape();
+    DrawInstanceShape(MarkDataType dataType, bool isSegment, QObject *parent = 0);
+    ~DrawInstanceShape();
 
     void initDraw();
 
@@ -19,13 +19,12 @@ public:
     void removeShape(bool &isDraw);
     bool isInShape(const QPoint &point);
 
+    void cancelDrawShape(bool &isDraw) override;
+
     void drawPixmap(const ShapeType shapeID, QPainter &painter);
 
     void setObjectList(QList<MyObject> list);
     void getObjectList(QList<MyObject> &list);
-
-    void getCurrentRect(QRect &rect, bool &isDraw);
-    QList<QPoint> getRectListPoints(const QString sampleClass);
 
 signals:
 
@@ -33,18 +32,30 @@ public slots:
 
 private:
 
+    QList<QPoint> getRectListPoints(const QString sampleClass);
     int nearRectPiont(const QPoint point);
     void updateRect(const QPoint point);
 
+    int nearPolygonPoint(const QPoint point);
+    void updatePolygon(const QPoint point);
+
 private:
-    int perScale;
-    int scale;
+    bool finishDrawRect;
+    bool finishDrawPolygon;
+    bool nearFirstPoint;
+
+    int nearPolygonIndex;
+    int polygonPointIndex;
+    QPoint firstPoint;
+    QPolygon currentPolygon;
 
     int nearRectIndex;
     int rectPointIndex;
     int removeRectIndex;
     QRect currentRect;
-    QList<MyObject> listRect;
+    QList<MyObject> listInstance;
+
+    bool isSegment;
 };
 
-#endif // DRAWINSTANCESEGMENTSHAPE_H
+#endif // DRAWINSTANCESHAPE_H

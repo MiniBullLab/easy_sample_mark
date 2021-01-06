@@ -15,6 +15,7 @@
 
 class ImageDrawLabel : public QLabel
 {
+    Q_OBJECT
 public:
     ImageDrawLabel(QWidget *parent = 0);
     virtual ~ImageDrawLabel();

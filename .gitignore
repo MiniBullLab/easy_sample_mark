@@ -1,4 +1,19 @@
-#C++
+# Executables
+*.exe
+*.out
+*.app
+
+# Visual Studio Code
+.vscode/*
+
+#python
+.idea/
+*.pyc
+
+#build
+build/*
+
+#Qt
 *.user
 
 #other
@@ -7,3 +22,4 @@
 *.vsd
 model/*.*
 #document/*.*
+

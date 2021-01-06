@@ -8,6 +8,7 @@
 
 class MyTextBrowser : public QTextBrowser
 {
+    Q_OBJECT
 public:
     MyTextBrowser(QWidget *parent = 0);
 

@@ -141,8 +141,10 @@ RESOURCES += \
     images.qrc \
     QtAwesome.qrc \
     document.qrc \
-    qm.qrc
+    qm.qrc \
+    icon.qrc
 
+#RC_FILE = icon.rc
 RC_ICONS = logo.ico
 
 TRANSLATIONS = zh.ts en.ts ja.ts

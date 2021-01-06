@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     file.open(QFile::ReadOnly);
     QString qss = QLatin1String(file.readAll());
     qApp->setStyleSheet(qss);
-    //qApp->setWindowIcon(QIcon(":/images/images/logo.png"));
+    qApp->setWindowIcon(QIcon(":/logo.ico"));
 
     MainWindow w;
     w.show();

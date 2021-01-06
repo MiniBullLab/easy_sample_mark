@@ -151,6 +151,10 @@ void ControlWindow::slotShowFull()
 void ControlWindow::slotIsMark()
 {
     isMarkData();
+    if(currentIndex >= 0)
+    {
+        emit signalIsMarkChanged(this->isMark);
+    }
 }
 
 void ControlWindow::slotReset()

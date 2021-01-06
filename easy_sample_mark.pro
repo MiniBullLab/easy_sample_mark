@@ -662,7 +662,7 @@ LIBS+=-L/home/lpj/Software/opencv34/lib \
     -lopencv_core
 
 #Eigen
-INCLUDEPATH += /usr/local/include/eigen3
+INCLUDEPATH += /usr/include/eigen3
 
 #Boost
 INCLUDEPATH += /usr/include/boost

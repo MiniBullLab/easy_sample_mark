@@ -74,6 +74,8 @@ public slots:
     //shapeTool
     void slotSelectMarkShape(const QString &text);
 
+    void slotIsMarkStatus(bool isMark);
+
     void slotCloseOtherWindow(QString flag);
 
 protected:

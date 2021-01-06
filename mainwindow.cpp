@@ -331,6 +331,30 @@ void MainWindow::slotSelectMarkShape(const QString &text)
     }
 }
 
+void MainWindow::slotIsMarkStatus(bool isMark)
+{
+    if(isMark)
+    {
+        manualParamterAction->setEnabled(false);
+        segmentParamterAction->setEnabled(false);
+#if EDGE_TOOL == 0
+        autoParamterAction->setEnabled(false);
+        videoMarkParamterAction->setEnabled(false);
+        pointcloudParamterAction->setEnabled(false);
+#endif
+    }
+    else
+    {
+        manualParamterAction->setEnabled(true);
+        segmentParamterAction->setEnabled(true);
+#if EDGE_TOOL == 0
+        autoParamterAction->setEnabled(true);
+        videoMarkParamterAction->setEnabled(true);
+        pointcloudParamterAction->setEnabled(true);
+#endif
+    }
+}
+
 void MainWindow::slotCloseOtherWindow(QString flag)
 {
     if(flag.contains("mark"))
@@ -649,6 +673,7 @@ void MainWindow::initConnect()
     for(int loop = 0; loop < markWindow.size(); loop++)
     {
         connect(this, &MainWindow::signalManualMarkParamterChanged, markWindow[loop], &ControlWindow::slotManualMarkParamterChanged);
+        connect(markWindow[loop], &ControlWindow::signalIsMarkChanged, this, &MainWindow::slotIsMarkStatus);
     }
 }
 

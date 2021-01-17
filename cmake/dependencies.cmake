@@ -1,5 +1,5 @@
 
-set(OpenCV_DIR /usr/local/lib/OpenCV)
+set(OpenCV_DIR /usr/local/share/OpenCV)
 find_package(OpenCV REQUIRED CONFIG)
 message(STATUS "Found OpenCV ${OpenCV_VERSION}")
 message(STATUS "${OpenCV_INCLUDE_DIRS}, ${OpenCV_LIBRARIES}")
@@ -23,7 +23,7 @@ message(STATUS "${VTK_INCLUDE_DIRS}, ${VTK_LIBRARIES}")
 include_directories(${VTK_INCLUDE_DIRS})
 link_directories(${VTK_LIBRARIES})
 
-set(PCL_DIR /usr/local/lib/cmake/pcl-1.9)
+set(PCL_DIR /usr/share/pcl-1.9)
 find_package(PCL REQUIRED COMPONENTS common io visualization CONFIG)
 message(STATUS "Found PCL ${PCL_VERSION}")
 message(STATUS "${PCL_INCLUDE_DIRS}, ${PCL_LIBRARIES}")

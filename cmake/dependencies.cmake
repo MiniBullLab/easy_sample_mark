@@ -23,7 +23,7 @@ message(STATUS "${VTK_INCLUDE_DIRS}, ${VTK_LIBRARIES}")
 include_directories(${VTK_INCLUDE_DIRS})
 link_directories(${VTK_LIBRARIES})
 
-set(PCL_DIR /usr/share/pcl-1.9)
+set(PCL_DIR /usr/local/share/pcl-1.9)
 find_package(PCL REQUIRED COMPONENTS common io visualization CONFIG)
 message(STATUS "Found PCL ${PCL_VERSION}")
 message(STATUS "${PCL_INCLUDE_DIRS}, ${PCL_LIBRARIES}")

@@ -41,8 +41,10 @@ private:
     QLineEdit *pathText;
     QLabel *fieldsNumberLabel;
     QSpinBox *fieldsNumberBox;
-    QLabel *formatLabel;
-    QComboBox *formatBox;
+    QLabel *srcFormatLabel;
+    QComboBox *srcFormatBox;
+    QLabel *dstFormatLabel;
+    QComboBox *dstFormatBox;
 
     QString pathDir;
     PCDConverterThread *pcdConverterThread;

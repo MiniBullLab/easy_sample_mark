@@ -2,6 +2,7 @@
 #pragma execution_character_set("utf-8")
 #endif
 #include "imagecontrolwindow.h"
+#include <QImageReader>
 #include <QMessageBox>
 #include <QDebug>
 
@@ -20,6 +21,7 @@ ImageControlWindow::~ImageControlWindow()
 
 void ImageControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
+    markDataListWidget->clear();
     initMarkData(markDataDir, dataType);
     initImageData();
 
@@ -74,8 +76,11 @@ void ImageControlWindow::slotChangeClass(QString classText)
     {
         saveMarkDataResult();
     }
-    loadMarkImage();
-    this->setFocus();
+    if(this->currentIndex >= 0)
+    {
+        loadMarkImage();
+        this->setFocus();
+    }
 }
 
 void ImageControlWindow::slotScrollArea(int keyValue)

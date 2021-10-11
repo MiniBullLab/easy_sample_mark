@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "pointcloudmarkparamterwindow.h"
 #include <QMessageBox>
 #include <limits>
@@ -106,6 +108,7 @@ void PointCloudMarkParamterWindow::initFileType()
 {
     formatBox->addItem("PCD", PointCloudFileType::PCD_FILE);
     formatBox->addItem("BIN", PointCloudFileType::BIN_FILE);
+    formatBox->addItem("PLY", PointCloudFileType::PLY_FILE);
 
     formatBox->setCurrentIndex(static_cast<int>(paramterConfig.getFileType()));
 }

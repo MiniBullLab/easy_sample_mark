@@ -21,6 +21,7 @@ ImageSegmentControlWindow::~ImageSegmentControlWindow()
 
 void ImageSegmentControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
+    markDataListWidget->clear();
     initMarkData(markDataDir, dataType);
     initImageData();
 
@@ -74,8 +75,11 @@ void ImageSegmentControlWindow::slotChangeClass(QString classText)
     {
         saveMarkDataResult();
     }
-    loadMarkImage();
-    this->setFocus();
+    if(this->currentIndex >= 0)
+    {
+        loadMarkImage();
+        this->setFocus();
+    }
 }
 
 void ImageSegmentControlWindow::slotScrollArea(int keyValue)
@@ -321,7 +325,7 @@ void ImageSegmentControlWindow::loadImageData(const QString &imagePath, const QS
     }
     else
     {
-        QMessageBox::information(this, tr("加载图片"), tr("加载图片失败！"));
+        QMessageBox::information(this, tr("加载图片"), tr("该图片加载失败,请点击下一张图片！"));
     }
 }
 

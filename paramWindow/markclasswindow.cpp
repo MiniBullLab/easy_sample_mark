@@ -121,8 +121,8 @@ void MarkClassWindow::initUI()
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(300, 130);
-    this->setMinimumSize(300, 130);
+    this->setMaximumSize(400, 130);
+    this->setMinimumSize(400, 130);
     this->setWindowTitle(tr("标注类别参数"));
 }
 

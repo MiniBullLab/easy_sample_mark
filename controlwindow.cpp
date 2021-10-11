@@ -34,6 +34,7 @@ ControlWindow::~ControlWindow()
 
 void ControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
+    markDataListWidget->clear();
     initMarkData(markDataDir, dataType);
     this->processMarkDataList = markDataList;
 }
@@ -151,6 +152,10 @@ void ControlWindow::slotShowFull()
 void ControlWindow::slotIsMark()
 {
     isMarkData();
+    if(currentIndex >= 0)
+    {
+        emit signalIsMarkChanged(this->isMark);
+    }
 }
 
 void ControlWindow::slotReset()
@@ -315,6 +320,7 @@ void ControlWindow::initMarkData(const QString dirPath, const MarkDataType dataT
     this->isMark = false;
     this->currentIndex = -1;
     this->currentImage = QImage(tr(":/images/images/play.png"));
+    this->jsonProcess.setMarkData(dataType);
 }
 
 void ControlWindow::initMarkClassBox()

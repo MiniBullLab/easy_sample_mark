@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/document">
-        <file>document/user_manuals.pdf</file>
+    <qresource prefix="/docs">
+        <file>docs/user_manuals.pdf</file>
     </qresource>
 </RCC>

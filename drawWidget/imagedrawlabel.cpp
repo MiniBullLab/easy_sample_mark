@@ -1,7 +1,8 @@
-#ifdef WIN32
+﻿#ifdef WIN32
 #pragma execution_character_set("utf-8")
 #endif
 #include "imagedrawlabel.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 ImageDrawLabel::ImageDrawLabel(QWidget *parent):
     QLabel(parent)
@@ -23,10 +24,14 @@ void ImageDrawLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
 
     polygonSegObejcts.clear();
     laneSegObejcts.clear();
+
+    ocrObejcts.clear();
+
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::RECT_SHAPE)
+        if(object.getShapeType() == ShapeType::RECT_SHAPE ||
+                object.getShapeType() == ShapeType::INSTANCE_SEGMENT_SHAPE)
         {
             rectObejcts.append(object);
         }
@@ -49,6 +54,10 @@ void ImageDrawLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         else if(object.getShapeType() == ShapeType::LANE_SEGMENT_SHAPE)
         {
             laneSegObejcts.append(object);
+        }
+        else if(object.getShapeType() == ShapeType::OCR_POLYGON_SHAPE)
+        {
+            ocrObejcts.append(object);
         }
     }
     this->sampleClass = sampleClass;
@@ -104,6 +113,7 @@ void ImageDrawLabel::slotRemoveObject()
 void ImageDrawLabel::init()
 {
     this->removeRectAction = new QAction(tr("删除标注"), this);
+    this->editRectAction = new QAction(tr("编辑标注"), this);
 
     this->shapeType = ShapeType::UNSHAPE;
     drawList.clear();
@@ -111,5 +121,7 @@ void ImageDrawLabel::init()
     this->sampleClass = "All";
 
     connect(removeRectAction, &QAction::triggered, this, &ImageDrawLabel::slotRemoveObject);
+
+    ManualParamterConfig::loadConfig();
 }
 

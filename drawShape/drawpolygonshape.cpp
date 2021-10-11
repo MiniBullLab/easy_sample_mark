@@ -3,8 +3,10 @@
 #endif
 #include "drawpolygonshape.h"
 #include <QMessageBox>
+#include <QDebug>
 #include "sampleMarkParam/manualparamterconfig.h"
-#include "selectmarkclasswindow.h"
+#include "selectMarkInfo/selectmarkclasswindow.h"
+#include "selectMarkInfo/selectmarkocrwindow.h"
 
 DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, bool isSegment, QObject *parent) :
     DrawShape(dataType, parent), isSegment(isSegment)
@@ -25,6 +27,7 @@ void DrawPolygonShape::initDraw()
     finishDrawPolygon = false;
     nearFirstPoint = false;
     firstPoint = QPoint(-1, -1);
+    currentPolygon.clear();
 
     nearPolygonIndex = -1;
     polygonPointIndex = 0;
@@ -99,28 +102,7 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, bool
             int minArea = ManualParamterConfig::getMinWidth() * ManualParamterConfig::getMinHeight();
             if(area >= minArea)
             {
-                SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
-                window->setModal(true);
-                window->setObjectRect(this->visibleSampleClass);
-                int res = window->exec();
-                if (res == QDialog::Accepted)
-                {
-                    MyObject object;
-                    if(this->markDataType == MarkDataType::SEGMENT)
-                    {
-                        object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
-                    }
-                    else
-                    {
-                        object.setShapeType(ShapeType::POLYGON_SHAPE);
-                    }
-                    object.setPolygon(currentPolygon);
-                    object.setObjectClass(window->getObjectClass());
-                    object.setIsDifficult(window->getIsDifficult());
-                    object.setObjectFlag(window->getObjectFlag());
-                    listPolygon.append(object);
-                }
-                window->deleteLater();
+                selectMarkInformation();
             }
             else
             {
@@ -195,6 +177,38 @@ bool DrawPolygonShape::isInShape(const QPoint &point)
     return isFind;
 }
 
+void DrawPolygonShape::editMark(bool &isDraw)
+{
+    isDraw = false;
+    if(removePolygonIndex >= 0 && removePolygonIndex < listPolygon.count())
+    {
+        if(this->markDataType == MarkDataType::OCR)
+        {
+            SelectMarkOCRWindow *window = new SelectMarkOCRWindow(this->markDataType);
+            OCRObject ocrObject = listPolygon[removePolygonIndex].getOCRObject();
+            window->setObjectText(ocrObject.objectText);
+            window->setIllegibility(ocrObject.isIllegibility);
+            window->setLanguage(ocrObject.language);
+            window->setModal(true);
+            int res = window->exec();
+            if (res == QDialog::Accepted)
+            {
+                ocrObject.objectText = window->getObjectText();
+                ocrObject.language = window->getLanguage();
+                ocrObject.isIllegibility = window->getIsIllegibility();
+                listPolygon[removePolygonIndex].setOCRObject(ocrObject);
+                isDraw = true;
+            }
+            else
+            {
+                isDraw = false;
+            }
+            window->deleteLater();
+        }
+        removePolygonIndex = -1;
+    }
+}
+
 void DrawPolygonShape::cancelDrawShape(bool &isDraw)
 {
     isDraw = false;
@@ -238,35 +252,15 @@ void DrawPolygonShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
         }
         if(this->visibleSampleClass == "All")
         {
-            QPolygon drawpoints = this->listPolygon[i].getPolygon();
-            drawpoints.append(drawpoints.at(0));
-            QPainterPath path;
-            path.addPolygon(this->listPolygon[i].getPolygon());
-            painter.fillPath(path, QBrush(QColor(drawColor.red(), drawColor.green(),
-                                                drawColor.blue(), 80)));
-            foreach (QPoint var, this->listPolygon[i].getPolygon())
-            {
-                painter.drawEllipse(var, 2, 2);
-            }
-            painter.drawPolyline(QPolygon(drawpoints));
-            painter.drawText(drawpoints.at(0), this->listPolygon[i].getObjectClass());
+            drawPolygon(this->listPolygon[i], drawColor, painter);
+            drawText(this->listPolygon[i], painter);
         }
         else
         {
             if(this->listPolygon[i].getObjectClass().contains(this->visibleSampleClass))
             {
-                QPolygon drawpoints = this->listPolygon[i].getPolygon();
-                drawpoints.append(drawpoints.at(0));
-                QPainterPath path;
-                path.addPolygon(this->listPolygon[i].getPolygon());
-                painter.fillPath(path, QBrush(QColor(drawColor.red(),drawColor.green(),
-                                                    drawColor.blue(), 80)));
-                foreach (QPoint var, this->listPolygon[i].getPolygon())
-                {
-                    painter.drawEllipse(var, 2, 2);
-                }
-                painter.drawPolyline(QPolygon(drawpoints));
-                painter.drawText(drawpoints.at(0), this->listPolygon[i].getObjectClass());
+                drawPolygon(this->listPolygon[i], drawColor, painter);
+                drawText(this->listPolygon[i], painter);
             }
         }
     }
@@ -360,4 +354,90 @@ void DrawPolygonShape::updatePolygon(const QPoint point)
     QPolygon polygon = listPolygon[nearPolygonIndex].getPolygon();
     polygon[polygonPointIndex - 1] = point;
     listPolygon[nearPolygonIndex].setPolygon(polygon);
+}
+
+void DrawPolygonShape::selectMarkInformation()
+{
+    if(this->markDataType == MarkDataType::OCR)
+    {
+        if(currentPolygon.count() > 3)
+        {
+            SelectMarkOCRWindow *window = new SelectMarkOCRWindow(this->markDataType);
+            window->setModal(true);
+            int res = window->exec();
+            if (res == QDialog::Accepted)
+            {
+                MyObject object;
+                OCRObject ocrObject;
+                object.setShapeType(ShapeType::OCR_POLYGON_SHAPE);
+                ocrObject.objectText = window->getObjectText();
+                ocrObject.language = window->getLanguage();
+                ocrObject.isIllegibility = window->getIsIllegibility();
+                object.setPolygon(currentPolygon);
+                object.setOCRObject(ocrObject);
+                object.setObjectClass("others");
+                object.setObjectFlag(window->getObjectFlag());
+                listPolygon.append(object);
+            }
+            window->deleteLater();
+        }
+        else
+        {
+            QMessageBox::information(NULL, tr("OCR标注"), tr("目标的点数必须大于3!"));
+        }
+    }
+    else
+    {
+        SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
+        window->setModal(true);
+        window->setObjectRect(this->visibleSampleClass);
+        int res = window->exec();
+        if (res == QDialog::Accepted)
+        {
+            MyObject object;
+            if(this->markDataType == MarkDataType::SEGMENT)
+            {
+                object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
+            }
+            else
+            {
+                object.setShapeType(ShapeType::POLYGON_SHAPE);
+            }
+            object.setPolygon(currentPolygon);
+            object.setObjectClass(window->getObjectClass());
+            object.setIsDifficult(window->getIsDifficult());
+            object.setObjectFlag(window->getObjectFlag());
+            listPolygon.append(object);
+        }
+        window->deleteLater();
+    }
+}
+
+void DrawPolygonShape::drawPolygon(const MyObject &drawObject, const QColor &drawColor, QPainter &painter)
+{
+    QPolygon drawpoints = drawObject.getPolygon();
+    drawpoints.append(drawpoints.at(0));
+    QPainterPath path;
+    path.addPolygon(drawObject.getPolygon());
+    painter.fillPath(path, QBrush(QColor(drawColor.red(), drawColor.green(),
+                                        drawColor.blue(), 80)));
+    foreach (QPoint var, drawObject.getPolygon())
+    {
+        // qDebug() << "point:" <<  var << endl;
+        painter.drawEllipse(var, 2, 2);
+    }
+    painter.drawPolyline(QPolygon(drawpoints));
+}
+
+void DrawPolygonShape::drawText(const MyObject &drawObject, QPainter &painter)
+{
+    QPolygon drawpoints = drawObject.getPolygon();
+    if(this->markDataType == MarkDataType::OCR)
+    {
+        painter.drawText(drawpoints.at(0), drawObject.getOCRObject().objectText);
+    }
+    else
+    {
+        painter.drawText(drawpoints.at(0), drawObject.getObjectClass());
+    }
 }

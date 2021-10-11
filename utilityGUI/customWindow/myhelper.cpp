@@ -1,8 +1,8 @@
-﻿#include "myhelper.h"
-#include <QDir>
-
+﻿#ifdef WIN32
 #pragma execution_character_set("utf-8")
-
+#endif
+#include "myhelper.h"
+#include <QDir>
 
 QtAwesome* MyHelper::m_awesome = nullptr;
 QSize MyHelper::maxWindowSize;

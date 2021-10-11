@@ -24,21 +24,18 @@ public:
     void setObjectList(QList<MyObject> list);
     void getObjectList(QList<MyObject> &list);
 
-    void getCurrentRect(QRect &rect, bool &isDraw);
-    QList<QPoint> getRectListPoints(const QString sampleClass);
-
 signals:
 
 public slots:
 
 private:
 
+    void getCurrentRect(QRect &rect, bool &isDraw);
+    QList<QPoint> getRectListPoints(const QString sampleClass);
     int nearRectPiont(const QPoint point);
     void updateRect(const QPoint point);
 
 private:
-    int perScale;
-    int scale;
 
     int nearRectIndex;
     int rectPointIndex;

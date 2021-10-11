@@ -7,7 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QLineEdit>
-#include "markclasswindow.h"
+#include "paramWindow/markclasswindow.h"
 
 MarkClassTreeWidget::MarkClassTreeWidget(QWidget *parent): QTreeWidget(parent)
 {

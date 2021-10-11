@@ -4,10 +4,13 @@
 #include <string>
 #include <iostream>
 
+#ifndef PCL_NO_PRECOMPILE
 #define PCL_NO_PRECOMPILE
+#endif
 
 #include <pcl/common/common.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
 
 class PointCloudWriter
 {

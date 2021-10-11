@@ -5,6 +5,8 @@
 #include <QString>
 #include <QMap>
 
+#define EDGE_TOOL 0
+
 typedef enum ShapeType{
     UNSHAPE = -1,
     RECT_SHAPE = 0,
@@ -13,10 +15,11 @@ typedef enum ShapeType{
     POLYLINE_SHAPE = 3,
     POLYGON_SEGMENT_SHAPE = 4,
     LANE_SEGMENT_SHAPE = 5,
-    MAX_IMAGE_SHAPE_TYPE = 6,
-    //INSTANCE_SEGMENT_SHAPE
-    RECT3D_SHAPE = 7,
-    MAX_SHAPE_TYPE = 8
+    INSTANCE_SEGMENT_SHAPE = 6,
+    OCR_POLYGON_SHAPE = 7,
+    MAX_IMAGE_SHAPE_TYPE = 8,
+    RECT3D_SHAPE = 9,
+    MAX_SHAPE_TYPE = 10
 }ShapeType;
 
 class MyShape
@@ -29,6 +32,7 @@ public:
     QMap<int, QString> getAllShape() const;
     QMap<int, QString> getImageShape() const;
     QMap<int, QString> getSegmentShape() const;
+    QMap<int, QString> getOCRShape() const;
 
 private:
 

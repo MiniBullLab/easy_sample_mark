@@ -8,10 +8,8 @@
 #include <QMouseEvent>
 #include <QCursor>
 
-#define PCL_NO_PRECOMPILE
+#include "saveData/pointcloudreader.h"
 
-#include <pcl/common/common.h>
-#include <pcl/io/pcd_io.h>
 #include <cfloat>
 #include <pcl/visualization/eigen.h>
 #include <pcl/visualization/point_cloud_handlers.h>
@@ -70,21 +68,20 @@ private:
 
     void drawRandomColorPointCloud();
     void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+    void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud);
     void drawCircle();
 
     void drawShape(const QList<MyObject> &obejcts);
     void drawObject(const MyObject &object, int id);
-
-    int readPCDFile(const QString &filePath);
-    int readBinFile(const QString &filePath,
-                    pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
 
     void initData();
     void initConnect();
     void initCloud();
 
 private:
-    pcl::PCDReader pcd;
+
+    PointCloudReader pcReader;
+
     ColorHandlerPtr colorHandler;
     GeometryHandlerPtr geometryHandler;
     pcl::visualization::PCLVisualizer::Ptr viewer;

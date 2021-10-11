@@ -4,7 +4,7 @@
 #include "drawrectshape.h"
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
-#include "selectmarkclasswindow.h"
+#include "selectMarkInfo/selectmarkclasswindow.h"
 
 DrawRectShape::DrawRectShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {
@@ -20,9 +20,6 @@ void DrawRectShape::initDraw()
 {
     drawMousePressed = false;
     moveMousePressed = false;
-
-    scale = 100;
-    perScale = 100;
 
     nearRectIndex = -1;
     rectPointIndex = 0;
@@ -126,13 +123,9 @@ int DrawRectShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &i
     else if(moveMousePressed)
     {
         QRect rect = listRect[nearRectIndex].getBox();
-        int minWidth = ManualParamterConfig::getMinWidth() * scale / 100.0f;
-        int minHeight = ManualParamterConfig::getMinHeight() * scale / 100.0f;
-        if(rect.width() >= minWidth && rect.height() >= minHeight)
-        {
-
-        }
-        else
+        int minWidth = ManualParamterConfig::getMinWidth();
+        int minHeight = ManualParamterConfig::getMinHeight();
+        if(rect.width() < minWidth && rect.height() < minHeight)
         {
             this->listRect.removeAt(nearRectIndex);
             QMessageBox::information(parent, tr("标注"), tr("标注目标宽度<%1或者高度<%2").arg(minWidth).arg(minHeight));

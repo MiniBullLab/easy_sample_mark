@@ -117,6 +117,8 @@ void ImageConverterWindow::initUI()
     imagePostBox->addItem(tr("*.jpg"));
     imagePostBox->addItem(tr("*.gif"));
     imagePostBox->addItem(tr("*.pgm"));
+    imagePostBox->addItem(tr("*.bmp"));
+    imagePostBox->addItem(tr("*.jpeg"));
 
     imageFormatLabel = new QLabel(tr("图片转换格式："));
     imageFormatBox = new QComboBox();
@@ -124,6 +126,7 @@ void ImageConverterWindow::initUI()
     imageFormatBox->addItem(tr(".jpg"));
     imageFormatBox->addItem(tr(".gif"));
     imageFormatBox->addItem(tr(".pgm"));
+    imageFormatBox->addItem(tr(".bmp"));
 
     layout->addWidget(imagePostLabel);
     layout->addWidget(imagePostBox);

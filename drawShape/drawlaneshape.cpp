@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "sampleMarkParam/segmentparamterconfig.h"
-#include "selectmarkclasswindow.h"
+#include "selectMarkInfo/selectmarkclasswindow.h"
 
 DrawLaneShape::DrawLaneShape(MarkDataType dataType, bool isSegment,
                              QObject *parent) :
@@ -268,7 +268,8 @@ void DrawLaneShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
             {
                 painter.drawEllipse(var, 2, 2);
             }
-
+            painter.setBrush(QColor("#000000"));
+            painter.drawEllipse(firstPoint, 4, 4);
             QPen pen(QColor("#3CFF55"), drawLineWidth ,Qt::DashLine);
             painter.setPen(pen);
             painter.drawPolyline(QPolygonF(currentPolygon));

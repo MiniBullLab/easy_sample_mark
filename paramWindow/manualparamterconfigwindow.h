@@ -39,6 +39,10 @@ private:
     QSpinBox *minWidthBox;
     QLabel *minHeightLabel;
     QSpinBox *minHeightBox;
+    QLabel *minScaleLabel;
+    QSpinBox *minScaleBox;
+    QLabel *maxScaleLabel;
+    QSpinBox *maxScaleBox;
 
     QStackedWidget *classModelWidget;
     MarkClassTableWidget *markClassTable;

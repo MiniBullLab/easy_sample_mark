@@ -39,6 +39,9 @@ void PointCloudParamterConfig::setFileType(int type)
     case 1:
         FILE_TYPE = PointCloudFileType::BIN_FILE;
         break;
+    case 2:
+        FILE_TYPE = PointCloudFileType::PLY_FILE;
+        break;
     }
 }
 
@@ -88,6 +91,9 @@ int PointCloudParamterConfig::loadConfig()
                         break;
                     case 1:
                         FILE_TYPE = PointCloudFileType::BIN_FILE;
+                        break;
+                    case 2:
+                        FILE_TYPE = PointCloudFileType::PLY_FILE;
                         break;
                     }
                 }

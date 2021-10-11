@@ -10,8 +10,8 @@
 #include "paramWindow/manualparamterconfigwindow.h"
 #include "paramWindow/videomarkparamterwindow.h"
 #include "paramWindow/segmentparamterconfigwindow.h"
-#include "autoSampleMark/autoparamterconfigwindow.h"
 #include "paramWindow/pointcloudmarkparamterwindow.h"
+#include "autoSampleMark/autoparamterconfigwindow.h"
 #include "sampleMarkParam/pointcloudparamterconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -98,6 +98,29 @@ void MainWindow::slotOpenImageSegmentDir()
     }
 }
 
+void MainWindow::slotOpenOCRImageDir()
+{
+    DirProcess dirProcess;
+    QList<QString> processDataList;
+    processDataList.clear();
+    this->openDataDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), openDataDir, QFileDialog::ShowDirsOnly);
+    if(this->openDataDir.trimmed().isEmpty() || !QDir(this->openDataDir).exists())
+    {
+        qDebug() << "打开的文件路径有误:" << this->openDataDir << endl;
+    }
+    else
+    {
+        initOCRMarkShape();
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
+        markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
+        loadDataType = MarkDataType::OCR;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
+    }
+}
+
 void MainWindow::slotOpenPCDDir()
 {
     DirProcess dirProcess;
@@ -118,6 +141,10 @@ void MainWindow::slotOpenPCDDir()
         else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
         {
             dirProcess.getDirAllFileName(this->openDataDir, "*.bin", processDataList);
+        }
+        else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PLY_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.ply", processDataList);
         }
         markWindow[loadDataType]->saveMarkDataList();
         markWindow[loadDataType]->saveClassConfig();
@@ -300,12 +327,12 @@ void MainWindow::slotPcdFilter()
 
 void MainWindow::slotAbout()
 {
-    QMessageBox::about(this, "样本标注系统", "样本标注系统 版本："+ qApp->applicationVersion());
+    QMessageBox::about(this, tr("样本标注系统"), tr("样本标注系统 版本 %1").arg(qApp->applicationVersion()));
 }
 
 void MainWindow::slotUserManual()
 {
-    QDesktopServices::openUrl(QUrl(tr(":/document/document/user_manuals.pdf"), QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(tr(":/docs/docs/user_manuals.pdf"), QUrl::TolerantMode));
 }
 
 void MainWindow::slotSelectMarkShape(const QString &text)
@@ -322,12 +349,39 @@ void MainWindow::slotSelectMarkShape(const QString &text)
     case MarkDataType::SEGMENT:
         markWindow[MarkDataType::SEGMENT]->setDrawShape(index);
         break;
+    case MarkDataType::OCR:
+        markWindow[MarkDataType::OCR]->setDrawShape(index);
+        break;
     case MarkDataType::PCD:
         break;
     case MarkDataType::UNKNOWN:
         break;
     case MarkDataType::MAX_CONUT:
         break;
+    }
+}
+
+void MainWindow::slotIsMarkStatus(bool isMark)
+{
+    if(isMark)
+    {
+        manualParamterAction->setEnabled(false);
+        segmentParamterAction->setEnabled(false);
+#if EDGE_TOOL == 0
+        autoParamterAction->setEnabled(false);
+        videoMarkParamterAction->setEnabled(false);
+        pointcloudParamterAction->setEnabled(false);
+#endif
+    }
+    else
+    {
+        manualParamterAction->setEnabled(true);
+        segmentParamterAction->setEnabled(true);
+#if EDGE_TOOL == 0
+        autoParamterAction->setEnabled(true);
+        videoMarkParamterAction->setEnabled(true);
+        pointcloudParamterAction->setEnabled(true);
+#endif
     }
 }
 
@@ -448,11 +502,13 @@ void MainWindow::initAction()
     //file
     openImageDirAction = new QAction(tr("打开图片文件夹"), this);
     openImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
+    openSegmentImageDirAction = new QAction(tr("打开分割图片文件夹"), this);
+    openSegmentImageDirAction->setIcon(QIcon(tr(":/images/images/segment.png")));
+    openOCRImageDirAction = new QAction(tr("打开字符图片文件夹"), this);
+    openOCRImageDirAction->setIcon(QIcon(tr(":/images/images/ocr.png")));
     openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
     openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
-    openSegmentImageDirAction = new QAction(tr("打开图片分割文件夹"), this);
-    openSegmentImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
-    openPCDDirAction = new QAction(tr("打开PCD文件夹"), this);
+    openPCDDirAction = new QAction(tr("打开点云文件夹"), this);
     openPCDDirAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
     exitAction = new QAction(tr("退出系统"), this);
     //setting
@@ -480,7 +536,7 @@ void MainWindow::initAction()
     cameraAction = new QAction(tr("视频采集"), this);
     cameraAction->setIcon(QIcon(tr(":/images/images/record.png")));
 
-    pcdConverterAction = new QAction(tr("PCD格式转换"), this);
+    pcdConverterAction = new QAction(tr("点云格式转换"), this);
     pcdConverterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
 
     pcdFilterAction = new QAction(tr("PCD文件过滤"), this);
@@ -510,20 +566,25 @@ void MainWindow::initMenuBar()
     //file
     fileMenu = new QMenu(tr("文件"), this);
     fileMenu->addAction(openImageDirAction);
-    fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openSegmentImageDirAction);
+    fileMenu->addAction(openOCRImageDirAction);
+#if EDGE_TOOL == 0
+    fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openPCDDirAction);
+#endif
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
     //setting
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
     settingMenu->addAction(segmentParamterAction);
+#if EDGE_TOOL == 0
     settingMenu->addAction(videoMarkParamterAction);
     settingMenu->addSeparator();
     settingMenu->addAction(autoParamterAction);
     settingMenu->addSeparator();
     settingMenu->addAction(pointcloudParamterAction);
+#endif
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
     autoMarkMenu->addAction(autoMarkAction);
@@ -536,10 +597,12 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(videoCuttingAction);
     toolMenu->addAction(videoCroppingAction);
     toolMenu->addAction(imageConverterAction);
+#if EDGE_TOOL == 0
     toolMenu->addAction(cameraAction);
     toolMenu->addSeparator();
     toolMenu->addAction(pcdConverterAction);
     toolMenu->addAction(pcdFilterAction);
+#endif
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -547,7 +610,9 @@ void MainWindow::initMenuBar()
 
     this->menuBar()->addMenu(fileMenu);
     this->menuBar()->addMenu(settingMenu);
+#if EDGE_TOOL == 0
     this->menuBar()->addMenu(autoMarkMenu);
+#endif
     this->menuBar()->addMenu(toolMenu);
     this->menuBar()->addMenu(aboutMenu);
 
@@ -560,9 +625,12 @@ void MainWindow::initToolBar()
     fileTool = new QToolBar(tr("文件"));
     fileTool->setIconSize(QSize(30, 30));
     fileTool->addAction(openImageDirAction);
-    fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openSegmentImageDirAction);
+    fileTool->addAction(openOCRImageDirAction);
+#if EDGE_TOOL == 0
+    fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openPCDDirAction);
+#endif
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
     autoMarkTool->setIconSize(QSize(30, 30));
@@ -572,7 +640,9 @@ void MainWindow::initToolBar()
     shapeTool->addWidget(shapeWidget);
 
     this->addToolBar(fileTool);
+#if EDGE_TOOL == 0
     this->addToolBar(autoMarkTool);
+#endif
     this->addToolBar(shapeTool);
 }
 
@@ -585,6 +655,7 @@ void MainWindow::initUI()
    markWindow.append(new ImageControlWindow(this));
    markWindow.append(new VideoControlWindow(this));
    markWindow.append(new ImageSegmentControlWindow(this));
+   markWindow.append(new OCRControlWindow(this));
    markWindow.append(new PCLControlWindow(this));
 
    for(int loop = 0; loop < markWindow.size(); loop++)
@@ -605,6 +676,7 @@ void MainWindow::initConnect()
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
     connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
     connect(openSegmentImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageSegmentDir);
+    connect(openOCRImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenOCRImageDir);
     connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
@@ -637,6 +709,7 @@ void MainWindow::initConnect()
     for(int loop = 0; loop < markWindow.size(); loop++)
     {
         connect(this, &MainWindow::signalManualMarkParamterChanged, markWindow[loop], &ControlWindow::slotManualMarkParamterChanged);
+        connect(markWindow[loop], &ControlWindow::signalIsMarkChanged, this, &MainWindow::slotIsMarkStatus);
     }
 }
 
@@ -654,6 +727,17 @@ void MainWindow::initImageMarkShape()
 void MainWindow::initSegmentMarkShape()
 {
     QMap<int, QString> shapeDatas = imgShape.getSegmentShape();
+    shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
+}
+
+void MainWindow::initOCRMarkShape()
+{
+    QMap<int, QString> shapeDatas = imgShape.getOCRShape();
     shapeBox->clear();
     for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
         iter != shapeDatas.constEnd(); ++iter)

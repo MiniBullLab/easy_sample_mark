@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "pclcontrolwindow.h"
 #include <QFileInfo>
 #include <QMessageBox>
@@ -20,6 +22,7 @@ PCLControlWindow::~PCLControlWindow()
 
 void PCLControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
+    markDataListWidget->clear();
     initMarkData(markDataDir, dataType);
 
     updateIsMarkButton(this->isMark);

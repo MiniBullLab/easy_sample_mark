@@ -2,7 +2,7 @@
 #define KALMANTRACKER_H
 
 #include <vector>
-#include "kalmanFilter/mykalmanfilter.h"
+#include "mykalmanfilter.h"
 #include "multipletracking/trackingobject.h"
 
 class KalmanTracker

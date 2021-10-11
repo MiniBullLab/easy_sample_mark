@@ -14,9 +14,9 @@
 
 #include "drawmarkcolor.h"
 
-int ManualParamterConfig::MIN_WIDTH = 1;
-int ManualParamterConfig::MIN_HEIGHT = 1;
-int ManualParamterConfig::NEAR_POINT_LENGTH = 5;
+int ManualParamterConfig::MIN_WIDTH = 10;
+int ManualParamterConfig::MIN_HEIGHT = 10;
+int ManualParamterConfig::NEAR_POINT_LENGTH = 10;
 int ManualParamterConfig::MAX_SCALE = 300;
 int ManualParamterConfig::MIN_SCALE = 50;
 QMap<QString, QString> ManualParamterConfig::markClass = QMap<QString, QString>();
@@ -144,6 +144,16 @@ int ManualParamterConfig::loadConfig()
                     MIN_HEIGHT = jsonObject.take("minHeight").toVariant().toInt();
                 }
 
+                if(jsonObject.contains("minScale"))
+                {
+                    MIN_SCALE = jsonObject.take("minScale").toVariant().toInt();
+                }
+
+                if(jsonObject.contains("maxScale"))
+                {
+                    MAX_SCALE = jsonObject.take("maxScale").toVariant().toInt();
+                }
+
                 if(jsonObject.contains("nearPointLength"))
                 {
                     NEAR_POINT_LENGTH = jsonObject.take("nearPointLength").toVariant().toInt();
@@ -187,6 +197,8 @@ int ManualParamterConfig::saveConfig()
     }
     jsonData.insert("minWidth", QString::number(MIN_WIDTH));
     jsonData.insert("minHeight", QString::number(MIN_HEIGHT));
+    jsonData.insert("minScale", QString::number(MIN_SCALE));
+    jsonData.insert("maxScale", QString::number(MAX_SCALE));
     jsonData.insert("nearPointLength", QString::number(NEAR_POINT_LENGTH));
     jsonData.insert("markClass", QJsonObject::fromVariantMap(saveMarkClass));
 

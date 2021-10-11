@@ -38,8 +38,8 @@ void PCDConverterWindow::slotOpen()
 
 void PCDConverterWindow::slotStart()
 {
-    QString suffix = "*.pcd";
-    QString format = formatBox->currentText();
+    QString suffix = srcFormatBox->currentText();
+    QString format = dstFormatBox->currentText();
     int fieldsNumber = fieldsNumberBox->value();
     if(pcdConverterThread->initData(pathDir, suffix, format, fieldsNumber) == 0)
     {
@@ -48,6 +48,10 @@ void PCDConverterWindow::slotStart()
         stopButton->setEnabled(true);
         startButton->setEnabled(false);
         openButton->setEnabled(false);
+    }
+    else
+    {
+        QMessageBox::information(this, tr("点云格式转换"), tr("input error!"));
     }
 }
 
@@ -72,7 +76,7 @@ void PCDConverterWindow::closeEvent(QCloseEvent *event)
     if(pcdConverterThread->isRunning())
     {
         QMessageBox::StandardButton button;
-        button=QMessageBox::question(this,tr("PCD格式转换程序"),QString(tr("PCD格式转换程序正在运行，是否退出？")),
+        button=QMessageBox::question(this,tr("点云格式转换"),QString(tr("点云格式转换程序正在运行，是否退出？")),
                                      QMessageBox::Yes|QMessageBox::No);
         if(button==QMessageBox::No)
         {
@@ -105,26 +109,34 @@ void PCDConverterWindow::initUI()
 {
     mainLayout = new QVBoxLayout();
 
-    QHBoxLayout* layout = new QHBoxLayout();
+    QHBoxLayout* layout0 = new QHBoxLayout();
 
-    formatLabel = new QLabel(tr("pcd转换格式："));
-    formatBox = new QComboBox();
-    formatBox->addItem(tr(".bin"));
+    srcFormatLabel = new QLabel(tr("点云初始格式："));
+    srcFormatBox = new QComboBox();
+    srcFormatBox->addItem(tr("*.pcd"));
+    srcFormatBox->addItem(tr("*.ply"));
 
+    dstFormatLabel = new QLabel(tr("点云转换格式："));
+    dstFormatBox = new QComboBox();
+    dstFormatBox->addItem(tr(".bin"));
+
+    layout0->addWidget(srcFormatLabel);
+    layout0->addWidget(srcFormatBox);
+    layout0->addWidget(dstFormatLabel);
+    layout0->addWidget(dstFormatBox);
+
+    QHBoxLayout* layout01 = new QHBoxLayout();
     fieldsNumberLabel = new QLabel(tr("转换字段数:"));
     fieldsNumberBox = new QSpinBox();
     fieldsNumberBox->setMinimum(3);
-    fieldsNumberBox->setMaximum(4);
+    fieldsNumberBox->setMaximum(6);
     fieldsNumberBox->setSingleStep(1);
     fieldsNumberBox->setValue(3);
-
-    layout->addWidget(formatLabel);
-    layout->addWidget(formatBox);
-    layout->addWidget(fieldsNumberLabel);
-    layout->addWidget(fieldsNumberBox);
+    layout01->addWidget(fieldsNumberLabel);
+    layout01->addWidget(fieldsNumberBox);
 
     QHBoxLayout* layout1 = new QHBoxLayout();
-    openButton = new QPushButton(tr("打开pcd文件夹"));
+    openButton = new QPushButton(tr("打开点云文件夹"));
     pathText = new QLineEdit();
     pathText->setReadOnly(true);
     layout1->addWidget(pathText);
@@ -139,11 +151,12 @@ void PCDConverterWindow::initUI()
     layout2->addWidget(startButton);
     layout2->addWidget(stopButton);
 
-    mainLayout->addLayout(layout);
+    mainLayout->addLayout(layout0);
+    mainLayout->addLayout(layout01);
     mainLayout->addLayout(layout1);
     mainLayout->addLayout(layout2);
     this->setLayout(mainLayout);
-    this->setWindowTitle(tr("PCD格式转换"));
+    this->setWindowTitle(tr("点云格式转换"));
 }
 
 void PCDConverterWindow::initConnect()

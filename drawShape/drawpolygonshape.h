@@ -20,6 +20,8 @@ public:
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
+    void editMark(bool &isDraw) override;
+
     void cancelDrawShape(bool &isDraw) override;
 
     void drawPixmap(const ShapeType shapeID, QPainter &painter) override;
@@ -41,6 +43,11 @@ private:
 
     int nearPolygonPoint(const QPoint point);
     void updatePolygon(const QPoint point);
+
+    void selectMarkInformation();
+
+    void drawPolygon(const MyObject &drawObject, const QColor &drawColor, QPainter &painter);
+    void drawText(const MyObject &drawObject, QPainter &painter);
 
 private:
 

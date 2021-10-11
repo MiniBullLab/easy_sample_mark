@@ -70,20 +70,12 @@ bool PCDFilterThread::myMakeDir(const QString& pathDir)
 void PCDFilterThread::removePCDFile(const QString &pcdPath)
 {
     pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
-    try {
-        if(pcdReader.read(pcdPath.toStdString(), *srcCloud) < 0)
+    if(pcReader.pcdRead(pcdPath.toStdString(), srcCloud) < 0)
+    {
+        if(!QFile::remove(pcdPath))
         {
-            if(!QFile::remove(pcdPath))
-            {
-                qDebug() << "remove file " << pcdPath << " faild!";
-            }
+            qDebug() << "remove file " << pcdPath << " faild!";
         }
-    } catch (std::exception e) {
-       std::cout << e.what() << std::endl;
-       if(!QFile::remove(pcdPath))
-       {
-           qDebug() << "remove file " << pcdPath << " faild!";
-       }
     }
 }
 

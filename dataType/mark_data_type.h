@@ -6,7 +6,8 @@ typedef enum MarkDataType{
     IMAGE = 1,
     VIDEO = 2,
     SEGMENT = 3,
-    PCD = 4,
+    OCR = 4,
+    PCD = 5,
     MAX_CONUT
 }MarkDataType;
 

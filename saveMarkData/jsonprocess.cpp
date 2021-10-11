@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "jsonprocess.h"
 #include <QJsonParseError>
 #include <QFile>
@@ -8,7 +10,7 @@
 
 JSONProcess::JSONProcess(QObject *parent) : QObject(parent)
 {
-
+    this->markDataType = MarkDataType::IMAGE;
 }
 
 JSONProcess::~JSONProcess()
@@ -58,6 +60,7 @@ int JSONProcess::createJSON(const QString &jsonFilePath, const QString &imageFil
     writePolylineData(objects, allData);
     writeLaneData(objects, allData);
     writeSegmentData(objects, allData);
+    writeOCRData(objects, allData);
 
     jsonData.insert("objects", allData);
     doc.setObject(jsonData);
@@ -128,6 +131,11 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
                         QJsonArray rect3DValue = allData.take("rect3DObject").toArray();
                         readRect3Ddata(rect3DValue, objects);
                     }
+                    if(allData.contains("ocrObject"))
+                    {
+                        QJsonArray ocrValue = allData.take("ocrObject").toArray();
+                        readOCRData(ocrValue, objects);
+                    }
                 }
             }
         }
@@ -140,21 +148,40 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
     return 0;
 }
 
+void JSONProcess::setMarkData(MarkDataType dataType)
+{
+    this->markDataType = dataType;
+}
+
 int JSONProcess::writeRectData(const QList<MyObject>& objects, QJsonObject &jsonData)
 {
     QJsonArray objectArrays;
     int index = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::RECT_SHAPE)
+        if(objects[loop].getShapeType() == ShapeType::RECT_SHAPE ||
+                objects[loop].getShapeType() == ShapeType::INSTANCE_SEGMENT_SHAPE)
         {
             const QRect rect = objects[loop].getBox();
+            const QPolygon mask = objects[loop].getMask();
             QJsonObject objectData;
+            QJsonArray maskData;
+            int tempIndex = 0;
             objectData.insert("minX", rect.topLeft().x());
             objectData.insert("minY", rect.topLeft().y());
             objectData.insert("maxX", rect.bottomRight().x());
             objectData.insert("maxY", rect.bottomRight().y());
             objectData.insert("class", objects[loop].getObjectClass());
+            if(mask.count() > 0)
+            {
+                objectData.insert("maskCount", mask.count());
+                for(int index = 0; index < mask.count(); index++)
+                {
+                    maskData.insert(tempIndex++, mask[index].x());
+                    maskData.insert(tempIndex++, mask[index].y());
+                }
+                objectData.insert("mask", maskData);
+            }
             objectArrays.insert(index, objectData);
             index++;
         }
@@ -176,9 +203,31 @@ int JSONProcess::readRectData(const QJsonArray &value, QList<MyObject>& objects)
         int minY = objectData.take("minY").toVariant().toInt();
         int maxX = objectData.take("maxX").toVariant().toInt();
         int maxY = objectData.take("maxY").toVariant().toInt();
+        QPolygon mask;
+        mask.clear();
+        if(objectData.contains("mask"))
+        {
+            QJsonArray dataList = objectData.take("mask").toArray();
+            for(int index = 0; index < dataList.size(); index++)
+            {
+                QPoint point;
+                point.setX(dataList.at(index).toInt());
+                index++;
+                point.setY(dataList.at(index).toInt());
+                mask.append(point);
+            }
+        }
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setBox(QRect(QPoint(minX, minY), QPoint(maxX, maxY)));
-        object.setShapeType(ShapeType::RECT_SHAPE);
+        object.setMask(mask);
+        if(this->markDataType == MarkDataType::SEGMENT)
+        {
+            object.setShapeType(ShapeType::INSTANCE_SEGMENT_SHAPE);
+        }
+        else
+        {
+            object.setShapeType(ShapeType::RECT_SHAPE);
+        }
         objects.append(object);
     }
 
@@ -454,6 +503,73 @@ int JSONProcess::readSegmentData(const QJsonArray &value, QList<MyObject>& objec
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setPolygon(polygon);
         object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
+        objects.append(object);
+    }
+
+    return 0;
+}
+
+int JSONProcess::writeOCRData(const QList<MyObject>& objects, QJsonObject &jsonData)
+{
+    QJsonArray objectArrays;
+    int dataIndex = 0;
+    for(int loop = 0; loop < objects.size(); loop++)
+    {
+        if(objects[loop].getShapeType() == ShapeType::OCR_POLYGON_SHAPE)
+        {
+            const OCRObject ocrObject = objects[loop].getOCRObject();
+            QPolygon polygon = objects[loop].getPolygon();
+            QJsonObject objectData;
+            QJsonArray polygonData;
+            int tempIndex = 0;
+            objectData.insert("transcription", ocrObject.objectText);
+            objectData.insert("language", ocrObject.language);
+            objectData.insert("illegibility", static_cast<int>(ocrObject.isIllegibility));
+            objectData.insert("pointCount", polygon.count());
+            for(int index = 0; index < polygon.count(); index++)
+            {
+                polygonData.insert(tempIndex++, polygon[index].x());
+                polygonData.insert(tempIndex++, polygon[index].y());
+            }
+            objectData.insert("class", objects[loop].getObjectClass());
+            objectData.insert("polygon", polygonData);
+            objectArrays.insert(dataIndex, objectData);
+            dataIndex++;
+        }
+    }
+    if(objectArrays.count() > 0)
+    {
+        jsonData.insert("ocrObject", objectArrays);
+    }
+    return 0;
+}
+
+int JSONProcess::readOCRData(const QJsonArray &value, QList<MyObject>& objects)
+{
+    for(int loop = 0; loop < value.size(); loop++)
+    {
+        QJsonObject objectData = value.at(loop).toObject();
+        MyObject object;
+        QPolygon polygon;
+        OCRObject ocrObject;
+        QJsonArray dataList = objectData.take("polygon").toArray();
+        polygon.clear();
+        for(int index = 0; index < dataList.size(); index++)
+        {
+            QPoint point;
+            point.setX(dataList.at(index).toInt());
+            index++;
+            point.setY(dataList.at(index).toInt());
+            polygon.append(point);
+        }
+        ocrObject.objectText = objectData.take("transcription").toVariant().toString();
+        ocrObject.language = objectData.take("language").toVariant().toString();
+        ocrObject.isIllegibility = objectData.take("illegibility").toVariant().toBool();
+        // qDebug() << "isIllegibility:" << ocrObject.isIllegibility << endl;
+        object.setOCRObject(ocrObject);
+        object.setPolygon(polygon);
+        object.setObjectClass(objectData.take("class").toVariant().toString());
+        object.setShapeType(ShapeType::OCR_POLYGON_SHAPE);
         objects.append(object);
     }
 

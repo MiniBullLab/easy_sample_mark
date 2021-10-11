@@ -60,7 +60,7 @@ public:
 
     Transform exp(const Vector6& vector)
     {
-        constexpr float kEpsilon = 1e-8;
+        constexpr float kEpsilon = static_cast<float>(1e-8);
         const float norm = vector.tail<3>().norm();
         if (norm < kEpsilon) {
             return Transform(vector.head<3>(), Rotation::Identity());

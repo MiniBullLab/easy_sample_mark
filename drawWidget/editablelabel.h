@@ -14,6 +14,8 @@
 
 class EditableLabel : public ImageDrawLabel
 {
+    Q_OBJECT
+
 public:
     EditableLabel(QWidget *parent = 0);
     ~EditableLabel();

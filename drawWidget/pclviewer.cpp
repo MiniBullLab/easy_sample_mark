@@ -29,14 +29,34 @@ int PCLViewer::setNewPointCloud(const QString &pcdFilePath)
     int errorCode = 0;
     if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PCD_FILE)
     {
-        errorCode = readPCDFile(pcdFilePath);
+        errorCode = pcReader.pcdRead(pcdFilePath.toStdString(), srcCloud, origin, orientation);
         drawRandomColorPointCloud();
     }
     else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
     {
-        pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
-        errorCode = readBinFile(pcdFilePath, cloud);
-        drawRGBPointCloud(cloud);
+        if(PointCloudParamterConfig::getFieldsNumber() == 3)
+        {
+            pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
+            errorCode = pcReader.xyzBinRead(pcdFilePath.toStdString(), cloud);
+            drawRGBPointCloud(cloud);
+        }
+        else if(PointCloudParamterConfig::getFieldsNumber() == 4)
+        {
+            pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
+            errorCode = pcReader.xyziBinRead(pcdFilePath.toStdString(), cloud);
+            drawRGBPointCloud(cloud);
+        }
+        else if(PointCloudParamterConfig::getFieldsNumber() == 6)
+        {
+            pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+            errorCode = pcReader.rbgBinRead(pcdFilePath.toStdString(), cloud);
+            drawRGBPointCloud(cloud);
+        }
+    }
+    else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PLY_FILE)
+    {
+        errorCode = pcReader.plyRead(pcdFilePath.toStdString(), srcCloud);
+        drawRandomColorPointCloud();
     }
     return errorCode;
 }
@@ -146,6 +166,17 @@ void PCLViewer::drawRandomColorPointCloud()
     geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
     //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
     viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
+
+    viewer->removeAllShapes();
+    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
+    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
+
     this->update();
 }
 
@@ -165,6 +196,30 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
       point.g = static_cast<unsigned char>(cloud->points[i].intensity * scale);
       point.b = static_cast<unsigned char>(cloud->points[i].intensity * scale);
       rgbCloud->push_back(point);
+    }
+    viewer->addPointCloud(rgbCloud, "srcCloud");
+
+    viewer->removeAllShapes();
+    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
+    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
+
+    this->update();
+}
+
+void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud)
+{
+    viewer->removePointCloud("srcCloud");
+    rgbCloud->clear();
+    // Fill the cloud with some points
+    for (size_t i = 0; i < cloud->points.size (); ++i)
+    {
+      rgbCloud->push_back(cloud->points[i]);
     }
     viewer->addPointCloud(rgbCloud, "srcCloud");
     this->update();
@@ -232,62 +287,6 @@ void PCLViewer::drawObject(const MyObject &object, int id)
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
                                         pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, boxId.toStdString());
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, boxId.toStdString());
-}
-
-int PCLViewer::readPCDFile(const QString &filePath)
-{
-    int version;
-//    pcl::PointCloud<pcl::PointXYZI>::Ptr currentCloud(new pcl::PointCloud<pcl::PointXYZI>);
-//    if(pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud) == -1)
-//    {
-//        return -1;
-//    }
-    srcCloud.reset(new pcl::PCLPointCloud2);
-    if(pcd.read(filePath.toStdString(), *srcCloud, origin, orientation, version) < 0)
-    {
-        return -1;
-    }
-    return 0;
-}
-
-int PCLViewer::readBinFile(const QString &filePath,
-                           pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
-{
-    ifstream inFile(filePath.toStdString(), ios::in|ios::binary);
-    if(!inFile)
-    {
-        cout << filePath.toStdString() << " open error!" <<endl;
-        return -1;
-    }
-    cloud->clear();
-    if(PointCloudParamterConfig::getFieldsNumber() == 3)
-    {
-        float data[3];
-        while(inFile.read(reinterpret_cast<char*>(data), sizeof(data)))
-        {
-            pcl::PointXYZI point;
-            point.x = data[0];
-            point.y = data[1];
-            point.z = data[2];
-            point.intensity = 255;
-            cloud->push_back(point);
-        }
-    }
-    else if(PointCloudParamterConfig::getFieldsNumber() == 4)
-    {
-        float data[4];
-        while(inFile.read(reinterpret_cast<char*>(data), sizeof(data)))
-        {
-            pcl::PointXYZI point;
-            point.x = data[0];
-            point.y = data[1];
-            point.z = data[2];
-            point.intensity = data[3];
-            cloud->push_back(point);
-        }
-    }
-    inFile.close();
-    return 0;
 }
 
 void PCLViewer::initData()

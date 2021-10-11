@@ -3,7 +3,7 @@
 DrawShape::DrawShape(MarkDataType dataType, QObject *parent) :
     QObject(parent), markDataType(dataType)
 {
-
+    visibleSampleClass = "All";
 }
 
 int DrawShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw)
@@ -13,6 +13,11 @@ int DrawShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &i
 }
 
 void DrawShape::cancelDrawShape(bool &isDraw)
+{
+    isDraw = false;
+}
+
+void DrawShape::editMark(bool &isDraw)
 {
     isDraw = false;
 }

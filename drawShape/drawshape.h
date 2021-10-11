@@ -25,6 +25,8 @@ public:
     virtual void setObjectList(QList<MyObject> list) = 0;
     virtual void getObjectList(QList<MyObject> &list) = 0;
 
+    virtual void editMark(bool &isDraw);
+
     virtual int getObjectSize();
 
     virtual int drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw);

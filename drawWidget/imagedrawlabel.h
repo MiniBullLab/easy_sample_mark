@@ -1,4 +1,4 @@
-#ifndef IMAGEDRAWLABEL_H
+﻿#ifndef IMAGEDRAWLABEL_H
 #define IMAGEDRAWLABEL_H
 
 #include <QLabel>
@@ -15,6 +15,7 @@
 
 class ImageDrawLabel : public QLabel
 {
+    Q_OBJECT
 public:
     ImageDrawLabel(QWidget *parent = 0);
     virtual ~ImageDrawLabel();
@@ -44,6 +45,7 @@ protected:
 protected:
 
     QAction *removeRectAction;
+    QAction *editRectAction;
 
     QPixmap mp;
     QPixmap tempPixmap;
@@ -60,6 +62,8 @@ protected:
 
     QList<MyObject> polygonSegObejcts;
     QList<MyObject> laneSegObejcts;
+
+    QList<MyObject> ocrObejcts;
 };
 
 #endif // IMAGEDRAWLABEL_H

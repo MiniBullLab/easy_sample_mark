@@ -23,9 +23,7 @@ include(multipletracking/multipletracking.pri)
 
 SOURCES += main.cpp\
         controlwindow.cpp \
-    markclasswindow.cpp \
     mainwindow.cpp \
-    selectmarkclasswindow.cpp \
     autoSampleMark/autoparamterconfig.cpp \
     autoSampleMark/autosamplemarkthread.cpp \
     autoSampleMark/autosamplemarkwindow.cpp \
@@ -76,12 +74,17 @@ SOURCES += main.cpp\
     videoTools/segmentationlabelconvertthread.cpp \
     saveMarkData/segmentationmaskprocess.cpp \
     drawShape/drawimagemask.cpp \
-    drawShape/drawinstancesegmentshape.cpp
+    drawShape/drawinstanceshape.cpp \
+    ocrcontrolwindow.cpp \
+    drawWidget/ocrlabel.cpp \
+    selectMarkInfo/selectmarkclasswindow.cpp \
+    paramWindow/markclasswindow.cpp \
+    selectMarkInfo/selectmarkocrwindow.cpp \
+    sampleMarkParam/ocrparamterconfig.cpp \
+    dataType/ocrobject.cpp
 
 HEADERS  += controlwindow.h \
-    markclasswindow.h \
     mainwindow.h \
-    selectmarkclasswindow.h \
     autoSampleMark/autoparamterconfig.h \
     autoSampleMark/autosamplemarkthread.h \
     autoSampleMark/autosamplemarkwindow.h \
@@ -134,15 +137,24 @@ HEADERS  += controlwindow.h \
     videoTools/segmentationlabelconvertthread.h \
     saveMarkData/segmentationmaskprocess.h \
     drawShape/drawimagemask.h \
-    drawShape/drawinstancesegmentshape.h
+    drawShape/drawinstanceshape.h \
+    ocrcontrolwindow.h \
+    drawWidget/ocrlabel.h \
+    selectMarkInfo/selectmarkclasswindow.h \
+    paramWindow/markclasswindow.h \
+    selectMarkInfo/selectmarkocrwindow.h \
+    sampleMarkParam/ocrparamterconfig.h \
+    dataType/ocrobject.h
 
 RESOURCES += \
     style.qrc \
     images.qrc \
     QtAwesome.qrc \
     document.qrc \
-    qm.qrc
+    qm.qrc \
+    icon.qrc
 
+#RC_FILE = icon.rc
 RC_ICONS = logo.ico
 
 TRANSLATIONS = zh.ts en.ts ja.ts
@@ -622,7 +634,6 @@ LIBS+=-L/home/lpj/Software/opencv34/lib \
     -lopencv_face \
     -lopencv_freetype \
     -lopencv_fuzzy \
-    -lopencv_hdf \
     -lopencv_hfs \
     -lopencv_img_hash \
     -lopencv_line_descriptor \
@@ -633,7 +644,6 @@ LIBS+=-L/home/lpj/Software/opencv34/lib \
     -lopencv_sfm \
     -lopencv_stereo \
     -lopencv_structured_light \
-    -lopencv_viz \
     -lopencv_phase_unwrapping \
     -lopencv_surface_matching \
     -lopencv_tracking \
@@ -673,4 +683,6 @@ LIBS += /home/lpj/Software/vtk_8_1_2/lib/libvtk*.so
 #PCL Header
 INCLUDEPATH += /home/lpj/Software/pcl_1_9/include/pcl-1.9
 LIBS += /home/lpj/Software/pcl_1_9/lib/libpcl_*.so
+
+LIBS += -llz4
 }

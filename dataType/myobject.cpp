@@ -142,6 +142,16 @@ QImage MyObject::getSegmentImage() const
     return maskImage;
 }
 
+void MyObject::setOCRObject(OCRObject ocr)
+{
+    this->ocrObject = ocr;
+}
+
+OCRObject MyObject::getOCRObject() const
+{
+    return this->ocrObject;
+}
+
 void MyObject::init()
 {
     this->shapeType = ShapeType::UNSHAPE;

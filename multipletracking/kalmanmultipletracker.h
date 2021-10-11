@@ -1,7 +1,7 @@
 ﻿#ifndef KALMANMULTIPLETRACKER_H
 #define KALMANMULTIPLETRACKER_H
 
-#include "package_tracker/kalmantracker.h"
+#include "kalman_tracker/kalmantracker.h"
 #include "imultipletracker.h"
 
 class KalmanMultipleTracker : public IMultipletracker

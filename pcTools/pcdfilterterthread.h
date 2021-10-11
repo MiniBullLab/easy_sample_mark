@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include "helpers/dirprocess.h"
-#include "saveData/pointcloudwriter.h"
+#include "saveData/pointcloudreader.h"
 
 class PCDFilterThread : public QThread
 {
@@ -29,7 +29,7 @@ protected:
 private:
 
     DirProcess dirProcess;
-    pcl::PCDReader pcdReader;
+    PointCloudReader pcReader;
 
     QString dirName;
     QString suffix;

@@ -6,7 +6,8 @@
 typedef enum PointCloudFileType{
     UNPCTYPE = -1,
     PCD_FILE = 0,
-    BIN_FILE = 1
+    BIN_FILE = 1,
+    PLY_FILE = 2
 }PointCloudFileType;
 
 class PointCloudParamterConfig

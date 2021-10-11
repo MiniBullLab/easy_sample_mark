@@ -4,7 +4,7 @@
 #include "markclasstablewidget.h"
 #include <QMenu>
 #include <QContextMenuEvent>
-#include "markclasswindow.h"
+#include "paramWindow/markclasswindow.h"
 #include <iostream>
 
 MarkClassTableWidget::MarkClassTableWidget(QWidget *parent): QTableWidget(parent)

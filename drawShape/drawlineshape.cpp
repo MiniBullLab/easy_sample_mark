@@ -6,7 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include "sampleMarkParam/manualparamterconfig.h"
-#include "selectmarkclasswindow.h"
+#include "selectMarkInfo/selectmarkclasswindow.h"
 
 DrawLineShape::DrawLineShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {

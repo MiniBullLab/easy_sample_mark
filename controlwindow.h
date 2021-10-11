@@ -41,6 +41,9 @@ public:
     virtual void readClassConfig();
     virtual void saveClassConfig();
 
+signals:
+    void signalIsMarkChanged(bool isMark);
+
 public slots:
     void slotManualMarkParamterChanged();
     void slotShowFull();

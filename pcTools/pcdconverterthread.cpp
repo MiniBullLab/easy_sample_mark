@@ -19,31 +19,17 @@ void PCDConverterThread::run()
 {
     if (isStart)
     {
-        QString saveDirName = this->dirName + "/bins";
+        QString saveDirName = this->dirName + "/temps";
         QList<QString> pcdList = dirProcess.getDirFileName(this->dirName, suffix);
         myMakeDir(saveDirName);
         saveDirName += "/";
-        for (int i = 0; i< pcdList.size(); ++i)
+        if(suffix.contains("pcd") && format.contains("bin"))
         {
-            if (!isStart)
-            {
-                break;
-            }
-            QFileInfo fileInfo(pcdList[i]);
-            QString fileName = fileInfo.completeBaseName();
-            QString saveFileName = saveDirName + fileName + format;
-            pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
-            try {
-                if(pcdReader.read(pcdList[i].toStdString(), *srcCloud) < 0)
-                {
-                    qDebug() << "open " << pcdList[i] << " faild!";
-                    continue;
-                }
-                pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
-                                             this->fieldsNumber);
-            } catch (std::exception e) {
-               qDebug() << e.what() << "|open " << pcdList[i] << " faild!";
-            }
+            pcdConvertToBin(saveDirName, pcdList);
+        }
+        else if(suffix.contains("ply") && format.contains("bin"))
+        {
+            plyConvertToBin(saveDirName, pcdList);
         }
         emit signalFinish(saveDirName);
     }
@@ -52,11 +38,18 @@ void PCDConverterThread::run()
 int PCDConverterThread::initData(const QString &fileNameDir, const QString& fileSuffix,
                                  const QString& format, int fieldsNumber)
 {
-    this->dirName = fileNameDir;
-    this->suffix = fileSuffix;
-    this->format = format;
-    this->fieldsNumber = fieldsNumber;
-    return 0;
+    if(fieldsNumber == 3 || fieldsNumber == 4 || fieldsNumber == 6)
+    {
+        this->dirName = fileNameDir;
+        this->suffix = fileSuffix;
+        this->format = format;
+        this->fieldsNumber = fieldsNumber;
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 void PCDConverterThread::startThread()
@@ -81,6 +74,48 @@ bool PCDConverterThread::myMakeDir(const QString& pathDir)
         }
     }
     return true;
+}
+
+void PCDConverterThread::pcdConvertToBin(const QString &saveDir, const QList<QString> &dataList)
+{
+    for (int i = 0; i< dataList.size(); ++i)
+    {
+        if (!isStart)
+        {
+            break;
+        }
+        QFileInfo fileInfo(dataList[i]);
+        QString fileName = fileInfo.completeBaseName();
+        QString saveFileName = saveDir + fileName + format;
+        pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
+        if(pcReader.pcdRead(dataList[i].toStdString(), srcCloud) < 0)
+        {
+            continue;
+        }
+        pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
+                                     this->fieldsNumber);
+    }
+}
+
+void PCDConverterThread::plyConvertToBin(const QString &saveDir, const QList<QString> &dataList)
+{
+    for (int i = 0; i< dataList.size(); ++i)
+    {
+        if (!isStart)
+        {
+            break;
+        }
+        QFileInfo fileInfo(dataList[i]);
+        QString fileName = fileInfo.completeBaseName();
+        QString saveFileName = saveDir + fileName + format;
+        pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
+        if(pcReader.plyRead(dataList[i].toStdString(), srcCloud) < 0)
+        {
+            continue;
+        }
+        pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
+                                     this->fieldsNumber);
+    }
 }
 
 void PCDConverterThread::init()

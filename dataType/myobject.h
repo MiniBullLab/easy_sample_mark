@@ -7,6 +7,7 @@
 #include <QPolygon>
 #include <QImage>
 #include "myrect3d.h"
+#include "ocrobject.h"
 #include "drawShape/myshape.h"
 
 class MyObject
@@ -54,11 +55,15 @@ public:
     void setSegmentImage(const QImage &image);
     QImage getSegmentImage() const;
 
+    void setOCRObject(OCRObject ocr);
+    OCRObject getOCRObject() const;
+
 private:
     int objectFlag;
     bool isDifficult;
     bool isTrackingObject;
     int lineWidth;
+    OCRObject ocrObject;
     MyRect3D box3D;
     QRect box;
     QList<QPoint> line;

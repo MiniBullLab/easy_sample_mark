@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "manualparamterconfigwindow.h"
 #include <QColorDialog>
 #include <QMessageBox>
@@ -31,6 +33,8 @@ void ManualParamterConfigWindow::slotOk()
 {
     paramterConfig.setMinWidth(this->minWidthBox->value());
     paramterConfig.setMinHeight(this->minHeightBox->value());
+    paramterConfig.setMinScale(this->minScaleBox->value());
+    paramterConfig.setMaxScale(this->maxScaleBox->value());
     paramterConfig.setMarkClass(this->markClassTable->getMarkClass());
     paramterConfig.saveConfig();
     this->accept();
@@ -57,26 +61,47 @@ void ManualParamterConfigWindow::initUI()
     modelLayout->addWidget(classModelSelectLabel);
     modelLayout->addWidget(classModelSelectBox);
 
-    minWidthLabel = new QLabel(tr("最小可标注宽度"));
+    minWidthLabel = new QLabel(tr("最小可标注宽度："));
     minWidthBox = new QSpinBox();
     minWidthBox->setSingleStep(10);
     minWidthBox->setMinimum(0);
     minWidthBox->setMaximum(INT_MAX);
     minWidthBox->setValue(paramterConfig.getMinWidth());
 
-    minHeightLabel = new QLabel(tr("最小可标注高度"));
+    minHeightLabel = new QLabel(tr("最小可标注高度："));
     minHeightBox = new QSpinBox();
     minHeightBox->setSingleStep(10);
     minHeightBox->setMinimum(0);
     minHeightBox->setMaximum(INT_MAX);
     minHeightBox->setValue(paramterConfig.getMinHeight());
 
-    QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->setSpacing(10);
-    topLayout->addWidget(minWidthLabel);
-    topLayout->addWidget(minWidthBox);
-    topLayout->addWidget(minHeightLabel);
-    topLayout->addWidget(minHeightBox);
+    QHBoxLayout *topLayout1 = new QHBoxLayout();
+    topLayout1->setSpacing(10);
+    topLayout1->addWidget(minWidthLabel);
+    topLayout1->addWidget(minWidthBox);
+    topLayout1->addWidget(minHeightLabel);
+    topLayout1->addWidget(minHeightBox);
+
+    minScaleLabel = new QLabel(tr("最小缩放尺度："));
+    minScaleBox = new QSpinBox();
+    minScaleBox->setSingleStep(10);
+    minScaleBox->setMinimum(10);
+    minScaleBox->setMaximum(100);
+    minScaleBox->setValue(paramterConfig.getMinSacle());
+
+    maxScaleLabel = new QLabel(tr("最大缩放尺度："));
+    maxScaleBox = new QSpinBox();
+    maxScaleBox->setSingleStep(50);
+    maxScaleBox->setMinimum(100);
+    maxScaleBox->setMaximum(INT_MAX);
+    maxScaleBox->setValue(paramterConfig.getMaxScale());
+
+    QHBoxLayout *topLayout2 = new QHBoxLayout();
+    topLayout2->setSpacing(10);
+    topLayout2->addWidget(minScaleLabel);
+    topLayout2->addWidget(minScaleBox);
+    topLayout2->addWidget(maxScaleLabel);
+    topLayout2->addWidget(maxScaleBox);
 
     classModelWidget = new QStackedWidget(this);
     markClassTable = new MarkClassTableWidget();
@@ -101,13 +126,14 @@ void ManualParamterConfigWindow::initUI()
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
     mainLayout->addLayout(modelLayout);
-    mainLayout->addLayout(topLayout);
+    mainLayout->addLayout(topLayout1);
+    mainLayout->addLayout(topLayout2);
     mainLayout->addWidget(classModelWidget);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(420, 500);
-    this->setMinimumSize(420, 500);
+    this->setMaximumSize(500, 500);
+    this->setMinimumSize(500, 500);
     this->setWindowTitle(tr("手动标注参数配置"));
 }
 
@@ -177,6 +203,7 @@ void ManualParamterConfigWindow::loadDefaultValue()
     markClassData.insert("truck", "#FF00FF");
     markClassData.insert("motorbike", "#00FFFF");
     markClassData.insert("background", "#FFFFFF");
+    markClassData.insert("others", "#FF0000");
     int rows = markClassData.count();
     markClassTable->clear();
     markClassTable->setRowCount(rows);
@@ -192,6 +219,6 @@ void ManualParamterConfigWindow::loadDefaultValue()
         markClassTable->setItem(row, 1, tableItem1);
         row++;
     }
-    minWidthBox->setValue(20);
-    minHeightBox->setValue(20);
+    minWidthBox->setValue(10);
+    minHeightBox->setValue(10);
 }

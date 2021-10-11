@@ -1,5 +1,6 @@
 ﻿#include "geometryalgorithm.h"
 #include <algorithm>
+#include <cmath>
 
 GeometryAlgorithm::GeometryAlgorithm()
 {

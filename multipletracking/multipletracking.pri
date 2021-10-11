@@ -1,19 +1,36 @@
 HEADERS += \
     $$PWD/utility/assignmentproblemsolver.h \
-    $$PWD/package_tracker/kalmanFilter/mykalmanfilter.h \
-    $$PWD/package_tracker/kalmantracker.h \
+    $$PWD/kalman_tracker/mykalmanfilter.h \
+    $$PWD/kalman_tracker/kalmantracker.h \
     $$PWD/kalmanmultipletracker.h \
     $$PWD/imultipletracker.h \
     $$PWD/trackingobject.h \
-    $$PWD/opencvmultipletracker.h
+    $$PWD/opencvmultipletracker.h \
+    $$PWD/hv_tracker/CMultipleObjTrack.h \
+    $$PWD/hv_tracker/Cobject.h \
+    $$PWD/hv_tracker/CObjgroup.h \
+    $$PWD/hv_tracker/CornerFind.h \
+    $$PWD/hv_tracker/CornerTrack.h \
+    $$PWD/hv_tracker/CTracker4Corner.h \
+    $$PWD/hv_tracker/CTrajecy.h \
+    $$PWD/hv_tracker/CTrajecyManage.h \
+    $$PWD/hv_tracker/utility.h
 
 
 SOURCES += \
     $$PWD/utility/assignmentproblemsolver.cpp \
-    $$PWD/package_tracker/kalmanFilter/mykalmanfilter.cpp \
-    $$PWD/package_tracker/kalmantracker.cpp \
+    $$PWD/kalman_tracker/mykalmanfilter.cpp \
+    $$PWD/kalman_tracker/kalmantracker.cpp \
     $$PWD/kalmanmultipletracker.cpp \
     $$PWD/imultipletracker.cpp \
     $$PWD/trackingobject.cpp \
-    $$PWD/opencvmultipletracker.cpp
+    $$PWD/opencvmultipletracker.cpp \
+    $$PWD/hv_tracker/CMultipleObjTrack.cpp \
+    $$PWD/hv_tracker/Cobject.cpp \
+    $$PWD/hv_tracker/CObjgroup.cpp \
+    $$PWD/hv_tracker/CornerFind.cpp \
+    $$PWD/hv_tracker/CornerTrack.cpp \
+    $$PWD/hv_tracker/CTracker4Corner.cpp \
+    $$PWD/hv_tracker/CTrajecy.cpp \
+    $$PWD/hv_tracker/CTrajecyManage.cpp
 

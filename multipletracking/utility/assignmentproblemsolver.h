@@ -3,7 +3,7 @@
  */
 #ifndef ASSIGNMENTPROBLEMSOLVER_H
 #define ASSIGNMENTPROBLEMSOLVER_H
-#pragma once
+
 #include <vector>
 #include <limits>
 #include <time.h>

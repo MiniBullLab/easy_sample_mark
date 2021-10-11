@@ -27,6 +27,7 @@
 #include "imagecontrolwindow.h"
 #include "videocontrolwindow.h"
 #include "imagesegmentcontrolwindow.h"
+#include "ocrcontrolwindow.h"
 #include "pclcontrolwindow.h"
 
 class MainWindow : public QMainWindow
@@ -44,6 +45,7 @@ public slots:
     void slotOpenImageDir();
     void slotOpenVideoDir();
     void slotOpenImageSegmentDir();
+    void slotOpenOCRImageDir();
     void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
@@ -74,6 +76,8 @@ public slots:
     //shapeTool
     void slotSelectMarkShape(const QString &text);
 
+    void slotIsMarkStatus(bool isMark);
+
     void slotCloseOtherWindow(QString flag);
 
 protected:
@@ -86,6 +90,7 @@ private:
     QAction *openImageDirAction;
     QAction *openVideoDirAction;
     QAction *openSegmentImageDirAction;
+    QAction *openOCRImageDirAction;
     QAction *openPCDDirAction;
     QAction *exitAction;
     //setting
@@ -159,6 +164,7 @@ private:
 
     void initImageMarkShape();
     void initSegmentMarkShape();
+    void initOCRMarkShape();
     void initPointCloudMarkShape();
 
 };

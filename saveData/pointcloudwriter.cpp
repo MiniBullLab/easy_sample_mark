@@ -2,7 +2,7 @@
 
 PointCloudWriter::PointCloudWriter()
 {
-
+    init();
 }
 
 PointCloudWriter::~PointCloudWriter()
@@ -45,6 +45,27 @@ int PointCloudWriter::savePointCloudToBin(const pcl::PCLPointCloud2::Ptr& srcClo
                 data[1] = point.y;
                 data[2] = point.z;
                 data[3] = point.intensity;
+                outF.write(reinterpret_cast<char*>(data), sizeof(data));
+            }
+            outF.close();
+        }
+    }
+    else if(number == 6)
+    {
+        pcl::PointCloud<pcl::PointXYZRGB> cloud;
+        pcl::fromPCLPointCloud2(*srcCloud, cloud);
+        if(cloud.size() > 0)
+        {
+            std::ofstream outF(fileNamePath, std::ios::binary);
+            for(const pcl::PointXYZRGB &point: cloud.points)
+            {
+                float data[6];
+                data[0] = point.x;
+                data[1] = point.y;
+                data[2] = point.z;
+                data[3] = static_cast<float>(point.r);
+                data[4] = static_cast<float>(point.g);
+                data[5] = static_cast<float>(point.b);
                 outF.write(reinterpret_cast<char*>(data), sizeof(data));
             }
             outF.close();

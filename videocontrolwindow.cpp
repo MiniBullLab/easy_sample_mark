@@ -24,6 +24,7 @@ VideoControlWindow::~VideoControlWindow()
 
 void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
+    markDataListWidget->clear();
     initMarkData(markDataDir, dataType);
     initVideoData();
     updateIsMarkButton(this->isMark);

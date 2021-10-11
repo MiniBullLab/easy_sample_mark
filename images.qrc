@@ -15,5 +15,7 @@
         <file>images/pcl.png</file>
         <file>images/seg.png</file>
         <file>images/logo.png</file>
+        <file>images/ocr.png</file>
+        <file>images/segment.png</file>
     </qresource>
 </RCC>

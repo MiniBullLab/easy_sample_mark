@@ -10,8 +10,15 @@
 #endif
 
 #include <pcl/common/common.h>
+#include <pcl/PolygonMesh.h>
+#include <pcl/TextureMesh.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
+#include <pcl/io/vtk_lib_io.h>
+#include <pcl/io/vtk_io.h>
+#include <pcl/io/obj_io.h>
 
 
 class PointCloudReader

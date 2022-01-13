@@ -30,7 +30,14 @@ int PCLViewer::setNewPointCloud(const QString &pcdFilePath)
     if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PCD_FILE)
     {
         errorCode = pcReader.pcdRead(pcdFilePath.toStdString(), srcCloud, origin, orientation);
-        drawRandomColorPointCloud();
+        if(PointCloudParamterConfig::getFieldsNumber() == 6)
+        {
+            drawRGBPointCloud();
+        }
+        else
+        {
+            drawRandomColorPointCloud();
+        }
     }
     else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
     {
@@ -55,8 +62,48 @@ int PCLViewer::setNewPointCloud(const QString &pcdFilePath)
     }
     else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PLY_FILE)
     {
-        errorCode = pcReader.plyRead(pcdFilePath.toStdString(), srcCloud);
-        drawRandomColorPointCloud();
+        if(PointCloudParamterConfig::getIsMesh())
+        {
+            srcMesh.reset (new pcl::PolygonMesh);
+            try{
+                errorCode = pcl::io::loadPolygonFilePLY(pcdFilePath.toStdString(), *srcMesh);
+                std::cout << "srcMesh:" << errorCode << std::endl;
+                drawPolygonMesh();
+             }
+             catch(std::bad_exception& e)
+             {
+                errorCode = -1;
+             }
+        }
+        else
+        {
+            errorCode = pcReader.plyRead(pcdFilePath.toStdString(), srcCloud);
+            if(PointCloudParamterConfig::getFieldsNumber() == 6)
+            {
+                drawRGBPointCloud();
+            }
+            else
+            {
+                drawRandomColorPointCloud();
+            }
+        }
+    }
+    else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::OBJ_FILE)
+    {
+        srcMesh.reset (new pcl::PolygonMesh);
+        try{
+            pcl::TextureMesh mesh;
+            std::cout << "1srcMesh:" << pcdFilePath.toStdString() << std::endl;
+            pcl::io::loadOBJFile(pcdFilePath.toStdString(), mesh);
+            std::cout << "2srcMesh:" << pcdFilePath.toStdString() << std::endl;
+            errorCode = pcl::io::loadPolygonFileOBJ(pcdFilePath.toStdString(), *srcMesh);
+            std::cout << "3srcMesh:" << errorCode << std::endl;
+            // drawPolygonMesh();
+         }
+         catch(std::bad_exception& e)
+         {
+            errorCode = -1;
+         }
     }
     return errorCode;
 }
@@ -159,6 +206,14 @@ void PCLViewer::clickedPointCallback(const pcl::visualization::PointPickingEvent
     }
 }
 
+void PCLViewer::drawPolygonMesh()
+{
+    viewer->removePolygonMesh("srcMesh");
+    viewer->addPolygonMesh(*srcMesh, "srcMesh");
+
+    this->update();
+}
+
 void PCLViewer::drawRandomColorPointCloud()
 {
     viewer->removePointCloud("srcCloud");
@@ -167,17 +222,36 @@ void PCLViewer::drawRandomColorPointCloud()
     //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
     viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
 
-    viewer->removeAllShapes();
-    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
-                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
-    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
-                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
+//    viewer->removeAllShapes();
+//    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+//                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
+//    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+//                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
 
     this->update();
+}
+
+void PCLViewer::drawRGBPointCloud()
+{
+    viewer->removePointCloud("srcCloud");
+    colorHandler.reset (new pcl::visualization::PointCloudColorHandlerRGBField<pcl::PCLPointCloud2>(srcCloud));
+    geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
+    //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
+    viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
+
+    //    viewer->removeAllShapes();
+    //    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
+    //    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+    //                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
+    //    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
+    //    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
+    //    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+    //                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
+    //    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
 }
 
 void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
@@ -199,15 +273,15 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
     }
     viewer->addPointCloud(rgbCloud, "srcCloud");
 
-    viewer->removeAllShapes();
-    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
-                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
-    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
-                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
-    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
+//    viewer->removeAllShapes();
+//    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+//                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube1");
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube1");
+//    viewer->addCube(0, 3.0, 0, 3.0, 0, 3.0, 1, 0, 0, "cube2", 0);
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+//                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "cube2");
+//    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "cube2");
 
     this->update();
 }
@@ -332,6 +406,7 @@ void PCLViewer::initConnect()
 
 void PCLViewer::initCloud()
 {
+    srcMesh.reset(new pcl::PolygonMesh);
     srcCloud.reset(new pcl::PCLPointCloud2);
     rgbCloud.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
     clickedPoints.reset(new pcl::PointCloud<pcl::PointXYZRGB>);

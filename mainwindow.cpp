@@ -146,6 +146,10 @@ void MainWindow::slotOpenPCDDir()
         {
             dirProcess.getDirAllFileName(this->openDataDir, "*.ply", processDataList);
         }
+        else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::OBJ_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.obj", processDataList);
+        }
         markWindow[loadDataType]->saveMarkDataList();
         markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::PCD;

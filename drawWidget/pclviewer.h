@@ -66,7 +66,9 @@ protected:
 
 private:
 
+    void drawPolygonMesh();
     void drawRandomColorPointCloud();
+    void drawRGBPointCloud();
     void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
     void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud);
     void drawCircle();
@@ -91,6 +93,8 @@ private:
     pcl::PCLPointCloud2::Ptr srcCloud;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr rgbCloud;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr clickedPoints;
+
+    pcl::PolygonMesh::Ptr srcMesh;
 
     pcl::search::KdTree<pcl::PointXYZ> search;
 

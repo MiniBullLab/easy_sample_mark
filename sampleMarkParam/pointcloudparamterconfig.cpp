@@ -9,6 +9,7 @@
 #include <QVariant>
 
 int PointCloudParamterConfig::FIELDS_NUMBER = 3;
+bool PointCloudParamterConfig::IS_MESH = false;
 PointCloudFileType PointCloudParamterConfig::FILE_TYPE = PointCloudFileType::PCD_FILE;
 
 PointCloudParamterConfig::PointCloudParamterConfig()
@@ -42,12 +43,25 @@ void PointCloudParamterConfig::setFileType(int type)
     case 2:
         FILE_TYPE = PointCloudFileType::PLY_FILE;
         break;
+    case 3:
+        FILE_TYPE = PointCloudFileType::OBJ_FILE;
+        break;
     }
+}
+
+void PointCloudParamterConfig::setIsMesh(bool is)
+{
+    IS_MESH = is;
 }
 
 int PointCloudParamterConfig::getFieldsNumber()
 {
     return FIELDS_NUMBER;
+}
+
+bool PointCloudParamterConfig::getIsMesh()
+{
+    return IS_MESH;
 }
 
 PointCloudFileType PointCloudParamterConfig::getFileType()
@@ -79,6 +93,10 @@ int PointCloudParamterConfig::loadConfig()
                 {
                     FIELDS_NUMBER = jsonObject.take("fieldsNumber").toVariant().toInt();
                 }
+                if(jsonObject.contains("isMesh"))
+                {
+                    IS_MESH = jsonObject.take("isMesh").toVariant().toBool();
+                }
                 if(jsonObject.contains("fileType"))
                 {
                     int type = jsonObject.take("fileType").toVariant().toInt();
@@ -94,6 +112,9 @@ int PointCloudParamterConfig::loadConfig()
                         break;
                     case 2:
                         FILE_TYPE = PointCloudFileType::PLY_FILE;
+                        break;
+                    case 3:
+                        FILE_TYPE = PointCloudFileType::OBJ_FILE;
                         break;
                     }
                 }
@@ -118,6 +139,7 @@ int PointCloudParamterConfig::saveConfig()
         return -1;
     }
     jsonData.insert("fieldsNumber", QString::number(FIELDS_NUMBER));
+    jsonData.insert("isMesh", QString::number(IS_MESH));
     jsonData.insert("fileType", QString::number(FILE_TYPE));
 
     doc.setObject(jsonData);

@@ -31,6 +31,7 @@ void PointCloudMarkParamterWindow::closeEvent(QCloseEvent *event)
 void PointCloudMarkParamterWindow::slotOk()
 {
     paramterConfig.setFieldsNumber(this->fieldsNumberBox->value());
+    paramterConfig.setIsMesh(this->isShowMeshBox->isChecked());
     paramterConfig.setFileType(this->formatBox->currentData().toInt());
     paramterConfig.saveConfig();
     this->accept();
@@ -60,16 +61,19 @@ void PointCloudMarkParamterWindow::initUI()
     fieldsNumberLabel = new QLabel(tr("读取字段数:"));
     fieldsNumberBox = new QSpinBox();
     fieldsNumberBox->setMinimum(3);
-    fieldsNumberBox->setMaximum(4);
+    fieldsNumberBox->setMaximum(6);
     fieldsNumberBox->setValue(paramterConfig.getFieldsNumber());
     fieldsNumberBox->setSingleStep(1);
+
+    isShowMeshBox = new QCheckBox(tr("是否显示Mesh"));
+    isShowMeshBox->setChecked(paramterConfig.getIsMesh());
 
     QHBoxLayout *layout1 = new QHBoxLayout();
     layout1->setSpacing(30);
     layout1->addWidget(fieldsNumberLabel);
     layout1->addWidget(fieldsNumberBox);
 
-    infoLabel = new QLabel(tr("注意：\n读取文件格式目前只支持pcd与bin文件，\n"
+    infoLabel = new QLabel(tr("注意：\n读取文件格式目前只支持pcd,bin,ply文件，\n"
                               "其中读取字段数参数只与读bin文件有关，\n"
                               "该参数描述了一个包含几个字段信息"));
 
@@ -88,12 +92,13 @@ void PointCloudMarkParamterWindow::initUI()
     mainLayout->setSpacing(10);
     mainLayout->addLayout(layout);
     mainLayout->addLayout(layout1);
+    mainLayout->addWidget(isShowMeshBox);
     mainLayout->addWidget(infoLabel);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(420, 250);
-    this->setMinimumSize(420, 250);
+    this->setMaximumSize(420, 280);
+    this->setMinimumSize(420, 280);
     this->setWindowTitle(tr("点云标注参数配置"));
 }
 
@@ -109,6 +114,7 @@ void PointCloudMarkParamterWindow::initFileType()
     formatBox->addItem("PCD", PointCloudFileType::PCD_FILE);
     formatBox->addItem("BIN", PointCloudFileType::BIN_FILE);
     formatBox->addItem("PLY", PointCloudFileType::PLY_FILE);
+    formatBox->addItem("OBJ", PointCloudFileType::OBJ_FILE);
 
     formatBox->setCurrentIndex(static_cast<int>(paramterConfig.getFileType()));
 }

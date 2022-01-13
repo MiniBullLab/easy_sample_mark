@@ -119,6 +119,8 @@ void PCDConverterWindow::initUI()
     dstFormatLabel = new QLabel(tr("点云转换格式："));
     dstFormatBox = new QComboBox();
     dstFormatBox->addItem(tr(".bin"));
+    dstFormatBox->addItem(tr(".txt"));
+    dstFormatBox->addItem(tr(".mesh"));
 
     layout0->addWidget(srcFormatLabel);
     layout0->addWidget(srcFormatBox);

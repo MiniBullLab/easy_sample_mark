@@ -36,6 +36,7 @@ private:
     QComboBox *formatBox;
     QLabel* fieldsNumberLabel;
     QSpinBox* fieldsNumberBox;
+    QCheckBox* isShowMeshBox;
     QLabel* infoLabel;
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;

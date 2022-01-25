@@ -215,13 +215,14 @@ void PCDConverterThread::poissonReconstruction(const std::string savePath, const
       std::cout << "begin poisson reconstruction" << std::endl;
       pcl::Poisson<pcl::PointXYZRGBNormal> poisson;
       poisson.setDegree(2);
-      poisson.setDepth(10);
-      poisson.setSolverDivide(8);
-      poisson.setIsoDivide(8);
-
-      poisson.setConfidence(false);
+      poisson.setDepth(8);
+      poisson.setSolverDivide(8); //设置求解线性方程组的Gauss-Seidel迭代方法的深度
+      poisson.setIsoDivide(8); //用于提取ISO等值面的算法的深度
+      poisson.setConfidence(false); //是否使用法向量的大小作为置信信息。如果false，所有法向量均归一化。
       poisson.setManifold(true);
-      poisson.setOutputPolygons(true);
+      poisson.setOutputPolygons(false);
+      poisson.setSamplesPerNode(3.0); //设置落入一个八叉树结点中的样本点的最小数量。无噪声，[1.0-5.0],有噪声[15.-20.]平滑
+      poisson.setScale(1.25);
 
       poisson.setInputCloud(cloud_smoothed_normals);
       PolygonMesh mesh;

@@ -242,6 +242,8 @@ void PCLViewer::drawRGBPointCloud()
     geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
     //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
     viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, \
+                                             PointCloudParamterConfig::getPointSize(), "srcCloud", 0);
 
     //    viewer->removeAllShapes();
     //    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
@@ -272,6 +274,8 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
       rgbCloud->push_back(point);
     }
     viewer->addPointCloud(rgbCloud, "srcCloud");
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, \
+                                             PointCloudParamterConfig::getPointSize(), "srcCloud", 0);
 
 //    viewer->removeAllShapes();
 //    viewer->addCube(0, 1.0, 0, 1.0, 0, 1.0, 1, 0, 0, "cube1", 0);
@@ -296,6 +300,8 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud)
       rgbCloud->push_back(cloud->points[i]);
     }
     viewer->addPointCloud(rgbCloud, "srcCloud");
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, \
+                                             PointCloudParamterConfig::getPointSize(), "srcCloud", 0);
     this->update();
 }
 

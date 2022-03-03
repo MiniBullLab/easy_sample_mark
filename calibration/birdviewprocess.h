@@ -53,6 +53,12 @@ private:
     QLabel *ratioLabel;
     QSpinBox *ratioBox;
 
+    QLabel *chessboardSizeLabel;
+    QDoubleSpinBox *chessboardSizeBox;
+    QLabel *chessboardCountLabel;
+    QSpinBox *chessboardWBox;
+    QSpinBox *chessboardHBox;
+
     QPushButton *selectPointButton;
     QPushButton *birdCalibrationButton;
     QPushButton *birdViewButton;
@@ -63,6 +69,7 @@ private:
 
     ConvertCVQImage convertImage;
 
+    std::vector<std::vector<cv::Point2f>> allCorners;
     cv::Mat homography;
 
     void init();

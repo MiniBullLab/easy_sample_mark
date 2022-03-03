@@ -115,7 +115,7 @@ void BirdViewProcess::slotComputeDistance()
 void BirdViewProcess::init()
 {
     this->currentImage = QImage(tr(":/images/images/play.png"));
-
+    allCorners.clear();
     homography = cv::Mat(3, 3, CV_32F, cv::Scalar::all (0));
 }
 
@@ -170,11 +170,43 @@ void BirdViewProcess::initUI()
     rightLayout3->addWidget(ratioLabel);
     rightLayout3->addWidget(ratioBox);
 
+    chessboardSizeLabel = new QLabel(tr("棋盘格尺寸:"));
+    chessboardSizeBox = new QDoubleSpinBox();
+    chessboardSizeBox->setValue(1.0);
+    chessboardSizeBox->setSingleStep(1.0);
+    chessboardSizeBox->setMinimum(1.0);
+    chessboardSizeBox->setSuffix("mm");
+
+    QHBoxLayout *rightLayout4 = new QHBoxLayout();
+    rightLayout4->setSpacing(20);
+    rightLayout4->addWidget(chessboardSizeLabel);
+    rightLayout4->addWidget(chessboardSizeBox);
+
+    chessboardCountLabel = new QLabel(tr("棋盘格角点数:"));
+    chessboardWBox = new QSpinBox();
+    chessboardWBox->setValue(1);
+    chessboardWBox->setMinimum(1);
+    chessboardWBox->setSingleStep(10);
+    chessboardWBox->setPrefix("w:");
+    chessboardHBox = new QSpinBox();
+    chessboardHBox->setValue(1);
+    chessboardHBox->setMinimum(1);
+    chessboardHBox->setSingleStep(10);
+    chessboardHBox->setPrefix("h:");
+
+    QHBoxLayout *rightLayout5 = new QHBoxLayout();
+    rightLayout5->setSpacing(20);
+    rightLayout5->addWidget(chessboardCountLabel);
+    rightLayout5->addWidget(chessboardWBox);
+    rightLayout5->addWidget(chessboardHBox);
+
     QVBoxLayout *paramLayout = new QVBoxLayout();
-    paramLayout->setSpacing(20);
+    // paramLayout->setSpacing(20);
     paramLayout->addLayout(rightLayout1);
     paramLayout->addLayout(rightLayout2);
     paramLayout->addLayout(rightLayout3);
+    paramLayout->addLayout(rightLayout4);
+    paramLayout->addLayout(rightLayout5);
     paramGroundBox = new QGroupBox(tr("参数"));
     paramGroundBox->setLayout(paramLayout);
 
@@ -188,7 +220,7 @@ void BirdViewProcess::initUI()
     distanceButton->setEnabled(false);
 
     QVBoxLayout *rightLayout = new QVBoxLayout();
-    rightLayout->setSpacing(30);
+    rightLayout->setSpacing(10);
     rightLayout->addWidget(openImageButton);
     rightLayout->addWidget(paramGroundBox);
     rightLayout->addWidget(selectPointButton);
@@ -197,7 +229,7 @@ void BirdViewProcess::initUI()
     rightLayout->addWidget(distanceButton);
 
     QHBoxLayout *centerLayout = new QHBoxLayout();
-    centerLayout->setSpacing(30);
+    centerLayout->setSpacing(10);
     centerLayout->addWidget(scrollArea);
     centerLayout->addLayout(rightLayout);
 
@@ -216,7 +248,7 @@ void BirdViewProcess::initUI()
     this->setLayout(mainLayout);
     //this->setMaximumSize(700,520);
     this->setMinimumSize(1000, 600);
-    this->setWindowTitle(tr("鸟瞰图标定"));
+    this->setWindowTitle(tr("标定"));
 }
 
 void BirdViewProcess::initConnect()

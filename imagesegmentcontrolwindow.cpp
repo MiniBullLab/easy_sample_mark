@@ -303,10 +303,11 @@ void ImageSegmentControlWindow::loadImageData(const QString &imagePath, const QS
 {
     if(currentImage.load(imagePath))
     {
+        // qDebug() << imagePath << endl;
         currentImagePath = imagePath;
         updateImage();
         QFileInfo imageFileInfo(currentImagePath);
-        QString readSegmentPath = saveSegmentLabelDir + "/" + imageFileInfo.completeBaseName() + ".png";
+        QString readSegmentPath = saveSegmentLabelDir + "/" + imageFileInfo.completeBaseName() + "." + SegmentParamterConfig::getSegmentPost();
         QFileInfo segmentFileInfo(readSegmentPath);
         MyObject maskObject;
         if(segmentFileInfo.exists() && maskProcess.readSegmentMask(readSegmentPath, maskObject) == 0)

@@ -37,6 +37,8 @@ private:
     QLabel* fieldsNumberLabel;
     QSpinBox* fieldsNumberBox;
     QCheckBox* isShowMeshBox;
+    QLabel* pointSizeLabel;
+    QSpinBox* pointSizeBox;
     QLabel* infoLabel;
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;

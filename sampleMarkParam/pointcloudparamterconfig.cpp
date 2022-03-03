@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QVariant>
 
+int PointCloudParamterConfig::POINT_SIZE = 2;
 int PointCloudParamterConfig::FIELDS_NUMBER = 3;
 bool PointCloudParamterConfig::IS_MESH = false;
 PointCloudFileType PointCloudParamterConfig::FILE_TYPE = PointCloudFileType::PCD_FILE;
@@ -21,6 +22,11 @@ PointCloudParamterConfig::PointCloudParamterConfig()
 PointCloudParamterConfig::~PointCloudParamterConfig()
 {
 
+}
+
+void PointCloudParamterConfig::setPointSize(int size)
+{
+    POINT_SIZE = size;
 }
 
 void PointCloudParamterConfig::setFieldsNumber(int number)
@@ -52,6 +58,11 @@ void PointCloudParamterConfig::setFileType(int type)
 void PointCloudParamterConfig::setIsMesh(bool is)
 {
     IS_MESH = is;
+}
+
+int PointCloudParamterConfig::getPointSize()
+{
+    return POINT_SIZE;
 }
 
 int PointCloudParamterConfig::getFieldsNumber()
@@ -89,6 +100,10 @@ int PointCloudParamterConfig::loadConfig()
             if (parseDoucment.isObject())
             {
                 QJsonObject jsonObject = parseDoucment.object();
+                if(jsonObject.contains("PointSize"))
+                {
+                    POINT_SIZE = jsonObject.take("PointSize").toVariant().toInt();
+                }
                 if(jsonObject.contains("fieldsNumber"))
                 {
                     FIELDS_NUMBER = jsonObject.take("fieldsNumber").toVariant().toInt();
@@ -138,6 +153,7 @@ int PointCloudParamterConfig::saveConfig()
     {
         return -1;
     }
+    jsonData.insert("PointSize", QString::number(POINT_SIZE));
     jsonData.insert("fieldsNumber", QString::number(FIELDS_NUMBER));
     jsonData.insert("isMesh", QString::number(IS_MESH));
     jsonData.insert("fileType", QString::number(FILE_TYPE));

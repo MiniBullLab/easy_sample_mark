@@ -17,10 +17,12 @@ public:
     PointCloudParamterConfig();
     ~PointCloudParamterConfig();
 
+    void setPointSize(int size);
     void setFieldsNumber(int number);
     void setFileType(int type);
     void setIsMesh(bool is);
 
+    static int getPointSize();
     static int getFieldsNumber();
     static bool getIsMesh();
     static PointCloudFileType getFileType();
@@ -29,6 +31,7 @@ public:
     static int saveConfig();
 
 private:
+    static int POINT_SIZE;
     static int FIELDS_NUMBER;
     static bool IS_MESH;
     static PointCloudFileType FILE_TYPE;

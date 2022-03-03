@@ -81,7 +81,11 @@ SOURCES += main.cpp\
     paramWindow/markclasswindow.cpp \
     selectMarkInfo/selectmarkocrwindow.cpp \
     sampleMarkParam/ocrparamterconfig.cpp \
-    dataType/ocrobject.cpp
+    dataType/ocrobject.cpp \
+    drawShape/drawrecttrackshape.cpp \
+    selectMarkInfo/selectmarktrackingwindow.cpp \
+    calibration/birdviewprocess.cpp \
+    calibration/imagelabel.cpp
 
 HEADERS  += controlwindow.h \
     mainwindow.h \
@@ -144,7 +148,11 @@ HEADERS  += controlwindow.h \
     paramWindow/markclasswindow.h \
     selectMarkInfo/selectmarkocrwindow.h \
     sampleMarkParam/ocrparamterconfig.h \
-    dataType/ocrobject.h
+    dataType/ocrobject.h \
+    drawShape/drawrecttrackshape.h \
+    selectMarkInfo/selectmarktrackingwindow.h \
+    calibration/birdviewprocess.h \
+    calibration/imagelabel.h
 
 RESOURCES += \
     style.qrc \
@@ -624,7 +632,6 @@ INCLUDEPATH+= /home/lpj/Software/opencv34/include
 LIBS+=-L/home/lpj/Software/opencv34/lib \
     -lopencv_stitching \
     -lopencv_superres \
-    -lopencv_cudacodec \
     -lopencv_videostab \
     -lopencv_bgsegm \
     -lopencv_bioinspired \

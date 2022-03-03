@@ -265,7 +265,7 @@ void SegmentLabel::drawSegmentMask(QPainter &painter)
         if(maskImage != NULL)
         {
             painter.save();
-            painter.setOpacity(0.3);
+            painter.setOpacity(0.1);
             painter.drawImage(QPoint(0, 0), *maskImage);
             painter.restore();
         }

@@ -1,5 +1,6 @@
 ﻿#include "segmentationmaskprocess.h"
 #include "sampleMarkParam/manualparamterconfig.h"
+#include <iostream>
 
 SegmentationMaskProcess::SegmentationMaskProcess(QObject *parent) : QObject(parent)
 {
@@ -39,6 +40,7 @@ int SegmentationMaskProcess::readSegmentMask(const QString &imageFilePath, MyObj
     if(segmentImage.load(imageFilePath))
     {
         object.setSegmentImage(segmentImage);
+        // std::cout << imageFilePath.toStdString() << std::endl;
         return 0;
     }
     else

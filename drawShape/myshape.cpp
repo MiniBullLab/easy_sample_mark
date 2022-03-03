@@ -39,6 +39,7 @@ QMap<int, QString> MyShape::getImageShape() const
     result.insert(ShapeType::LINE_SHAPE, this->shape[ShapeType::LINE_SHAPE]);
     result.insert(ShapeType::POLYGON_SHAPE, this->shape[ShapeType::POLYGON_SHAPE]);
     result.insert(ShapeType::POLYLINE_SHAPE, this->shape[ShapeType::POLYLINE_SHAPE]);
+    result.insert(ShapeType::RECT_TRACK_SHAPE, this->shape[ShapeType::RECT_TRACK_SHAPE]);
 #endif
     return result;
 }
@@ -70,5 +71,6 @@ void MyShape::init()
     shape.insert(ShapeType::LINE_SHAPE, QObject::tr("直线"));
     shape.insert(ShapeType::POLYGON_SHAPE, QObject::tr("多边形"));
     shape.insert(ShapeType::POLYLINE_SHAPE, QObject::tr("折线"));
+    shape.insert(ShapeType::RECT_TRACK_SHAPE, QObject::tr("矩形追踪"));
     shape.insert(ShapeType::INSTANCE_SEGMENT_SHAPE, QObject::tr("实例分割"));
 }

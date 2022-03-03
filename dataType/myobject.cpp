@@ -20,6 +20,16 @@ ShapeType MyObject::getShapeType() const
     return this->shapeType;
 }
 
+void MyObject::setID(const int id)
+{
+    this->objectID = id;
+}
+
+int MyObject::getID() const
+{
+    return this->objectID;
+}
+
 void MyObject::setBox(QRect box)
 {
     this->box = box;
@@ -155,6 +165,7 @@ OCRObject MyObject::getOCRObject() const
 void MyObject::init()
 {
     this->shapeType = ShapeType::UNSHAPE;
+    this->objectID = -1;
     this->line.clear();
     this->pointList.clear();
     this->polygon.clear();

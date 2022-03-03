@@ -19,6 +19,9 @@ public:
     void setShapeType(ShapeType type);
     ShapeType getShapeType() const;
 
+    void setID(const int id);
+    int getID() const;
+
     void setBox(QRect box);
     QRect getBox() const;
 
@@ -59,6 +62,7 @@ public:
     OCRObject getOCRObject() const;
 
 private:
+    int objectID;
     int objectFlag;
     bool isDifficult;
     bool isTrackingObject;

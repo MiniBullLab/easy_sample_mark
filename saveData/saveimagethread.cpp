@@ -23,6 +23,7 @@ void SaveImageThread::run()
     QImage currentImage;
     int errCode=0;
     QString fileName;
+    int widthCount = QString::number(videoProcess->getFrameCount()).count() + 1;
     while (isStart)
     {
         if(videoProcess->isOpen())
@@ -35,9 +36,9 @@ void SaveImageThread::run()
                 {
                     if(frameNumber % skipFrameNuber == 0)
                     {
-                        fileName = dirName + "/" + QString("/%1_%2").arg(this->videoFileName).arg(frameNumber)
-                                + imagePost;
-                        // fileName = dirName + "/" + QString("/%1").arg(frameNumber) + imagePost;
+//                        fileName = dirName + "/" + QString("/%1_%2").arg(this->videoFileName).arg(frameNumber)
+//                                + imagePost;
+                        fileName = dirName + "/" + QString("/%1").arg(frameNumber, widthCount, 10,QLatin1Char('0')) + imagePost;
                         //myImageWrite.saveImage(frame, fileName.toStdString());
                         cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
                         currentImage = QImage((uchar*)(frame.data), frame.cols, frame.rows,

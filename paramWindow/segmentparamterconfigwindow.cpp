@@ -32,6 +32,7 @@ void SegmentParamterConfigWindow::closeEvent(QCloseEvent *event)
 void SegmentParamterConfigWindow::slotOk()
 {
     paramterConfig.setLineWidth(lineWidthBox->value());
+    paramterConfig.setSegmentPost(segmentPostBox->currentText().toStdString());
     paramterConfig.saveConfig();
     this->accept();
 }
@@ -43,7 +44,7 @@ void SegmentParamterConfigWindow::init()
 
 void SegmentParamterConfigWindow::initUI()
 {
-    lineWidthLabel = new QLabel(tr("线条区域宽度"));
+    lineWidthLabel = new QLabel(tr("线条区域宽度:"));
     lineWidthBox = new QSpinBox();
     lineWidthBox->setMinimum(1);
     lineWidthBox->setMaximum(200);
@@ -54,6 +55,17 @@ void SegmentParamterConfigWindow::initUI()
     topLayout->setSpacing(30);
     topLayout->addWidget(lineWidthLabel);
     topLayout->addWidget(lineWidthBox);
+
+    segmentPostLabel = new QLabel(tr("保存分割图格式:"));
+    segmentPostBox = new QComboBox();
+    segmentPostBox->addItem(tr("png"));
+    segmentPostBox->addItem(tr("jpg"));
+    segmentPostBox->setCurrentText(paramterConfig.getSegmentPost());
+
+    QHBoxLayout *topLayout1 = new QHBoxLayout();
+    topLayout1->setSpacing(30);
+    topLayout1->addWidget(segmentPostLabel);
+    topLayout1->addWidget(segmentPostBox);
 
     loadDefaultButton = new QPushButton(tr("恢复默认值"));
     saveButton = new QPushButton(tr("保存"));
@@ -69,6 +81,7 @@ void SegmentParamterConfigWindow::initUI()
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
     mainLayout->addLayout(topLayout);
+    mainLayout->addLayout(topLayout1);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
@@ -87,4 +100,5 @@ void SegmentParamterConfigWindow::initConnect()
 void SegmentParamterConfigWindow::loadDefaultValue()
 {
     lineWidthBox->setValue(10);
+    segmentPostBox->setCurrentText("png");
 }

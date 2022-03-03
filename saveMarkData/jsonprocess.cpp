@@ -167,6 +167,10 @@ int JSONProcess::writeRectData(const QList<MyObject>& objects, QJsonObject &json
             QJsonObject objectData;
             QJsonArray maskData;
             int tempIndex = 0;
+            if(objects[loop].getID() >= 0)
+            {
+                objectData.insert("id", objects[loop].getID());
+            }
             objectData.insert("minX", rect.topLeft().x());
             objectData.insert("minY", rect.topLeft().y());
             objectData.insert("maxX", rect.bottomRight().x());
@@ -216,6 +220,11 @@ int JSONProcess::readRectData(const QJsonArray &value, QList<MyObject>& objects)
                 point.setY(dataList.at(index).toInt());
                 mask.append(point);
             }
+        }
+        if(objectData.contains("id"))
+        {
+            int id = objectData.take("id").toVariant().toInt();
+            object.setID(id);
         }
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setBox(QRect(QPoint(minX, minY), QPoint(maxX, maxY)));

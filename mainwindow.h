@@ -21,6 +21,7 @@
 #include "videoTools/qcamerawindow.h"
 #include "pcTools/pcdconverterwindow.h"
 #include "pcTools/pcdfilterwindow.h"
+#include "calibration/birdviewprocess.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -69,6 +70,8 @@ public slots:
     void slotPcdConverter();
     void slotPcdFilter();
 
+    void slotBirdViewProcess();
+
     //about
     void slotAbout();
     void slotUserManual();
@@ -111,6 +114,7 @@ private:
     QAction *cameraAction;
     QAction *pcdConverterAction;
     QAction *pcdFilterAction;
+    QAction *birdViewProcessAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -148,6 +152,8 @@ private:
 
     PCDConverterWindow *pcdConverterWindow;
     PCDFilterWindow *pcdFilterWindow;
+
+    BirdViewProcess *birdViewPorcess;
 
     MarkDataType loadDataType;
     MyShape imgShape;

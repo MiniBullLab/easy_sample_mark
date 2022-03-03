@@ -15,6 +15,7 @@
 #include "manualparamterconfig.h"
 
 int SegmentParamterConfig::LINE_WIDTH = 10;
+std::string SegmentParamterConfig::SEGMENT_POST = "png";
 
 SegmentParamterConfig::SegmentParamterConfig()
 {
@@ -34,6 +35,16 @@ void SegmentParamterConfig::setLineWidth(const int width)
 int SegmentParamterConfig::getLineWidth()
 {
     return LINE_WIDTH;
+}
+
+void SegmentParamterConfig::setSegmentPost(const std::string post)
+{
+    SEGMENT_POST = post;
+}
+
+QString SegmentParamterConfig::getSegmentPost()
+{
+    return QString::fromStdString(SEGMENT_POST);
 }
 
 int SegmentParamterConfig::loadConfig()
@@ -60,6 +71,10 @@ int SegmentParamterConfig::loadConfig()
                 {
                     LINE_WIDTH = jsonObject.take("lineWidth").toVariant().toInt();
                 }
+                if(jsonObject.contains("segmentPost"))
+                {
+                    SEGMENT_POST = jsonObject.take("segmentPost").toVariant().toString().toStdString();
+                }
             }
         }
     }
@@ -81,6 +96,7 @@ int SegmentParamterConfig::saveConfig()
         return -1;
     }
     jsonData.insert("lineWidth", QString::number(LINE_WIDTH));
+    jsonData.insert("segmentPost", QString::fromStdString(SEGMENT_POST));
     doc.setObject(jsonData);
     data = doc.toJson();
     file.write(data);

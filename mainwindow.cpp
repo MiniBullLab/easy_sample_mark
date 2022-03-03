@@ -329,6 +329,15 @@ void MainWindow::slotPcdFilter()
     pcdFilterWindow->show();
 }
 
+void MainWindow::slotBirdViewProcess()
+{
+    birdViewPorcess = new BirdViewProcess();
+    birdViewPorcess->setModal(true);
+    birdViewPorcess->exec();
+    birdViewPorcess->deleteLater();
+    birdViewPorcess = nullptr;
+}
+
 void MainWindow::slotAbout()
 {
     QMessageBox::about(this, tr("样本标注系统"), tr("样本标注系统 版本 %1").arg(qApp->applicationVersion()));
@@ -475,6 +484,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         pcdConverterWindow->close();
     if(pcdFilterWindow != nullptr)
         pcdFilterWindow->close();
+    if(birdViewPorcess != nullptr)
+        birdViewPorcess->close();
     if(centerWidget != nullptr)
     {
         centerWidget->currentWidget()->close();
@@ -496,6 +507,8 @@ void MainWindow::initData()
 
     pcdConverterWindow = nullptr;
     pcdFilterWindow = nullptr;
+
+    birdViewPorcess = nullptr;
 
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
@@ -545,6 +558,8 @@ void MainWindow::initAction()
 
     pcdFilterAction = new QAction(tr("PCD文件过滤"), this);
     pcdFilterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
+
+    birdViewProcessAction = new QAction(tr("鸟瞰图标定"), this);
 
     //about
     aboutAction = new QAction(tr("关于"), this);
@@ -606,6 +621,8 @@ void MainWindow::initMenuBar()
     toolMenu->addSeparator();
     toolMenu->addAction(pcdConverterAction);
     toolMenu->addAction(pcdFilterAction);
+    toolMenu->addSeparator();
+    toolMenu->addAction(birdViewProcessAction);
 #endif
     //about
     aboutMenu = new QMenu(tr("关于"), this);
@@ -703,6 +720,8 @@ void MainWindow::initConnect()
 
     connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
     connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
+
+    connect(birdViewProcessAction, &QAction::triggered, this, &MainWindow::slotBirdViewProcess);
 
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);

@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QSpinBox>
 #include <QLabel>
+#include <QComboBox>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -31,6 +32,8 @@ protected:
 private:
     QLabel *lineWidthLabel;
     QSpinBox *lineWidthBox;
+    QLabel *segmentPostLabel;
+    QComboBox *segmentPostBox;
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;
     QPushButton *cancelButton;

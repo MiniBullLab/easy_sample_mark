@@ -10,6 +10,7 @@
 #include "drawShape/drawlineshape.h"
 #include "drawShape/drawpolygonshape.h"
 #include "drawShape/drawlaneshape.h"
+#include "drawShape/drawrecttrackshape.h"
 #include "dataType/mark_data_type.h"
 
 class EditableLabel : public ImageDrawLabel

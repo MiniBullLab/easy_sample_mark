@@ -30,6 +30,7 @@ void PointCloudMarkParamterWindow::closeEvent(QCloseEvent *event)
 
 void PointCloudMarkParamterWindow::slotOk()
 {
+    paramterConfig.setPointSize(this->pointSizeBox->value());
     paramterConfig.setFieldsNumber(this->fieldsNumberBox->value());
     paramterConfig.setIsMesh(this->isShowMeshBox->isChecked());
     paramterConfig.setFileType(this->formatBox->currentData().toInt());
@@ -39,6 +40,7 @@ void PointCloudMarkParamterWindow::slotOk()
 
 void PointCloudMarkParamterWindow::loadDefaultValue()
 {
+    this->pointSizeBox->setValue(2);
     this->fieldsNumberBox->setValue(3);
     this->formatBox->setCurrentIndex(0);
 }
@@ -65,13 +67,26 @@ void PointCloudMarkParamterWindow::initUI()
     fieldsNumberBox->setValue(paramterConfig.getFieldsNumber());
     fieldsNumberBox->setSingleStep(1);
 
-    isShowMeshBox = new QCheckBox(tr("是否显示Mesh"));
-    isShowMeshBox->setChecked(paramterConfig.getIsMesh());
-
     QHBoxLayout *layout1 = new QHBoxLayout();
     layout1->setSpacing(30);
     layout1->addWidget(fieldsNumberLabel);
     layout1->addWidget(fieldsNumberBox);
+
+    isShowMeshBox = new QCheckBox(tr("是否显示Mesh"));
+    isShowMeshBox->setChecked(paramterConfig.getIsMesh());
+
+    pointSizeLabel = new QLabel(tr("显示点云大小:"));
+    pointSizeBox = new QSpinBox();
+    pointSizeBox->setMinimum(1);
+    pointSizeBox->setMaximum(100);
+    pointSizeBox->setValue(paramterConfig.getPointSize());
+    pointSizeBox->setSingleStep(1);
+
+    QHBoxLayout *layout2 = new QHBoxLayout();
+    layout2->setSpacing(30);
+    layout2->addWidget(isShowMeshBox);
+    layout2->addWidget(pointSizeLabel);
+    layout2->addWidget(pointSizeBox);
 
     infoLabel = new QLabel(tr("注意：\n读取文件格式目前只支持pcd,bin,ply文件，\n"
                               "其中读取字段数参数只与读bin文件有关，\n"
@@ -92,7 +107,7 @@ void PointCloudMarkParamterWindow::initUI()
     mainLayout->setSpacing(10);
     mainLayout->addLayout(layout);
     mainLayout->addLayout(layout1);
-    mainLayout->addWidget(isShowMeshBox);
+    mainLayout->addLayout(layout2);
     mainLayout->addWidget(infoLabel);
     mainLayout->addLayout(bottomLayout);
 

@@ -371,7 +371,8 @@ void PCLViewer::initData()
     colorHandler.reset (new pcl::visualization::PointCloudColorHandlerRandom<pcl::PCLPointCloud2>(srcCloud));
     geometryHandler.reset (new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
     viewer->addPointCloud (srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
-    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "srcCloud", 0);
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, \
+                                             PointCloudParamterConfig::getPointSize(), "srcCloud", 0);
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_IMMEDIATE_RENDERING, 1.0, "srcCloud");
 
     this->SetRenderWindow(viewer->getRenderWindow());

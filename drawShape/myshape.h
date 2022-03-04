@@ -34,6 +34,7 @@ public:
     QMap<int, QString> getImageShape() const;
     QMap<int, QString> getSegmentShape() const;
     QMap<int, QString> getOCRShape() const;
+    QMap<int, QString> getTracking2dShape() const;
 
 private:
 

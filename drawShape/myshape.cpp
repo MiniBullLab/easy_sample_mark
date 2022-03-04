@@ -39,7 +39,6 @@ QMap<int, QString> MyShape::getImageShape() const
     result.insert(ShapeType::LINE_SHAPE, this->shape[ShapeType::LINE_SHAPE]);
     result.insert(ShapeType::POLYGON_SHAPE, this->shape[ShapeType::POLYGON_SHAPE]);
     result.insert(ShapeType::POLYLINE_SHAPE, this->shape[ShapeType::POLYLINE_SHAPE]);
-    result.insert(ShapeType::RECT_TRACK_SHAPE, this->shape[ShapeType::RECT_TRACK_SHAPE]);
 #endif
     return result;
 }
@@ -61,6 +60,14 @@ QMap<int, QString> MyShape::getOCRShape() const
     QMap<int, QString> result;
     result.clear();
     result.insert(ShapeType::OCR_POLYGON_SHAPE, QObject::tr("多边形标注"));
+    return result;
+}
+
+QMap<int, QString> MyShape::getTracking2dShape() const
+{
+    QMap<int, QString> result;
+    result.clear();
+    result.insert(ShapeType::RECT_TRACK_SHAPE, this->shape[ShapeType::RECT_TRACK_SHAPE]);
     return result;
 }
 

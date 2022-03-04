@@ -64,7 +64,7 @@ void MainWindow::slotOpenVideoDir()
     }
     else
     {
-        initImageMarkShape();
+        initImageTrackingMarkShape();
         processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
         markWindow[loadDataType]->saveClassConfig();
@@ -115,6 +115,29 @@ void MainWindow::slotOpenOCRImageDir()
         markWindow[loadDataType]->saveMarkDataList();
         markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::OCR;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
+    }
+}
+
+void MainWindow::slotOpenImageTrackingDir()
+{
+    DirProcess dirProcess;
+    QList<QString> processDataList;
+    processDataList.clear();
+    this->openDataDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), openDataDir, QFileDialog::ShowDirsOnly);
+    if(this->openDataDir.trimmed().isEmpty() || !QDir(this->openDataDir).exists())
+    {
+        qDebug() << "打开的文件路径有误:" << this->openDataDir << endl;
+    }
+    else
+    {
+        initImageTrackingMarkShape();
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
+        markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
+        loadDataType = MarkDataType::IMAGE_TRACKING;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
@@ -365,6 +388,9 @@ void MainWindow::slotSelectMarkShape(const QString &text)
     case MarkDataType::OCR:
         markWindow[MarkDataType::OCR]->setDrawShape(index);
         break;
+    case MarkDataType::IMAGE_TRACKING:
+        markWindow[MarkDataType::IMAGE_TRACKING]->setDrawShape(index);
+        break;
     case MarkDataType::PCD:
         break;
     case MarkDataType::UNKNOWN:
@@ -523,6 +549,8 @@ void MainWindow::initAction()
     openSegmentImageDirAction->setIcon(QIcon(tr(":/images/images/segment.png")));
     openOCRImageDirAction = new QAction(tr("打开字符图片文件夹"), this);
     openOCRImageDirAction->setIcon(QIcon(tr(":/images/images/ocr.png")));
+    openImageTrackingDirAction = new QAction(tr("打开追踪图片文件夹"), this);
+    openImageTrackingDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
     openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
     openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
     openPCDDirAction = new QAction(tr("打开点云文件夹"), this);
@@ -587,6 +615,7 @@ void MainWindow::initMenuBar()
     fileMenu->addAction(openImageDirAction);
     fileMenu->addAction(openSegmentImageDirAction);
     fileMenu->addAction(openOCRImageDirAction);
+    fileMenu->addAction(openImageTrackingDirAction);
 #if EDGE_TOOL == 0
     fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openPCDDirAction);
@@ -648,6 +677,7 @@ void MainWindow::initToolBar()
     fileTool->addAction(openImageDirAction);
     fileTool->addAction(openSegmentImageDirAction);
     fileTool->addAction(openOCRImageDirAction);
+    fileTool->addAction(openImageTrackingDirAction);
 #if EDGE_TOOL == 0
     fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openPCDDirAction);
@@ -677,6 +707,7 @@ void MainWindow::initUI()
    markWindow.append(new VideoControlWindow(this));
    markWindow.append(new ImageSegmentControlWindow(this));
    markWindow.append(new OCRControlWindow(this));
+   markWindow.append(new ImageTrackingControlWindow(this));
    markWindow.append(new PCLControlWindow(this));
 
    for(int loop = 0; loop < markWindow.size(); loop++)
@@ -695,9 +726,10 @@ void MainWindow::initConnect()
 {
     //file
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
-    connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
     connect(openSegmentImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageSegmentDir);
     connect(openOCRImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenOCRImageDir);
+    connect(openImageTrackingDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageTrackingDir);
+    connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
     connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
@@ -761,6 +793,17 @@ void MainWindow::initSegmentMarkShape()
 void MainWindow::initOCRMarkShape()
 {
     QMap<int, QString> shapeDatas = imgShape.getOCRShape();
+    shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
+}
+
+void MainWindow::initImageTrackingMarkShape()
+{
+    QMap<int, QString> shapeDatas = imgShape.getTracking2dShape();
     shapeBox->clear();
     for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
         iter != shapeDatas.constEnd(); ++iter)

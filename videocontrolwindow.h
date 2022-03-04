@@ -1,11 +1,12 @@
 ﻿#ifndef VIDEOCONTROLWINDOW_H
 #define VIDEOCONTROLWINDOW_H
 
-#include "imagecontrolwindow.h"
+//#include "imagecontrolwindow.h"
+#include "imagetrackingcontrolwindow.h"
 #include "helpers/videoprocess.h"
 #include "videomultipletracking.h"
 
-class VideoControlWindow : public ImageControlWindow
+class VideoControlWindow : public ImageTrackingControlWindow
 {
     Q_OBJECT
 

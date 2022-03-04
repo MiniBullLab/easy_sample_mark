@@ -8,7 +8,7 @@
 #include "sampleMarkParam/videomarkparamterconfig.h"
 
 VideoControlWindow::VideoControlWindow(QWidget *parent)
-    : ImageControlWindow(parent)
+    : ImageTrackingControlWindow(parent)
 {
     initData();
 }

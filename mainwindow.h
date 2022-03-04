@@ -29,6 +29,7 @@
 #include "videocontrolwindow.h"
 #include "imagesegmentcontrolwindow.h"
 #include "ocrcontrolwindow.h"
+#include "imagetrackingcontrolwindow.h"
 #include "pclcontrolwindow.h"
 
 class MainWindow : public QMainWindow
@@ -47,6 +48,7 @@ public slots:
     void slotOpenVideoDir();
     void slotOpenImageSegmentDir();
     void slotOpenOCRImageDir();
+    void slotOpenImageTrackingDir();
     void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
@@ -91,9 +93,10 @@ private:
     //Action
     //file
     QAction *openImageDirAction;
-    QAction *openVideoDirAction;
     QAction *openSegmentImageDirAction;
     QAction *openOCRImageDirAction;
+    QAction *openImageTrackingDirAction;
+    QAction *openVideoDirAction;
     QAction *openPCDDirAction;
     QAction *exitAction;
     //setting
@@ -171,6 +174,7 @@ private:
     void initImageMarkShape();
     void initSegmentMarkShape();
     void initOCRMarkShape();
+    void initImageTrackingMarkShape();
     void initPointCloudMarkShape();
 
 };

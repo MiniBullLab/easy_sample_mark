@@ -85,7 +85,9 @@ SOURCES += main.cpp\
     drawShape/drawrecttrackshape.cpp \
     selectMarkInfo/selectmarktrackingwindow.cpp \
     calibration/birdviewprocess.cpp \
-    calibration/imagelabel.cpp
+    calibration/imagelabel.cpp \
+    drawWidget/tracking2dlabel.cpp \
+    imagetrackingcontrolwindow.cpp
 
 HEADERS  += controlwindow.h \
     mainwindow.h \
@@ -152,7 +154,9 @@ HEADERS  += controlwindow.h \
     drawShape/drawrecttrackshape.h \
     selectMarkInfo/selectmarktrackingwindow.h \
     calibration/birdviewprocess.h \
-    calibration/imagelabel.h
+    calibration/imagelabel.h \
+    drawWidget/tracking2dlabel.h \
+    imagetrackingcontrolwindow.h
 
 RESOURCES += \
     style.qrc \

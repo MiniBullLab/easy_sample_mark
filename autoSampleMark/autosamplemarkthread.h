@@ -10,6 +10,7 @@
 #include "helpers/videoprocess.h"
 #include "saveMarkData/xmlprocess.h"
 #include "deepLearning/ssdector.h"
+#include "deepLearning/yolov5dector.h"
 #include "dataType/myobject.h"
 
 class AutoSampleMarkThread : public QThread
@@ -20,7 +21,7 @@ public:
     AutoSampleMarkThread();
     ~AutoSampleMarkThread();
 
-    int initModel(const QString modelConfiguration, const QString modelBinary);
+    int initModel(const QString &modelName, const QString &modelPath, const QString &modelBinary="");
     void initData(const QList<QString> videoList, const int skipFrameCount, const float confidenceThreshold);
 
     void startThread();//开始线程
@@ -42,13 +43,12 @@ private:
     void markVideo(const QString& videoPath, QString& processInfo);
     void saveImage(const QString& imagePath, const cv::Mat &frame);
 
-    QList<MyObject> toMyObjects(const std::vector<cv::Rect> &objectRect,
-                     const std::vector<std::string> &objectClass);
+    QList<MyObject> toMyObjects(const std::vector<Detect2dBox> &objectRect);
 
 private:
 
     std::shared_ptr<VideoProcess> videoProcess;
-    std::shared_ptr<SSDector> detector;
+    std::shared_ptr<BaseDetector> detector;
 
     XMLProcess xmlCreator;
 

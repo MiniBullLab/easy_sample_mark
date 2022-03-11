@@ -22,7 +22,7 @@
 #include "pcTools/pcdconverterwindow.h"
 #include "pcTools/pcdfilterwindow.h"
 #include "calibration/birdviewprocess.h"
-#include "autoSampleMark/autosamplemarkwindow.h"
+#include "autoSampleMark/autodetection2dwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
 #include "imagecontrolwindow.h"
@@ -106,7 +106,7 @@ private:
     QAction *videoMarkParamterAction;
     QAction *pointcloudParamterAction;
     //autoMark
-    QAction *autoMarkAction;
+    QAction *autoDet2dAction;
     //tool
     QAction *segLabelConvertAction;
     QAction *videoToPictureAction;
@@ -143,7 +143,7 @@ private:
     QList<ControlWindow *> markWindow;
 
 private:
-    AutoSampleMarkWindow *autoSampleMarkWindow;
+    AutoDetection2DWindow *autoDetection2DWindow;
 
     SegmentationLabelConvertWindow *segLabelConvertWindow;
     FromVideoToPictureWindow *videoToPictureWindow;

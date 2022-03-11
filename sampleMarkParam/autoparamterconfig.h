@@ -12,14 +12,12 @@ public:
 
     void setInpuDataWidth(int width);
     void setInpuDataHeight(int height);
-    void setCaffeNet(QString net);
-    void setCaffeModel(QString model);
+    void setThreshold(float value);
     void setModelLabels(QMap<int, QString> labels);
 
     static int getInpuDataWidth();
     static int getInpuDataHeight();
-    static QString getCaffeNet();
-    static QString getCaffeModel();
+    static float getThreshold();
     static QMap<int, QString> getModelLabels();
     static int loadConfig();
     static int saveConfig();
@@ -28,8 +26,7 @@ private:
 
     static int inputDataWidth;
     static int inputDataHeight;
-    static QString caffeNet;
-    static QString caffeModel;
+    static float threshold;
     static QMap<int, QString> modelLabels;
 
 private:

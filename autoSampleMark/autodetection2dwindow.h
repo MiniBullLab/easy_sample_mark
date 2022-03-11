@@ -1,5 +1,5 @@
-﻿#ifndef AUTOSAMPLEMARKWINDOW_H
-#define AUTOSAMPLEMARKWINDOW_H
+﻿#ifndef AUTODETECTION2DWINDOW_H
+#define AUTODETECTION2DWINDOW_H
 
 #include <QWidget>
 #include <QLabel>
@@ -20,15 +20,13 @@
 
 
 
-class AutoSampleMarkWindow : public QWidget
+class AutoDetection2DWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    AutoSampleMarkWindow(QWidget *parent = 0);
-    ~AutoSampleMarkWindow();
-
-    void initData();
+    AutoDetection2DWindow(QWidget *parent = 0);
+    ~AutoDetection2DWindow();
 
 signals:
     void signalCloseAutoSampleMarkWindow(QString flag);
@@ -43,6 +41,11 @@ public slots:
     void slotVideoFinish(QString videoInfo);
     void slotFinishAll();
 
+    void slotSelectDL();
+    void slotSelectCaffeNet();
+    void slotSelectCaffeModel();
+    void slotSelectOnnxModel();
+
 protected:
 
     void closeEvent(QCloseEvent *event);
@@ -50,6 +53,7 @@ protected:
 
 private:
 
+    void initData();
     void initMainUI();
     void initMenu();
     void initConnect();
@@ -59,6 +63,22 @@ private:
     void updateProgressBar();
 
 private:
+
+    QGroupBox *netGroundBox;
+
+    QLabel *selectNetLabel;
+    QComboBox *selectNetBox;
+
+    QLabel *caffeNetLabel;
+    QLineEdit *caffeNetText;
+    QPushButton *caffeNetButton;
+    QLabel *caffeModelLabel;
+    QLineEdit *caffeModelText;
+    QPushButton *caffeModelButton;
+
+    QLabel *onnxNetLabel;
+    QLineEdit *onnxNetText;
+    QPushButton *onnxNetButton;
 
     QGroupBox *centerGroundBox;
 
@@ -109,4 +129,4 @@ private:
 };
 
 
-#endif // AUTOSAMPLEMARKWINDOW_H
+#endif // AUTODETECTION2DWINDOW_H

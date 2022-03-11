@@ -14,12 +14,12 @@ SSDector::~SSDector()
 
 }
 
-int SSDector::initModel(const std::string caffeNet, const std::string caffeModel)
+int SSDector::initModel(const std::string modelNet, const std::string modelWeigh)
 {
     //Import Caffe SSD model
     try
     {
-        net = cv::dnn::readNetFromCaffe(caffeNet, caffeModel);
+        net = cv::dnn::readNetFromCaffe(modelNet, modelWeigh);
     }
     catch (const cv::Exception &err) //Importer can throw errors, we will catch them
     {
@@ -45,8 +45,7 @@ int SSDector::initDetectorParameters(const int dataWidth, const int dataHeight,
     return 0;
 }
 
-void SSDector::processDetect(const cv::Mat &inputImage, std::vector<cv::Rect> &objectRect,
-                               std::vector<std::string> &objectClass, std::vector<float> &objectConfidence)
+void SSDector::processDetect(const cv::Mat &inputImage, std::vector<Detect2dBox> &objectRect)
 {
     if(inputImage.empty())
     {
@@ -61,7 +60,7 @@ void SSDector::processDetect(const cv::Mat &inputImage, std::vector<cv::Rect> &o
     if(width <= (this->inputDataWidth * 1.9) && height <= (this->inputDataHeight * 1.9))
     {
         detectionObject = detect(inputImage);
-        processDetectionObject(inputImage, detectionObject, 0, 0, objectRect, objectClass, objectConfidence);
+        processDetectionObject(inputImage, detectionObject, 0, 0, objectRect);
     }
     else if(width <= (this->inputDataWidth * 1.9))
     {
@@ -69,7 +68,7 @@ void SSDector::processDetect(const cv::Mat &inputImage, std::vector<cv::Rect> &o
         int topY = height / 2;
         const cv::Mat roi = inputImage(cv::Rect(topX, topY, width - topX, height - topY));
         detectionObject = detect(roi);
-        processDetectionObject(roi, detectionObject, topX, topY, objectRect, objectClass, objectConfidence);
+        processDetectionObject(roi, detectionObject, topX, topY, objectRect);
     }
     else if(height <= (this->inputDataHeight * 1.9))
     {
@@ -79,10 +78,10 @@ void SSDector::processDetect(const cv::Mat &inputImage, std::vector<cv::Rect> &o
         int topY2 = 0;
         const cv::Mat roi1 = inputImage(cv::Rect(topX1, topY1, topX2 - topX1, height - topY1));
         detectionObject = detect(roi1);
-        processDetectionObject(roi1, detectionObject, topX1, topY1, objectRect, objectClass, objectConfidence);
+        processDetectionObject(roi1, detectionObject, topX1, topY1, objectRect);
         const cv::Mat roi2 = inputImage(cv::Rect(topX2, topY2, width - topX2, height - topY2));
         detectionObject = detect(roi2);
-        processDetectionObject(roi2, detectionObject, topX2, topY2, objectRect, objectClass, objectConfidence);
+        processDetectionObject(roi2, detectionObject, topX2, topY2, objectRect);
     }
     else
     {
@@ -92,10 +91,10 @@ void SSDector::processDetect(const cv::Mat &inputImage, std::vector<cv::Rect> &o
         int topY2 = height / 2;
         const cv::Mat roi1 = inputImage(cv::Rect(topX1, topY1, topX2 - topX1, height - topY1));
         detectionObject = detect(roi1);
-        processDetectionObject(roi1, detectionObject, topX1, topY1, objectRect, objectClass, objectConfidence);
+        processDetectionObject(roi1, detectionObject, topX1, topY1, objectRect);
         const cv::Mat roi2 = inputImage(cv::Rect(topX2, topY2, width - topX2, height - topY2));
         detectionObject = detect(roi2);
-        processDetectionObject(roi2, detectionObject, topX2, topY2, objectRect, objectClass, objectConfidence);
+        processDetectionObject(roi2, detectionObject, topX2, topY2, objectRect);
     }
 
     duration = (static_cast<double>(cv::getTickCount()) - duration) / cv::getTickFrequency();
@@ -112,7 +111,7 @@ cv::Mat SSDector::detect(const cv::Mat &image)
         return cv::Mat();
     }
     //Convert Mat to batch of images
-    cv::Mat inputBlob = cv::dnn::blobFromImage(image, 1.0f, cv::Size(this->inputDataWidth, this->inputDataHeight),
+    cv::Mat inputBlob = cv::dnn::blobFromImage(image, 1.0, cv::Size(this->inputDataWidth, this->inputDataHeight),
                                                cv::Scalar(104, 117, 123), false, false);
 
     net.setInput(inputBlob, "data"); //set the network input
@@ -120,9 +119,9 @@ cv::Mat SSDector::detect(const cv::Mat &image)
     return detection;
 }
 
-void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detectionObjects, const int topX, const int topY,
-                                      std::vector<cv::Rect> &objectRect, std::vector<std::string> &objectClass,
-                                      std::vector<float> &objectConfidence)
+void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detectionObjects,
+                                      const int topX, const int topY,
+                                      std::vector<Detect2dBox> &objectRect)
 {
     if(roi.empty())
     {
@@ -141,13 +140,18 @@ void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detecti
             int xRightTop = static_cast<int>(detectionObjects.at<float>(i, 5) * roi.cols) + topX;
             int yRightTop = static_cast<int>(detectionObjects.at<float>(i, 6) * roi.rows) + topY;
 
-            objectRect.push_back(cv::Rect(xLeftBottom, yLeftBottom, xRightTop - xLeftBottom,
-                                          yRightTop - yLeftBottom));
-
             std::string objectName = getLabelName(classIndex);
-            objectClass.push_back(objectName);
 
-            objectConfidence.push_back(confidence);
+            Detect2dBox tempBox;
+            tempBox.minX = xLeftBottom;
+            tempBox.minY = yLeftBottom;
+            tempBox.maxX = xRightTop;
+            tempBox.maxY = yRightTop;
+            tempBox.objectName = objectName;
+            tempBox.classID = classIndex;
+            tempBox.confidence = confidence;
+
+            objectRect.push_back(tempBox);
 
 //            std::cout << "Class: " << objectName << std::endl;
 //            std::cout << "Confidence: " << confidence << std::endl;
@@ -159,22 +163,7 @@ void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detecti
     }
 }
 
-std::string SSDector::getLabelName(const int indice)
-{
-    std::string labelName = "";
-    for(size_t index = 0; index < labelIds.size(); index++)
-    {
-        if(labelIds[index] == indice)
-        {
-            labelName = labelNames[index];
-            break;
-        }
-    }
-    return labelName;
-}
-
-void SSDector::showDetection(cv::Mat &image, std::vector<cv::Rect> &objectRect,
-                   std::vector<std::string> &objectClass, std::vector<float> &objectConfidence)
+void SSDector::showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect)
 {
     if(image.empty())
     {
@@ -184,9 +173,10 @@ void SSDector::showDetection(cv::Mat &image, std::vector<cv::Rect> &objectRect,
     int objectColor = 10;
     for(size_t index = 0; index < objectRect.size(); index++)
     {
-        cv::rectangle(image, objectRect[index],
-                      cv::Scalar(255 * (objectColor / 100), 255 * ((objectColor / 10) % 10), 255 * (objectColor % 10)));
-        cv::putText(image, objectClass[index], objectRect[index].tl(), cv::FONT_HERSHEY_COMPLEX, 0.5,
+        cv::Rect tempRect(cv::Point(objectRect[index].minX, objectRect[index].minY),
+                          cv::Point(objectRect[index].maxX, objectRect[index].maxY));
+        cv::rectangle(image, tempRect, cv::Scalar(255 * (objectColor / 100), 255 * ((objectColor / 10) % 10), 255 * (objectColor % 10)));
+        cv::putText(image, objectRect[index].objectName, tempRect.tl(), cv::FONT_HERSHEY_COMPLEX, 0.5,
                     cv::Scalar(255 * (objectColor / 100), 255 * ((objectColor / 10) % 10), 255 * (objectColor % 10)));
     }
 }

@@ -11,7 +11,7 @@
 #include "paramWindow/videomarkparamterwindow.h"
 #include "paramWindow/segmentparamterconfigwindow.h"
 #include "paramWindow/pointcloudmarkparamterwindow.h"
-#include "autoSampleMark/autoparamterconfigwindow.h"
+#include "paramWindow/autoparamterconfigwindow.h"
 #include "sampleMarkParam/pointcloudparamterconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -253,13 +253,12 @@ void MainWindow::slotPointCloudParamterConfig()
 
 void MainWindow::slotAutoSampleMark()
 {
-    if(autoSampleMarkWindow == nullptr)
+    if(autoDetection2DWindow == nullptr)
     {
-        autoSampleMarkWindow = new AutoSampleMarkWindow();
-        connect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
+        autoDetection2DWindow = new AutoDetection2DWindow();
+        connect(autoDetection2DWindow, &AutoDetection2DWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
     }
-    autoSampleMarkWindow->show();
-    autoSampleMarkWindow->initData();
+    autoDetection2DWindow->show();
 }
 
 void MainWindow::slotSegLabelConvert()
@@ -428,9 +427,9 @@ void MainWindow::slotCloseOtherWindow(QString flag)
 {
     if(flag.contains("mark"))
     {
-        disconnect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
-        autoSampleMarkWindow->deleteLater();;
-        autoSampleMarkWindow = nullptr;
+        disconnect(autoDetection2DWindow, &AutoDetection2DWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
+        autoDetection2DWindow->deleteLater();;
+        autoDetection2DWindow = nullptr;
     }
     else if(flag.contains("segLabelConverter"))
     {
@@ -490,8 +489,8 @@ void MainWindow::slotCloseOtherWindow(QString flag)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(autoSampleMarkWindow != nullptr)
-        autoSampleMarkWindow->close();
+    if(autoDetection2DWindow != nullptr)
+        autoDetection2DWindow->close();
     if(segLabelConvertWindow != nullptr)
         segLabelConvertWindow->close();
     if(videoToPictureWindow != nullptr)
@@ -522,7 +521,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::initData()
 {
-    autoSampleMarkWindow = nullptr;
+    autoDetection2DWindow = nullptr;
     segLabelConvertWindow = nullptr;
     videoToPictureWindow = nullptr;
     videoFromPictureWindow = nullptr;
@@ -563,8 +562,8 @@ void MainWindow::initAction()
     videoMarkParamterAction = new QAction(tr("视频标注参数设置"), this);
     pointcloudParamterAction = new QAction(tr("点云标注参数设置"));
     //autoMark
-    autoMarkAction = new QAction(tr("自动化样本标注"), this);
-    autoMarkAction->setIcon(QIcon(tr(":/images/images/mark.png")));
+    autoDet2dAction = new QAction(tr("自动化检测样本标注"), this);
+    autoDet2dAction->setIcon(QIcon(tr(":/images/images/mark.png")));
     //tool
     segLabelConvertAction = new QAction(tr("分割图生成"), this);
     segLabelConvertAction->setIcon(QIcon(tr(":/images/images/seg.png")));
@@ -635,7 +634,7 @@ void MainWindow::initMenuBar()
 #endif
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
-    autoMarkMenu->addAction(autoMarkAction);
+    autoMarkMenu->addAction(autoDet2dAction);
     //tool
     toolMenu = new QMenu(tr("工具"), this);
     toolMenu->addAction(segLabelConvertAction);
@@ -685,7 +684,7 @@ void MainWindow::initToolBar()
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
     autoMarkTool->setIconSize(QSize(30, 30));
-    autoMarkTool->addAction(autoMarkAction);
+    autoMarkTool->addAction(autoDet2dAction);
     //shapeTool
     shapeTool = new QToolBar(tr("标注形状"));
     shapeTool->addWidget(shapeWidget);
@@ -739,7 +738,7 @@ void MainWindow::initConnect()
     connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
     connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
     //autoMark
-    connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
+    connect(autoDet2dAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
     //tool
     connect(segLabelConvertAction, &QAction::triggered, this, &MainWindow::slotSegLabelConvert);
 

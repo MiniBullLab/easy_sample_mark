@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "sampleMarkParam/manualparamterconfig.h"
-#include "autoparamterconfig.h"
+#include "sampleMarkParam/autoparamterconfig.h"
 
 AutoSampleMarkThread::AutoSampleMarkThread()
 {
@@ -21,11 +21,21 @@ AutoSampleMarkThread::~AutoSampleMarkThread()
 
 }
 
-int AutoSampleMarkThread::initModel(const QString modelConfiguration, const QString modelBinary)
+int AutoSampleMarkThread::initModel(const QString &modelName, const QString &modelPath, const QString &modelBinary)
 {
-    int errorCode = 0;
-    errorCode = detector->initModel(modelConfiguration.toStdString(),
-                                    modelBinary.toStdString());
+    int errorCode = -1;
+    if(modelName == "ssd")
+    {
+        detector.reset(new SSDector());
+        errorCode = detector->initModel(modelPath.toStdString(),
+                                        modelBinary.toStdString());
+    }
+    else if(modelName == "yolov5")
+    {
+        detector.reset(new YoloV5Dector());
+        errorCode = detector->initModel(modelPath.toStdString(),
+                                        modelBinary.toStdString());
+    }
     return errorCode;
 }
 
@@ -112,14 +122,12 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
             {
                 if(currentFrame % this->skipFrameCount == 0)
                 {
-                    std::vector<cv::Rect> objectRect;
-                    std::vector<std::string> objectClass;
-                    std::vector<float> objectConfidence;
+                    std::vector<Detect2dBox> objectRect;
                     QList<MyObject> objects;
-                    detector->processDetect(frame, objectRect, objectClass, objectConfidence);
+                    detector->processDetect(frame, objectRect);
                     QString savXmlPath = saveXMLDir + QString("/%1_%2.xml").arg(videoName).arg(currentFrame);
                     QString saveImagePath = saveImageDir + QString("/%1_%2.png").arg(videoName).arg(currentFrame);
-                    objects = toMyObjects(objectRect, objectClass);
+                    objects = toMyObjects(objectRect);
                     xmlCreator.createXML(savXmlPath, saveImagePath, videoWidth, videoHeight, objects);
                     saveImage(saveImagePath, frame);
                     emit signalCurrentFrame(currentFrame + 1);
@@ -169,8 +177,7 @@ void AutoSampleMarkThread::saveImage(const QString& imagePath, const cv::Mat &fr
     }
 }
 
-QList<MyObject> AutoSampleMarkThread::toMyObjects(const std::vector<cv::Rect> &objectRect,
-                 const std::vector<std::string> &objectClass)
+QList<MyObject> AutoSampleMarkThread::toMyObjects(const std::vector<Detect2dBox> &objectRect)
 {
     QList<MyObject> objects;
     int count = static_cast<int>(objectRect.size());
@@ -178,11 +185,14 @@ QList<MyObject> AutoSampleMarkThread::toMyObjects(const std::vector<cv::Rect> &o
     for(int index = 0; index < count; index++)
     {
         MyObject object;
-        const cv::Rect cvRect = objectRect[index];
-        if(cvRect.width >= ManualParamterConfig::getMinWidth() && cvRect.height >= ManualParamterConfig::getMinHeight())
+        const Detect2dBox tempObject = objectRect[index];
+        const float width = tempObject.maxX - tempObject.minX;
+        const float height = tempObject.maxY - tempObject.minY;
+        if(width >= ManualParamterConfig::getMinWidth() && height >= ManualParamterConfig::getMinHeight())
         {
-            object.setBox(QRect(cvRect.x, cvRect.y, cvRect.width, cvRect.height));
-            object.setObjectClass(QString::fromStdString(objectClass[index]));
+            object.setBox(QRect(QPoint(tempObject.minX, tempObject.minY), \
+                                QPoint(tempObject.maxX, tempObject.maxY)));
+            object.setObjectClass(QString::fromStdString(tempObject.objectName));
         }
     }
     return objects;
@@ -198,5 +208,5 @@ void AutoSampleMarkThread::init()
     videoList.clear();
 
     videoProcess = std::shared_ptr<VideoProcess>(new VideoProcess());
-    detector = std::shared_ptr<SSDector>(new SSDector());
+    detector = nullptr;
 }

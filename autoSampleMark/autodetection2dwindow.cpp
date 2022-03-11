@@ -1,7 +1,7 @@
 ﻿#ifdef WIN32
 #pragma execution_character_set("utf-8")
 #endif
-#include "autosamplemarkwindow.h"
+#include "autodetection2dwindow.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -16,9 +16,9 @@
 #include <QDebug>
 
 #include "helpers/dirprocess.h"
-#include "autoparamterconfig.h"
+#include "sampleMarkParam/autoparamterconfig.h"
 
-AutoSampleMarkWindow::AutoSampleMarkWindow(QWidget *parent)
+AutoDetection2DWindow::AutoDetection2DWindow(QWidget *parent)
     : QWidget(parent)
 {
     initMainUI();
@@ -26,32 +26,22 @@ AutoSampleMarkWindow::AutoSampleMarkWindow(QWidget *parent)
     initConnect();
 }
 
-AutoSampleMarkWindow::~AutoSampleMarkWindow()
+AutoDetection2DWindow::~AutoDetection2DWindow()
 {
 
 }
 
-void AutoSampleMarkWindow::initData()
+void AutoDetection2DWindow::initData()
 {
-    int errorCode = 0;
     processVideoList.clear();
     historyVideo.clear();
     videoPathDir = ".";
     currentProcessVideo = "";
     currentFrameNumber = 0;
     updateProgressBar();
-    errorCode = sampleMarkThread.initModel(AutoParamterConfig::getCaffeNet(), AutoParamterConfig::getCaffeModel());
-    if(errorCode < 0)
-    {
-        startProcessButton->setEnabled(false);
-        stopProcessButton->setEnabled(false);
-        videoListWidget->setEnabled(false);
-        centerGroundBox->setEnabled(false);
-        QMessageBox::information(this, tr("检测模型初始化"), tr("检测模型初始化失败"));
-    }
 }
 
-void AutoSampleMarkWindow::closeEvent(QCloseEvent *event)
+void AutoDetection2DWindow::closeEvent(QCloseEvent *event)
 {
     if(sampleMarkThread.isRunning())
     {
@@ -81,7 +71,7 @@ void AutoSampleMarkWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void AutoSampleMarkWindow::contextMenuEvent (QContextMenuEvent * event)
+void AutoDetection2DWindow::contextMenuEvent (QContextMenuEvent * event)
 {
     QMenu* popMenu = new QMenu(this);
     if(videoListWidget->itemAt(videoListWidget->mapFromGlobal(QCursor::pos())) != NULL) //如果有item则添加"修改"菜单
@@ -109,7 +99,7 @@ void AutoSampleMarkWindow::contextMenuEvent (QContextMenuEvent * event)
     QWidget::contextMenuEvent(event);
 }
 
-void AutoSampleMarkWindow::slotOpenDir()
+void AutoDetection2DWindow::slotOpenDir()
 {
     DirProcess dirProcess;
     this->videoPathDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), videoPathDir, QFileDialog::ShowDirsOnly);
@@ -149,30 +139,49 @@ void AutoSampleMarkWindow::slotOpenDir()
     }
 }
 
-void AutoSampleMarkWindow::slotStart()
+void AutoDetection2DWindow::slotStart()
 {
-    if(isProcessDirBox->isChecked())
+    int errorCode = -1;
+    if(!onnxNetText->text().trimmed().isEmpty())
     {
-        sampleMarkThread.initData(processVideoList, skipFrameBox->value(), confidenceThresholdBox->value());
-        sampleMarkThread.startThread();
-        sampleMarkThread.start();
-        startProcessButton->setEnabled(false);
-        stopProcessButton->setEnabled(true);
-        centerGroundBox->setEnabled(false);
+        errorCode = sampleMarkThread.initModel(selectNetBox->currentText(), onnxNetText->text());
     }
     else
     {
-        QList<QString> tempVideo;
-        currentProcessVideo = videoListWidget->currentItem()->text();
-        tempVideo.append(currentProcessVideo);
-        sampleMarkThread.initData(tempVideo, skipFrameBox->value(), confidenceThresholdBox->value());
-        sampleMarkThread.startThread();
-        sampleMarkThread.start();
+        errorCode = sampleMarkThread.initModel(selectNetBox->currentText(), caffeNetText->text(), caffeModelText->text());
+    }
+    if(errorCode < 0)
+    {
+        stopProcessButton->setEnabled(false);
+        videoListWidget->setEnabled(false);
         centerGroundBox->setEnabled(false);
+        QMessageBox::information(this, tr("检测模型初始化"), tr("检测模型初始化失败"));
+    }
+    else
+    {
+        if(isProcessDirBox->isChecked())
+        {
+            sampleMarkThread.initData(processVideoList, skipFrameBox->value(), (float)confidenceThresholdBox->value());
+            sampleMarkThread.startThread();
+            sampleMarkThread.start();
+            startProcessButton->setEnabled(false);
+            stopProcessButton->setEnabled(true);
+            centerGroundBox->setEnabled(false);
+        }
+        else
+        {
+            QList<QString> tempVideo;
+            currentProcessVideo = videoListWidget->currentItem()->text();
+            tempVideo.append(currentProcessVideo);
+            sampleMarkThread.initData(tempVideo, skipFrameBox->value(), (float)confidenceThresholdBox->value());
+            sampleMarkThread.startThread();
+            sampleMarkThread.start();
+            centerGroundBox->setEnabled(false);
+        }
     }
 }
 
-void AutoSampleMarkWindow::slotStop()
+void AutoDetection2DWindow::slotStop()
 {
     sampleMarkThread.stopThread();
     startProcessButton->setEnabled(false);
@@ -180,7 +189,7 @@ void AutoSampleMarkWindow::slotStop()
     centerGroundBox->setEnabled(false);
 }
 
-void AutoSampleMarkWindow::slotIsProcessDir(bool isChecked)
+void AutoDetection2DWindow::slotIsProcessDir(bool isChecked)
 {
     if(processVideoList.size() > 0)
     {
@@ -197,18 +206,18 @@ void AutoSampleMarkWindow::slotIsProcessDir(bool isChecked)
     }
 }
 
-void AutoSampleMarkWindow::slotVideoInit(int allFrameCount)
+void AutoDetection2DWindow::slotVideoInit(int allFrameCount)
 {
     this->videoProgressBar->setRange(0, allFrameCount);
 }
 
-void AutoSampleMarkWindow::slotVideoCurrentFrame(int number)
+void AutoDetection2DWindow::slotVideoCurrentFrame(int number)
 {
     this->currentFrameNumber = number;
     updateProgressBar();
 }
 
-void AutoSampleMarkWindow::slotVideoFinish(QString videoInfo)
+void AutoDetection2DWindow::slotVideoFinish(QString videoInfo)
 {
     commandText->append(videoInfo);
     if(videoInfo.startsWith("Video"))
@@ -223,7 +232,7 @@ void AutoSampleMarkWindow::slotVideoFinish(QString videoInfo)
     updateProgressBar();
 }
 
-void AutoSampleMarkWindow::slotFinishAll()
+void AutoDetection2DWindow::slotFinishAll()
 {
     centerGroundBox->setEnabled(true);
     if(isProcessDirBox->isChecked()&& processVideoList.size() > 0)
@@ -240,7 +249,50 @@ void AutoSampleMarkWindow::slotFinishAll()
     historyProcess.writeHistoryData(this->videoPathDir, this->historyVideo);
 }
 
-void AutoSampleMarkWindow::initProcessVideoList(const QList<QString>& pathList)
+void AutoDetection2DWindow::slotSelectDL()
+{
+    if(selectNetBox->currentText() == "ssd")
+    {
+        caffeNetButton->setEnabled(true);
+        caffeModelButton->setEnabled(true);
+        onnxNetButton->setEnabled(false);
+    }
+    else if(selectNetBox->currentText() == "yolov5")
+    {
+        caffeNetButton->setEnabled(false);
+        caffeModelButton->setEnabled(false);
+        onnxNetButton->setEnabled(true);
+    }
+}
+
+void AutoDetection2DWindow::slotSelectCaffeNet()
+{
+    QString name = QFileDialog::getOpenFileName(this,tr("选择caffe网络"),".","caffe files(*.prototxt *.*)");
+    if(!name.trimmed().isEmpty())
+    {
+        this->caffeNetText->setText(name);
+    }
+}
+
+void AutoDetection2DWindow::slotSelectCaffeModel()
+{
+    QString name = QFileDialog::getOpenFileName(this,tr("选择caffe权重"),".","caffe files(*.caffemodel *.*)");
+    if(!name.trimmed().isEmpty())
+    {
+        this->caffeModelText->setText(name);
+    }
+}
+
+void AutoDetection2DWindow::slotSelectOnnxModel()
+{
+    QString name = QFileDialog::getOpenFileName(this,tr("选择onnx模型"),".","onnx files(*.onnx *.*)");
+    if(!name.trimmed().isEmpty())
+    {
+        this->onnxNetText->setText(name);
+    }
+}
+
+void AutoDetection2DWindow::initProcessVideoList(const QList<QString>& pathList)
 {
     for(int index = 0; index < pathList.size(); index++)
     {
@@ -258,7 +310,7 @@ void AutoSampleMarkWindow::initProcessVideoList(const QList<QString>& pathList)
     }
 }
 
-void AutoSampleMarkWindow::updateListBox()
+void AutoDetection2DWindow::updateListBox()
 {
     int index1 = 0;
     int index2 = 0;
@@ -284,13 +336,64 @@ void AutoSampleMarkWindow::updateListBox()
     }
 }
 
-void AutoSampleMarkWindow::updateProgressBar()
+void AutoDetection2DWindow::updateProgressBar()
 {
     videoProgressBar->setValue(currentFrameNumber);
 }
 
-void AutoSampleMarkWindow::initMainUI()
+void AutoDetection2DWindow::initMainUI()
 {
+    selectNetLabel = new QLabel(tr("选择深度学习模型："));
+    selectNetBox = new QComboBox();
+    selectNetBox->addItem("ssd");
+    selectNetBox->addItem("yolov5");
+
+    QHBoxLayout *topLayout0 = new QHBoxLayout();
+    topLayout0->setSpacing(30);
+    topLayout0->addWidget(selectNetLabel);
+    topLayout0->addWidget(selectNetBox);
+
+    caffeNetLabel = new QLabel(tr("caffe网络："));
+    caffeNetText = new QLineEdit();
+    caffeNetText->setReadOnly(true);
+    caffeNetButton = new QPushButton(tr("选择caffe网络"));
+
+    caffeModelLabel = new QLabel(tr("caffe权重："));
+    caffeModelText = new QLineEdit();
+    caffeModelText->setReadOnly(true);
+    caffeModelButton = new QPushButton(tr("选择caffe权重"));
+
+    QHBoxLayout *topLayout1 = new QHBoxLayout();
+    topLayout1->setSpacing(10);
+    topLayout1->addWidget(caffeNetLabel);
+    topLayout1->addWidget(caffeNetText);
+    topLayout1->addWidget(caffeNetButton);
+    topLayout1->addWidget(caffeModelLabel);
+    topLayout1->addWidget(caffeModelText);
+    topLayout1->addWidget(caffeModelButton);
+
+    onnxNetLabel = new QLabel(tr("onnx模型："));
+    onnxNetText = new QLineEdit();
+    onnxNetText->setReadOnly(true);
+    onnxNetButton = new QPushButton(tr("选择onnx模型"));
+
+    QHBoxLayout *topLayout2 = new QHBoxLayout();
+    topLayout2->setSpacing(30);
+    topLayout2->addWidget(onnxNetLabel);
+    topLayout2->addWidget(onnxNetText);
+    topLayout2->addWidget(onnxNetButton);
+
+    QVBoxLayout *topLayout = new QVBoxLayout();
+    topLayout->setSpacing(10);
+    topLayout->addLayout(topLayout0);
+    topLayout->addLayout(topLayout1);
+    topLayout->addLayout(topLayout2);
+
+    slotSelectDL();
+
+    netGroundBox = new QGroupBox();
+    netGroundBox->setLayout(topLayout);
+
     isProcessDirBox = new QCheckBox(tr("是否批量处理"));
     isProcessDirBox->setChecked(true);
 
@@ -322,7 +425,7 @@ void AutoSampleMarkWindow::initMainUI()
     confidenceThresholdBox->setSingleStep(0.01);
 
     QGridLayout *centerTopLayout0 = new QGridLayout();
-    centerTopLayout0->setSpacing(80);
+    centerTopLayout0->setSpacing(30);
     centerTopLayout0->addWidget(isProcessDirBox, 0, 0, 1, 1);
     centerTopLayout0->addWidget(videoPostLabel, 1, 0, 1, 1);
     centerTopLayout0->addWidget(videoPostBox, 1, 1, 1, 1);
@@ -371,51 +474,60 @@ void AutoSampleMarkWindow::initMainUI()
     hLayout2->addWidget(videoProgressBar);
 
     QVBoxLayout *centerLayout = new QVBoxLayout();
-    centerLayout->setSpacing(20);
+    centerLayout->setSpacing(10);
+    centerLayout->addWidget(netGroundBox);
     centerLayout->addWidget(centerGroundBox);
     centerLayout->addLayout(hLayout1);
     centerLayout->addLayout(hLayout2);
 
     videoListWidget = new QListWidget();
 
-    QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->addLayout(centerLayout);
-    topLayout->addWidget(videoListWidget);
-    topLayout->setStretchFactor(centerLayout, 3);
-    topLayout->setStretchFactor(videoListWidget, 1);
+    QHBoxLayout *allLayout = new QHBoxLayout();
+    allLayout->addLayout(centerLayout);
+    allLayout->addWidget(videoListWidget);
+    allLayout->setStretchFactor(centerLayout, 3);
+    allLayout->setStretchFactor(videoListWidget, 1);
 
     commandText = new MyTextBrowser();
-    commandText->setFixedHeight(50);
+    // commandText->setFixedHeight(50);
     commandText->setReadOnly(true);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setMargin(10); //设置这个对话框的边距
     mainLayout->setSpacing(10);  //设置各个控件之间的边距
     mainLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->addLayout(topLayout);
+    mainLayout->addLayout(allLayout);
     mainLayout->addWidget(commandText);
+    mainLayout->setStretchFactor(allLayout, 3);
+    mainLayout->setStretchFactor(commandText, 1);
+
     this->setLayout(mainLayout);
     //this->setMaximumSize(700,520);
-    this->setMinimumSize(800, 600);
+    this->setMinimumSize(800, 700);
     this->setWindowTitle(tr("自动化样本标注"));
 }
 
-void AutoSampleMarkWindow::initMenu()
+void AutoDetection2DWindow::initMenu()
 {
     startVideoProcessAction = new QAction(tr("开始处理"), this);
     stopVideoProcessAction = new QAction(tr("停止处理"), this);
 }
 
-void AutoSampleMarkWindow::initConnect()
+void AutoDetection2DWindow::initConnect()
 {
-    connect(openVideoDirButton, &QPushButton::clicked, this,&AutoSampleMarkWindow::slotOpenDir);
-    connect(startProcessButton, &QPushButton::clicked, this,&AutoSampleMarkWindow::slotStart);
-    connect(stopProcessButton, &QPushButton::clicked, this,&AutoSampleMarkWindow::slotStop);
-    connect(isProcessDirBox, &QCheckBox::clicked, this, &AutoSampleMarkWindow::slotIsProcessDir);
-    connect(&sampleMarkThread, &AutoSampleMarkThread::signalVideoFinish, this, &AutoSampleMarkWindow::slotVideoFinish);
-    connect(&sampleMarkThread, &AutoSampleMarkThread::signalFinishAll, this, &AutoSampleMarkWindow::slotFinishAll);
-    connect(&sampleMarkThread, &AutoSampleMarkThread::signalCurrentFrame, this, &AutoSampleMarkWindow::slotVideoCurrentFrame);
-    connect(&sampleMarkThread, &AutoSampleMarkThread::signalVideoInit, this, &AutoSampleMarkWindow::slotVideoInit);
-    connect(startVideoProcessAction, &QAction::triggered, this, &AutoSampleMarkWindow::slotStart);
-    connect(stopVideoProcessAction, &QAction::triggered, this, &AutoSampleMarkWindow::slotStop);
+    connect(openVideoDirButton, &QPushButton::clicked, this,&AutoDetection2DWindow::slotOpenDir);
+    connect(startProcessButton, &QPushButton::clicked, this,&AutoDetection2DWindow::slotStart);
+    connect(stopProcessButton, &QPushButton::clicked, this,&AutoDetection2DWindow::slotStop);
+    connect(isProcessDirBox, &QCheckBox::clicked, this, &AutoDetection2DWindow::slotIsProcessDir);
+    connect(&sampleMarkThread, &AutoSampleMarkThread::signalVideoFinish, this, &AutoDetection2DWindow::slotVideoFinish);
+    connect(&sampleMarkThread, &AutoSampleMarkThread::signalFinishAll, this, &AutoDetection2DWindow::slotFinishAll);
+    connect(&sampleMarkThread, &AutoSampleMarkThread::signalCurrentFrame, this, &AutoDetection2DWindow::slotVideoCurrentFrame);
+    connect(&sampleMarkThread, &AutoSampleMarkThread::signalVideoInit, this, &AutoDetection2DWindow::slotVideoInit);
+    connect(startVideoProcessAction, &QAction::triggered, this, &AutoDetection2DWindow::slotStart);
+    connect(stopVideoProcessAction, &QAction::triggered, this, &AutoDetection2DWindow::slotStop);
+
+    connect(selectNetBox, &QComboBox::currentTextChanged, this, &AutoDetection2DWindow::slotSelectDL);
+    connect(caffeNetButton, &QPushButton::clicked, this, &AutoDetection2DWindow::slotSelectCaffeNet);
+    connect(caffeModelButton, &QPushButton::clicked, this, &AutoDetection2DWindow::slotSelectCaffeModel);
+    connect(onnxNetButton, &QPushButton::clicked, this, &AutoDetection2DWindow::slotSelectOnnxModel);
 }

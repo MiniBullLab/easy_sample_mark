@@ -1,14 +1,14 @@
-#ifndef SSDECTOR_H
-#define SSDECTOR_H
+#ifndef YOLOV5DECTOR_H
+#define YOLOV5DECTOR_H
 
 #include "basedetector.h"
 #include <QMap>
 
-class SSDector : public BaseDetector
+class YoloV5Dector : public BaseDetector
 {
 public:
-    SSDector();
-    ~SSDector();
+    YoloV5Dector();
+    ~YoloV5Dector();
 
     int initModel(const std::string modelNet, const std::string modelWeight="");
 
@@ -19,18 +19,6 @@ public:
 
 private:
 
-    cv::Mat detect(const cv::Mat &image);
-
-    void processDetectionObject(const cv::Mat& roi, const cv::Mat& detectionObjects,
-                                const int topX, const int topY,
-                                std::vector<Detect2dBox> &objectRect);
-
-    void showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect);
-
-    void initData();
-
-private:
-
     //Initialize network
     cv::dnn::Net net;
 
@@ -38,11 +26,21 @@ private:
     int inputDataHeight;
     float confidenceThreshold;
 
+    std::vector<std::vector<float> > anchors;
+    std::vector<float> stride;
+    float nmsThreshold;
+    float objThreshold;
+
 private:
+
+    void initData();
+
+    int postprocess(const cv::Size &srcSize, const std::vector<cv::Mat> &outputs, std::vector<Detect2dBox> &det_results);
+    std::vector<std::vector<float>> applyNMS(std::vector<std::vector<float>>& boxes,
+                                    const float thres);
 
      void saveConfig();
      void loadConfig();
-
 };
 
-#endif // SSDECTOR_H
+#endif // YOLOV5DECTOR_H

@@ -32,8 +32,7 @@ void AutoParamterConfigWindow::closeEvent(QCloseEvent *event)
 void AutoParamterConfigWindow::slotOk()
 {
     QMap<int, QString> modelLabelsData = this->modelLabelTable->getModelLabels();
-    if(caffeNetText->text().trimmed().isEmpty() || caffeModelText->text().trimmed().isEmpty()
-            || modelLabelsData.size() <= 0)
+    if(modelLabelsData.size() <= 0)
     {
         QMessageBox::information(this, tr("自动标注参数设置"), tr("自动标注参数设置有误！"));
     }
@@ -41,29 +40,9 @@ void AutoParamterConfigWindow::slotOk()
     {
         paramterConfig.setInpuDataWidth(this->inputDataWidthBox->value());
         paramterConfig.setInpuDataHeight(this->inputDataHeightBox->value());
-        paramterConfig.setCaffeNet(this->caffeNetText->text());
-        paramterConfig.setCaffeModel(this->caffeModelText->text());
         paramterConfig.setModelLabels(modelLabelsData);
         paramterConfig.saveConfig();
         this->accept();
-    }
-}
-
-void AutoParamterConfigWindow::slotSelectCaffeNet()
-{
-    QString name = QFileDialog::getOpenFileName(this,tr("选择caffe测试网络"),".","caffe files(*.prototxt *.*)");
-    if(!name.trimmed().isEmpty())
-    {
-        this->caffeNetText->setText(name);
-    }
-}
-
-void AutoParamterConfigWindow::slotSelectCaffeModel()
-{
-    QString name = QFileDialog::getOpenFileName(this,tr("选择caffe模型"),".","caffe files(*.caffemodel *.*)");
-    if(!name.trimmed().isEmpty())
-    {
-        this->caffeModelText->setText(name);
     }
 }
 
@@ -74,28 +53,6 @@ void AutoParamterConfigWindow::init()
 
 void AutoParamterConfigWindow::initUI()
 {
-    caffeNetLabel = new QLabel(tr("caffe测试网络："));
-    caffeNetText = new QLineEdit();
-    caffeNetText->setReadOnly(true);
-    caffeNetButton = new QPushButton(tr("选择caffe测试网络"));
-
-    QHBoxLayout *topLayout0 = new QHBoxLayout();
-    topLayout0->setSpacing(10);
-    topLayout0->addWidget(caffeNetLabel);
-    topLayout0->addWidget(caffeNetText);
-    topLayout0->addWidget(caffeNetButton);
-
-    caffeModelLabel = new QLabel(tr("caffe模型："));
-    caffeModelText = new QLineEdit();
-    caffeModelText->setReadOnly(true);
-    caffeModelButton = new QPushButton(tr("选择caffe模型"));
-
-    QHBoxLayout *topLayout1 = new QHBoxLayout();
-    topLayout1->setSpacing(10);
-    topLayout1->addWidget(caffeModelLabel);
-    topLayout1->addWidget(caffeModelText);
-    topLayout1->addWidget(caffeModelButton);
-
     inputDataWidthLabel = new QLabel(tr("模型输入图象宽度"));
     inputDataWidthBox = new QSpinBox();
     inputDataWidthBox->setSingleStep(10);
@@ -110,12 +67,23 @@ void AutoParamterConfigWindow::initUI()
     inputDataHeightBox->setMaximum(INT_MAX);
     inputDataHeightBox->setValue(paramterConfig.getInpuDataHeight());
 
+    QHBoxLayout *topLayout1 = new QHBoxLayout();
+    topLayout1->setSpacing(10);
+    topLayout1->addWidget(inputDataWidthLabel);
+    topLayout1->addWidget(inputDataWidthBox);
+    topLayout1->addWidget(inputDataHeightLabel);
+    topLayout1->addWidget(inputDataHeightBox);
+
+    thresholdLabel = new QLabel(tr("置信度:"));
+    thresholdBox = new QDoubleSpinBox();
+    thresholdBox->setSingleStep(0.1);
+    thresholdBox->setMaximum(0);
+    thresholdBox->setValue((double)paramterConfig.getThreshold());
+
     QHBoxLayout *topLayout2 = new QHBoxLayout();
-    topLayout2->setSpacing(10);
-    topLayout2->addWidget(inputDataWidthLabel);
-    topLayout2->addWidget(inputDataWidthBox);
-    topLayout2->addWidget(inputDataHeightLabel);
-    topLayout2->addWidget(inputDataHeightBox);
+    topLayout2->setSpacing(30);
+    topLayout2->addWidget(thresholdLabel);
+    topLayout2->addWidget(thresholdBox);
 
     modelLabelTable = new ModelLabelTableWidget();
     initTable();
@@ -133,7 +101,6 @@ void AutoParamterConfigWindow::initUI()
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
-    mainLayout->addLayout(topLayout0);
     mainLayout->addLayout(topLayout1);
     mainLayout->addLayout(topLayout2);
     mainLayout->addWidget(modelLabelTable);
@@ -147,8 +114,6 @@ void AutoParamterConfigWindow::initUI()
 
 void AutoParamterConfigWindow::initConnect()
 {
-    connect(caffeNetButton, &QPushButton::clicked, this, &AutoParamterConfigWindow::slotSelectCaffeNet);
-    connect(caffeModelButton, &QPushButton::clicked, this, &AutoParamterConfigWindow::slotSelectCaffeModel);
     connect(loadDefaultButton, &QPushButton::clicked, this, &AutoParamterConfigWindow::loadDefaultValue);
     connect(saveButton, &QPushButton::clicked, this, &AutoParamterConfigWindow::slotOk);
     connect(cancelButton, &QPushButton::clicked, this, &AutoParamterConfigWindow::reject);
@@ -214,6 +179,4 @@ void AutoParamterConfigWindow::loadDefaultValue()
     }
     inputDataWidthBox->setValue(512);
     inputDataHeightBox->setValue(512);
-    caffeNetText->setText("./model/deploy.prototxt");
-    caffeModelText->setText("./model/VGG_VOC0712_SSD_512x512_iter_120000.caffemodel");
 }

@@ -24,16 +24,13 @@ include(multipletracking/multipletracking.pri)
 SOURCES += main.cpp\
         controlwindow.cpp \
     mainwindow.cpp \
-    autoSampleMark/autoparamterconfig.cpp \
     autoSampleMark/autosamplemarkthread.cpp \
-    autoSampleMark/autosamplemarkwindow.cpp \
     videoTools/croppingvideothread.cpp \
     videoTools/fromvideotopicturewindow.cpp \
     videoTools/videocroppingwindow.cpp \
     videoTools/videocuttingwindow.cpp \
     videoTools/frompicturetovideowindow.cpp \
     autoSampleMark/modellabelwindow.cpp \
-    autoSampleMark/autoparamterconfigwindow.cpp \
     drawShape/myshape.cpp \
     drawShape/drawrectshape.cpp \
     drawShape/drawlineshape.cpp \
@@ -87,20 +84,20 @@ SOURCES += main.cpp\
     calibration/birdviewprocess.cpp \
     calibration/imagelabel.cpp \
     drawWidget/tracking2dlabel.cpp \
-    imagetrackingcontrolwindow.cpp
+    imagetrackingcontrolwindow.cpp \
+    sampleMarkParam/autoparamterconfig.cpp \
+    paramWindow/autoparamterconfigwindow.cpp \
+    autoSampleMark/autodetection2dwindow.cpp
 
 HEADERS  += controlwindow.h \
     mainwindow.h \
-    autoSampleMark/autoparamterconfig.h \
     autoSampleMark/autosamplemarkthread.h \
-    autoSampleMark/autosamplemarkwindow.h \
     videoTools/croppingvideothread.h \
     videoTools/fromvideotopicturewindow.h \
     videoTools/videocroppingwindow.h \
     videoTools/videocuttingwindow.h \
     videoTools/frompicturetovideowindow.h \
     autoSampleMark/modellabelwindow.h \
-    autoSampleMark/autoparamterconfigwindow.h \
     drawShape/myshape.h \
     drawShape/drawrectshape.h \
     drawShape/drawlineshape.h \
@@ -156,7 +153,10 @@ HEADERS  += controlwindow.h \
     calibration/birdviewprocess.h \
     calibration/imagelabel.h \
     drawWidget/tracking2dlabel.h \
-    imagetrackingcontrolwindow.h
+    imagetrackingcontrolwindow.h \
+    sampleMarkParam/autoparamterconfig.h \
+    paramWindow/autoparamterconfigwindow.h \
+    autoSampleMark/autodetection2dwindow.h
 
 RESOURCES += \
     style.qrc \

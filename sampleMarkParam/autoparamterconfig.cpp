@@ -1,9 +1,11 @@
+#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "autoparamterconfig.h"
 
 int AutoParamterConfig::inputDataWidth = 512;
 int AutoParamterConfig::inputDataHeight = 512;
-QString AutoParamterConfig::caffeNet = "";
-QString AutoParamterConfig::caffeModel = "";
+float AutoParamterConfig::threshold = 0.1f;
 QMap<int, QString> AutoParamterConfig::modelLabels = QMap<int, QString>();
 
 AutoParamterConfig::AutoParamterConfig()
@@ -26,14 +28,9 @@ void AutoParamterConfig::setInpuDataHeight(int height)
     inputDataHeight = height;
 }
 
-void AutoParamterConfig::setCaffeNet(QString net)
+void AutoParamterConfig::setThreshold(float value)
 {
-    caffeNet = net;
-}
-
-void AutoParamterConfig::setCaffeModel(QString model)
-{
-    caffeModel = model;
+    threshold = value;
 }
 
 void AutoParamterConfig::setModelLabels(QMap<int, QString> labels)
@@ -52,14 +49,9 @@ int AutoParamterConfig::getInpuDataHeight()
     return inputDataHeight;
 }
 
-QString AutoParamterConfig::getCaffeNet()
+float AutoParamterConfig::getThreshold()
 {
-    return caffeNet;
-}
-
-QString AutoParamterConfig::getCaffeModel()
-{
-    return caffeModel;
+    return threshold;
 }
 
 QMap<int, QString> AutoParamterConfig::getModelLabels()

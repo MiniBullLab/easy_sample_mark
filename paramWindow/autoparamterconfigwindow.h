@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDialog>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -11,7 +12,7 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include "utilityGUI/customWindow/modellabeltablewidget.h"
-#include "autoparamterconfig.h"
+#include "sampleMarkParam/autoparamterconfig.h"
 
 class AutoParamterConfigWindow : public QDialog
 {
@@ -25,24 +26,18 @@ signals:
 public slots:
 
     void slotOk();
-    void slotSelectCaffeNet();
-    void slotSelectCaffeModel();
 
 protected:
 
     void closeEvent(QCloseEvent *event);
 
 private:
-    QLabel *caffeNetLabel;
-    QLineEdit *caffeNetText;
-    QPushButton *caffeNetButton;
-    QLabel *caffeModelLabel;
-    QLineEdit *caffeModelText;
-    QPushButton *caffeModelButton;
     QLabel *inputDataWidthLabel;
     QSpinBox *inputDataWidthBox;
     QLabel *inputDataHeightLabel;
     QSpinBox *inputDataHeightBox;
+    QLabel *thresholdLabel;
+    QDoubleSpinBox *thresholdBox;
     ModelLabelTableWidget *modelLabelTable;
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;

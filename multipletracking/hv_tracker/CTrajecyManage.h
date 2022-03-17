@@ -1,4 +1,4 @@
-//角点跟踪
+﻿//角点跟踪
 #ifndef CTRAJECT_H
 #define CTRAJECT_H
 

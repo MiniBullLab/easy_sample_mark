@@ -1,4 +1,4 @@
-#ifndef  CTRACKERRFORCORNER_H 
+﻿#ifndef  CTRACKERRFORCORNER_H 
 #define CTRACKERRFORCORNER_H
 
 #include "utility.h"

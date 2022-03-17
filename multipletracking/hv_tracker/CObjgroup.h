@@ -1,4 +1,4 @@
-#ifndef COBJGROUP_H
+﻿#ifndef COBJGROUP_H
 #define COBJGROUP_H
 #include "utility.h"
 

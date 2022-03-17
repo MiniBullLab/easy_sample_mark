@@ -1,4 +1,4 @@
-//角点跟踪
+﻿//角点跟踪
 #ifndef CORNERFIND_H
 #define CORNERFIND_H
 

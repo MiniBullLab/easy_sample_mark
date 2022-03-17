@@ -1,4 +1,4 @@
-#ifndef YOLOV5DECTOR_H
+﻿#ifndef YOLOV5DECTOR_H
 #define YOLOV5DECTOR_H
 
 #include "basedetector.h"

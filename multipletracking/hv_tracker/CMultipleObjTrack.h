@@ -1,4 +1,4 @@
-#ifndef CMULTIPLEOBJTRACK_H
+﻿#ifndef CMULTIPLEOBJTRACK_H
 #define CMULTIPLEOBJTRACK_H
 
 #include "utility.h"

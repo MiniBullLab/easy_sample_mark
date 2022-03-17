@@ -1,4 +1,4 @@
-#include "Cobject.h"
+﻿#include "Cobject.h"
 #include "CTrajecy.h"
 #include "CTrajecyManage.h"
 

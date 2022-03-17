@@ -1,4 +1,4 @@
-#ifndef COBJECT_H
+﻿#ifndef COBJECT_H
 #define COBJECT_H
 
 #include "utility.h"

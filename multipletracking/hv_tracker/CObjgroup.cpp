@@ -1,4 +1,4 @@
-#include "CObjgroup.h"
+﻿#include "CObjgroup.h"
 #include "opencv2/opencv.hpp"
 #include "CTrajecy.h"
 #include "Cobject.h"

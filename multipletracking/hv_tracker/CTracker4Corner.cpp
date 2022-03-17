@@ -1,4 +1,4 @@
-#include "CTracker4Corner.h"
+﻿#include "CTracker4Corner.h"
 #include "CornerFind.h"
 #include "CornerTrack.h"
 #include "CTrajecyManage.h"

@@ -1,4 +1,4 @@
-#ifndef BIRDVIEWPROCESS_H
+﻿#ifndef BIRDVIEWPROCESS_H
 #define BIRDVIEWPROCESS_H
 
 #include <QWidget>

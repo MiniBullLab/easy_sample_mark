@@ -5,7 +5,6 @@ HEADERS += \
     $$PWD/kalmanmultipletracker.h \
     $$PWD/imultipletracker.h \
     $$PWD/trackingobject.h \
-    $$PWD/opencvmultipletracker.h \
     $$PWD/hv_tracker/CMultipleObjTrack.h \
     $$PWD/hv_tracker/Cobject.h \
     $$PWD/hv_tracker/CObjgroup.h \
@@ -14,7 +13,8 @@ HEADERS += \
     $$PWD/hv_tracker/CTracker4Corner.h \
     $$PWD/hv_tracker/CTrajecy.h \
     $$PWD/hv_tracker/CTrajecyManage.h \
-    $$PWD/hv_tracker/utility.h
+    $$PWD/hv_tracker/utility.h \
+    $$PWD/opencvmultipletracker.h
 
 
 SOURCES += \
@@ -24,7 +24,6 @@ SOURCES += \
     $$PWD/kalmanmultipletracker.cpp \
     $$PWD/imultipletracker.cpp \
     $$PWD/trackingobject.cpp \
-    $$PWD/opencvmultipletracker.cpp \
     $$PWD/hv_tracker/CMultipleObjTrack.cpp \
     $$PWD/hv_tracker/Cobject.cpp \
     $$PWD/hv_tracker/CObjgroup.cpp \
@@ -32,5 +31,6 @@ SOURCES += \
     $$PWD/hv_tracker/CornerTrack.cpp \
     $$PWD/hv_tracker/CTracker4Corner.cpp \
     $$PWD/hv_tracker/CTrajecy.cpp \
-    $$PWD/hv_tracker/CTrajecyManage.cpp
+    $$PWD/hv_tracker/CTrajecyManage.cpp \
+    $$PWD/opencvmultipletracker.cpp
 

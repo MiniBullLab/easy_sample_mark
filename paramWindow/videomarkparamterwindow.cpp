@@ -116,11 +116,6 @@ void VideoMarkParamterWindow::initConnect()
 void VideoMarkParamterWindow::initTrackingMethod()
 {
     trackingMethodBox->addItem("kalman", TrackingMethod::KALMAN);
-    trackingMethodBox->addItem("KCF", TrackingMethod::KCF);
-    trackingMethodBox->addItem("TLD", TrackingMethod::TLD);
-    trackingMethodBox->addItem("MIL", TrackingMethod::MIL);
-    trackingMethodBox->addItem("CSRT", TrackingMethod::CSRT);
-    trackingMethodBox->addItem("MOSSE", TrackingMethod::MOSSE);
 
     isTrackingBox->setChecked(paramterConfig.getIsTracking());
     trackingMethodBox->setCurrentIndex((int)paramterConfig.getTrackingMethod());

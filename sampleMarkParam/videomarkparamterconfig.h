@@ -6,12 +6,6 @@
 typedef enum TrackingMethod{
     UNTRACKINGMETHOD = -1,
     KALMAN = 0,
-//opencv
-    KCF = 1,
-    TLD = 2,
-    MIL = 3,
-    CSRT = 4,
-    MOSSE = 5
 }TrackingMethod;
 
 class VideoMarkParamterConfig

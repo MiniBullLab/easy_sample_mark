@@ -631,9 +631,9 @@ LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_aruco400.lib
 
 unix{
 
-INCLUDEPATH+= /home/lpj/Software/opencv34/include
+INCLUDEPATH+= /home/lpj/Software/opencv45/include/opencv4
 
-LIBS+=-L/home/lpj/Software/opencv34/lib \
+LIBS+=-L/home/lpj/Software/opencv45/lib \
     -lopencv_stitching \
     -lopencv_superres \
     -lopencv_videostab \

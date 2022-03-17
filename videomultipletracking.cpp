@@ -2,7 +2,6 @@
 #include <QDir>
 #include <iostream>
 #include "multipletracking/kalmanmultipletracker.h"
-#include "multipletracking/opencvmultipletracker.h"
 
 VideoMultipletracking::VideoMultipletracking()
 {
@@ -45,18 +44,6 @@ void VideoMultipletracking::tracking(const cv::Mat preFrame, const cv::Mat &next
                     trackingObjects = getTrackingObjects(preObjects, ShapeType::RECT_SHAPE);
                     multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
                 }
-                trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT_SHAPE);
-                multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
-            }
-            break;
-        case TrackingMethod::KCF:
-        case TrackingMethod::TLD:
-        case TrackingMethod::MIL:
-        case TrackingMethod::CSRT:
-        case TrackingMethod::MOSSE:
-            {
-                std::vector<TrackingObject> trackingObjects;
-                QList<MyObject> updateObjects = updateRectTrackingObjects(preObjects);
                 trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT_SHAPE);
                 multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
             }
@@ -206,26 +193,6 @@ void VideoMultipletracking::init()
     case TrackingMethod::KALMAN:
         method = TrackingMethod::KALMAN;
         multipleTracker = new KalmanMultipleTracker();
-        break;
-    case TrackingMethod::KCF:
-        method = TrackingMethod::KCF;
-        multipleTracker = new OpencvMultipletracker("KCF");
-        break;
-    case TrackingMethod::TLD:
-        method = TrackingMethod::TLD;
-        multipleTracker = new OpencvMultipletracker("TLD");
-        break;
-    case TrackingMethod::MIL:
-        method = TrackingMethod::MIL;
-        multipleTracker = new OpencvMultipletracker("MIL");
-        break;
-    case TrackingMethod::CSRT:
-        method = TrackingMethod::MIL;
-        multipleTracker = new OpencvMultipletracker("CSRT");
-        break;
-    case TrackingMethod::MOSSE:
-        method = TrackingMethod::MIL;
-        multipleTracker = new OpencvMultipletracker("MOSSE");
         break;
     default:
         break;

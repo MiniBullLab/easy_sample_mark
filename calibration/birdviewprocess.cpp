@@ -97,7 +97,7 @@ void BirdViewProcess::slotBirdView()
     cv::Mat birdImage;
     cv::Mat rgbFrame;
     cv::warpPerspective(imageInput, birdImage, homography, cv::Size(imageInput.cols, imageInput.rows) , \
-                        CV_INTER_LINEAR + CV_WARP_INVERSE_MAP + CV_WARP_FILL_OUTLIERS);
+                        cv::INTER_LINEAR + cv::WARP_INVERSE_MAP + cv::WARP_FILL_OUTLIERS);
     cv::cvtColor(birdImage, rgbFrame, cv::COLOR_BGR2RGB);
     birdViewImage = QImage((uchar*)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, QImage::Format_RGB888);
     imageShow->setNewQImage(birdViewImage);

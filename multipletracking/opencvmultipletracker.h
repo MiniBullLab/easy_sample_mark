@@ -2,7 +2,7 @@
 #define OPENCVMULTIPLETRACKER_H
 
 #include "imultipletracker.h"
-#include <opencv2/tracking.hpp>
+#include <opencv2/core/utility.hpp>
 
 class OpencvMultipletracker : public IMultipletracker
 {
@@ -16,8 +16,6 @@ public:
 
 private:
 
-    cv::Ptr<cv::Tracker> newTracker;
-    cv::MultiTracker *multiTrackers;
     std::string trackingMethod;
     std::vector<TrackingObject> trackingObjects;
     std::vector<std::vector<cv::Point>> trajectorys;

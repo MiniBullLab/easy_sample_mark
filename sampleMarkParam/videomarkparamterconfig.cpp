@@ -45,21 +45,6 @@ void VideoMarkParamterConfig::setTrackingMethod(int method)
     case 0:
         trackingMethod = TrackingMethod::KALMAN;
         break;
-    case 1:
-        trackingMethod = TrackingMethod::KCF;
-        break;
-    case 2:
-        trackingMethod = TrackingMethod::TLD;
-        break;
-    case 3:
-        trackingMethod = TrackingMethod::MIL;
-        break;
-    case 4:
-        trackingMethod = TrackingMethod::CSRT;
-        break;
-    case 5:
-        trackingMethod = TrackingMethod::MOSSE;
-        break;
     }
 }
 
@@ -124,21 +109,6 @@ int VideoMarkParamterConfig::loadConfig()
                         break;
                     case 0:
                         trackingMethod = TrackingMethod::KALMAN;
-                        break;
-                    case 1:
-                        trackingMethod = TrackingMethod::KCF;
-                        break;
-                    case 2:
-                        trackingMethod = TrackingMethod::TLD;
-                        break;
-                    case 3:
-                        trackingMethod = TrackingMethod::MIL;
-                        break;
-                    case 4:
-                        trackingMethod = TrackingMethod::CSRT;
-                        break;
-                    case 5:
-                        trackingMethod = TrackingMethod::MOSSE;
                         break;
                     }
                 }

@@ -175,7 +175,7 @@ win32{
 
 win32:DEFINES+=_CRT_SECURE_NO_WARNINGS
 
-INCLUDEPATH+= D:\opencv\opencv451\myBuild\install\include
+INCLUDEPATH+= D:\opencv\opencv451\build\include
 
 INCLUDEPATH+= D:\PCL_1_8_1\3rdParty\Boost\include\boost-1_64
 INCLUDEPATH+= D:\PCL_1_8_1\3rdParty\Eigen\eigen3
@@ -360,51 +360,7 @@ LIBS+=  D:\PCL_1_8_1\3rdParty\Qhull\lib\qhullstatic_d.lib\
 
 LIBS+=  D:\PCL_1_8_1\3rdParty\OpenNI2\Lib\OpenNI2.lib
 
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xphoto451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xobjdetect451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ximgproc451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xfeatures2d451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_videostab451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_videoio451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_video451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_tracking451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_text451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_surface_matching451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_superres451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_structured_light451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_stitching451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_stereo451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_shape451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_saliency451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_rgbd451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_reg451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_plot451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_photo451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_phase_unwrapping451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_optflow451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_objdetect451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ml451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_line_descriptor451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_imgproc451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_imgcodecs451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_img_hash451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_highgui451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_hfs451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_hdf451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_fuzzy451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_flann451d.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_features2d451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_face451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dpm451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dnn451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dnn_objdetect451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_datasets451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_core451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ccalib451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_calib3d451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_bioinspired451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_bgsegm451d.lib
-LIBS+= D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_aruco451d.lib
+LIBS+=D:\opencv\opencv451\build\x64\vc14\lib\opencv_world451d.lib
 
 } else {
 
@@ -581,51 +537,8 @@ LIBS+=  D:\PCL_1_8_1\3rdParty\VTK\lib\vtkalglib-8.0.lib\
         D:\PCL_1_8_1\3rdParty\VTK\lib\vtkzlib-8.0.lib
 LIBS+=  D:\PCL_1_8_1\3rdParty\OpenNI2\Lib\OpenNI2.lib
 
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xphoto451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xobjdetect451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ximgproc451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_xfeatures2d451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_videostab451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_videoio451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_video451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_tracking451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_text451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_surface_matching451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_superres451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_structured_light451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_stitching451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_stereo451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_shape451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_saliency451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_rgbd451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_reg451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_plot451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_photo451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_phase_unwrapping451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_optflow451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_objdetect451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ml451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_line_descriptor451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_imgproc451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_imgcodecs451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_img_hash451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_highgui451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_hfs451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_hdf451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_fuzzy451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_flann451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_features2d451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_face451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dpm451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dnn451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_dnn_objdetect451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_datasets451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_core451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_ccalib451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_calib3d451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_bioinspired451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_bgsegm451.lib
-LIBS+=D:\opencv\opencv451\myBuild\install\x64\vc14\lib\opencv_aruco451.lib
+LIBS+=D:\opencv\opencv451\build\x64\vc14\lib\opencv_world451.lib
+
 }
 }
 

@@ -4,6 +4,7 @@
 #include "yolov5dector.h"
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 #define IDX(o) (entry_index(o,anchor,j,i,grid_x,grid_y))
 
@@ -11,12 +12,12 @@ static int g_classificationCnt = 1;
 
 static float sigmoid_x(float x)
 {
-    return static_cast<float>(1.f / (1.f + exp(-x)));
+    return static_cast<float>(1.f / (1.f + (float)exp(-x)));
 }
 
 static int entry_index(int loc, int anchorC, int w, int h, int lWidth, int lHeight)
 {
-    return ((anchorC *(3+5) + loc) * lHeight * lWidth + h * lWidth + w);
+    return ((anchorC *(g_classificationCnt+5) + loc) * lHeight * lWidth + h * lWidth + w);
 }
 
 static float overlap(float x1, float w1, float x2, float w2)
@@ -63,19 +64,13 @@ int YoloV5Dector::initModel(const std::string modelNet, const std::string modelW
 }
 
 int YoloV5Dector::initDetectorParameters(const int dataWidth, const int dataHeight,
-                                     const float confidenceThreshold, const QMap<int, QString> &labels)
+                                     const float confidenceThreshold,const std::map<int, std::string> &labels)
 {
     this->inputDataWidth = dataWidth;
     this->inputDataHeight = dataHeight;
     this->confidenceThreshold = confidenceThreshold;
-    this->labelIds.clear();
-    this->labelNames.clear();
-    for(QMap<int, QString>::const_iterator iterator = labels.constBegin(); iterator != labels.constEnd(); ++iterator)
-    {
-        this->labelIds.push_back(iterator.key());
-        this->labelNames.push_back(iterator.value().toStdString());
-    }
-    g_classificationCnt = this->labelIds.size();
+    this->labels = labels;
+    g_classificationCnt = this->labels.size();
     // std::cout << g_classificationCnt << confidenceThreshold << dataWidth << dataHeight <<  std::endl;
     return 0;
 }
@@ -119,7 +114,6 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
 
     for (int stride = 0; stride < 3; stride++)
     {    //stride
-        std::vector<float> box;
         float* pdata = (float*)outputs[stride].data;
         int grid_x = (int)(this->inputDataWidth / this->stride[stride]);
         int grid_y = (int)(this->inputDataHeight / this->stride[stride]);
@@ -151,6 +145,7 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
                         // max_class_socre = sigmoid_x((float)max_class_socre); // (float)max_class_socre;
                         if (box_score > this->confidenceThreshold) {
                             // rect [x,y,w,h]
+                            std::vector<float> box;
                             box.clear();
                             float x = (sigmoid_x(pdata[IDX(0)]) * 2.f - 0.5f + j) * this->stride[stride]; //x pdata[0];   //
                             float y = (sigmoid_x(pdata[IDX(1)]) * 2.f - 0.5f + i) * this->stride[stride]; //y pdata[1]; //
@@ -175,67 +170,99 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
     }
 
     boxes = applyNMS(boxes, this->nmsThreshold);
-    for (int i = 0; i < boxes.size(); i++) {
+    for (size_t i = 0; i < boxes.size(); i++) {
         Detect2dBox result;
-        std::string objectName = getLabelName(boxes[i][4]);
-        result.objectName = objectName;
-        result.classID = boxes[i][4];
-        // if (result.classID == 0)
-        // {
-        result.confidence = boxes[i][5];
-        result.minX = boxes[i][0];
-        // if (result.x1 < 1) {continue;}
-        result.minY = boxes[i][1];
-        // if (result.y1 < 1) {continue;}
-        result.maxX = boxes[i][0] + boxes[i][2];
-        // if (result.x2 >= this->src_width) {result.x2 = this->src_width - 1;}
-        result.maxY = boxes[i][1] + boxes[i][3];
-        // if (result.y2 >= 1080) {result.y2 = 1080 - 1;}
-        // std::cout << result.minX << " " << result.minY << " " << result.maxX << " " << result.maxY << std::endl;
-        det_results.push_back(result);
-        // }
+        int classId = static_cast<int>(boxes[i][4]);
+        if (this->labels.find(classId) != this->labels.end())
+        {
+            std::string objectName = this->labels[classId];
+            result.objectName = objectName;
+            result.classID = boxes[i][4];
+            // if (result.classID == 0)
+            // {
+            result.confidence = boxes[i][5];
+            result.minX = boxes[i][0];
+            // if (result.x1 < 1) {continue;}
+            result.minY = boxes[i][1];
+            // if (result.y1 < 1) {continue;}
+            result.maxX = boxes[i][0] + boxes[i][2];
+            // if (result.x2 >= this->src_width) {result.x2 = this->src_width - 1;}
+            result.maxY = boxes[i][1] + boxes[i][3];
+            // if (result.y2 >= 1080) {result.y2 = 1080 - 1;}
+            // std::cout << result.minX << " " << result.minY << " " << result.maxX << " " << result.maxY << std::endl;
+            det_results.push_back(result);
+        }
     }
 
     return rval;
 }
 
-std::vector<std::vector<float>> YoloV5Dector::applyNMS(std::vector<std::vector<float>>& boxes, const float thres)
+std::vector<std::vector<float>> YoloV5Dector::applyNMS(std::vector<std::vector<float> >& boxes, const float thres)
 {
     std::vector<std::vector<float>> result;
-    std::vector<bool> exist_box(boxes.size(), true);
+    std::vector<bool> existBox(boxes.size(), true);
+    result.clear();
 
-    int n = 0;
-    for (size_t _i = 0; _i < boxes.size(); ++_i)
+    std::sort(boxes.begin(), boxes.end(), [](const std::vector<float> &det1, const std::vector<float> &det2){
+        return det1[5] > det2[5];
+    });
+
+    for(size_t i = 0; i < boxes.size(); i++)
     {
-        if (!exist_box[_i])
+        if (!existBox[i])
             continue;
-        n = 0;
-        for (size_t _j = _i + 1; _j < boxes.size(); ++_j)
+        for(size_t j = 1 + i; j < boxes.size(); j++)
         {
-            // different class name
-            if (!exist_box[_j] || boxes[_i][4] != boxes[_j][4])
-                continue;
-            float ovr = cal_iou(boxes[_j], boxes[_i]);
-            if (ovr >= thres)
+            if(existBox[j])
             {
-                if (boxes[_j][5] <= boxes[_i][5])
+                float iouValue =  cal_iou(boxes[j], boxes[i]);
+                if(iouValue >= thres)
                 {
-                    exist_box[_j] = false;
-                }
-                else
-                {
-                    n++;   // have object_score bigger than boxes[_i]
-                    exist_box[_i] = false;
-                    break;
+                    existBox[j] = false;
                 }
             }
         }
-        //if (n) exist_box[_i] = false;
-        if (n == 0)
+    }
+    for(size_t index = 0; index < existBox.size(); index++)
+    {
+        if(existBox[index])
         {
-            result.push_back(boxes[_i]);
+            result.push_back(boxes[index]);
         }
     }
+
+//    int n = 0;
+//    for (size_t _i = 0; _i < boxes.size(); ++_i)
+//    {
+//        if (!exist_box[_i])
+//            continue;
+//        n = 0;
+//        for (size_t _j = _i + 1; _j < boxes.size(); ++_j)
+//        {
+//            // different class name
+//            if (!exist_box[_j] || boxes[_i][4] != boxes[_j][4])
+//                continue;
+//            float ovr = cal_iou(boxes[_j], boxes[_i]);
+//            if (ovr >= thres)
+//            {
+//                if (boxes[_j][5] <= boxes[_i][5])
+//                {
+//                    exist_box[_j] = false;
+//                }
+//                else
+//                {
+//                    n++;   // have object_score bigger than boxes[_i]
+//                    exist_box[_i] = false;
+//                    break;
+//                }
+//            }
+//        }
+//        //if (n) exist_box[_i] = false;
+//        if (n == 0)
+//        {
+//            result.push_back(boxes[_i]);
+//        }
+//    }
 
     return result;
 }
@@ -246,8 +273,7 @@ void YoloV5Dector::initData()
     this->inputDataHeight = 352;
     this->confidenceThreshold = 0.3f;
 
-    this->labelIds.clear();
-    this->labelNames.clear();
+    this->labels.clear();
 
     this->anchors = {{10.0, 13.0, 16.0, 30.0, 33.0, 23.0}, \
                      {30.0, 61.0, 62.0, 45.0, 59.0, 119.0}, \

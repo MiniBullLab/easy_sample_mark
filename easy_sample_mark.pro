@@ -7,7 +7,7 @@
 QT       += core gui xml
 QT       += multimedia
 QT       += multimediawidgets
-CONFIG   += c++11
+CONFIG   += c++14
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

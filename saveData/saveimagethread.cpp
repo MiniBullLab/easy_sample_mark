@@ -38,7 +38,7 @@ void SaveImageThread::run()
                     {
 //                        fileName = dirName + "/" + QString("/%1_%2").arg(this->videoFileName).arg(frameNumber)
 //                                + imagePost;
-                        fileName = dirName + "/" + QString("/%1").arg(frameNumber, widthCount, 10,QLatin1Char('0')) + imagePost;
+                        fileName = dirName + "/" + QString("/%1").arg(frameNumber, widthCount, 10, QLatin1Char('0')) + imagePost;
                         //myImageWrite.saveImage(frame, fileName.toStdString());
                         cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
                         currentImage = QImage((uchar*)(frame.data), frame.cols, frame.rows,

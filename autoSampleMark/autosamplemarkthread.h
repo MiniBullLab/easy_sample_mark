@@ -58,6 +58,7 @@ private:
     int skipFrameCount;
     int videoWidth;
     int videoHeight;
+    QString imagePost;
 
     QList<QString> videoList;
 

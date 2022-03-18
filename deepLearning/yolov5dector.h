@@ -13,7 +13,7 @@ public:
     int initModel(const std::string modelNet, const std::string modelWeight="");
 
     int initDetectorParameters(const int dataWidth, const int dataHeight,
-                               const float confidenceThreshold, const QMap<int, QString> &labels);
+                               const float confidenceThreshold, const std::map<int, std::string> &labels);
 
     void processDetect(const cv::Mat &inputImage, std::vector<Detect2dBox> &objectRect);
 
@@ -34,8 +34,7 @@ private:
 private:
 
     int postprocess(const cv::Size &srcSize, const std::vector<cv::Mat> &outputs, std::vector<Detect2dBox> &det_results);
-    std::vector<std::vector<float>> applyNMS(std::vector<std::vector<float>>& boxes,
-                                    const float thres);
+    std::vector<std::vector<float>> applyNMS(std::vector<std::vector<float>>& boxes, const float thres);
 
      void initData();
      void saveConfig();

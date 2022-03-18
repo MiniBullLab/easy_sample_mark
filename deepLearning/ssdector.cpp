@@ -28,18 +28,12 @@ int SSDector::initModel(const std::string modelNet, const std::string modelWeigh
 }
 
 int SSDector::initDetectorParameters(const int dataWidth, const int dataHeight,
-                                     const float confidenceThreshold, const QMap<int, QString> &labels)
+                                     const float confidenceThreshold, const std::map<int, std::string> &labels)
 {
     this->inputDataWidth = dataWidth;
     this->inputDataHeight = dataHeight;
     this->confidenceThreshold = confidenceThreshold;
-    this->labelIds.clear();
-    this->labelNames.clear();
-    for(QMap<int, QString>::const_iterator iterator = labels.constBegin(); iterator != labels.constEnd(); ++iterator)
-    {
-        this->labelIds.push_back(iterator.key());
-        this->labelNames.push_back(iterator.value().toStdString());
-    }
+    this->labels = labels;
     return 0;
 }
 
@@ -138,18 +132,22 @@ void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detecti
             int xRightTop = static_cast<int>(detectionObjects.at<float>(i, 5) * roi.cols) + topX;
             int yRightTop = static_cast<int>(detectionObjects.at<float>(i, 6) * roi.rows) + topY;
 
-            std::string objectName = getLabelName(classIndex);
+            if (this->labels.find(classIndex) != this->labels.end())
+            {
+                std::string objectName = this->labels[classIndex];
 
-            Detect2dBox tempBox;
-            tempBox.minX = xLeftBottom;
-            tempBox.minY = yLeftBottom;
-            tempBox.maxX = xRightTop;
-            tempBox.maxY = yRightTop;
-            tempBox.objectName = objectName;
-            tempBox.classID = classIndex;
-            tempBox.confidence = confidence;
+                Detect2dBox tempBox;
+                tempBox.minX = xLeftBottom;
+                tempBox.minY = yLeftBottom;
+                tempBox.maxX = xRightTop;
+                tempBox.maxY = yRightTop;
+                tempBox.objectName = objectName;
+                tempBox.classID = classIndex;
+                tempBox.confidence = confidence;
 
-            objectRect.push_back(tempBox);
+                objectRect.push_back(tempBox);
+            }
+
 
 //            std::cout << "Class: " << objectName << std::endl;
 //            std::cout << "Confidence: " << confidence << std::endl;
@@ -166,9 +164,7 @@ void SSDector::initData()
     this->inputDataWidth = 512;
     this->inputDataHeight = 512;
     this->confidenceThreshold = 0.5f;
-
-    this->labelIds.clear();
-    this->labelNames.clear();
+    this->labels.clear();
 }
 
 void SSDector::saveConfig()

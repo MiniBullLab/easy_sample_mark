@@ -42,10 +42,16 @@ int AutoSampleMarkThread::initModel(const QString &modelName, const QString &mod
 
 void AutoSampleMarkThread::initData(const QList<QString> videoList, const int skipFrameCount)
 {
+    std::map<int, std::string> tempLabels;
     this->videoList = videoList;
     this->skipFrameCount = skipFrameCount;
+    for(QMap<int, QString>::const_iterator iterator = AutoParamterConfig::getModelLabels().constBegin(); \
+        iterator != AutoParamterConfig::getModelLabels().constEnd(); ++iterator)
+    {
+        tempLabels[iterator.key()] = iterator.value().toStdString();
+    }
     this->detector->initDetectorParameters(AutoParamterConfig::getInpuDataWidth(), AutoParamterConfig::getInpuDataHeight(),
-                                           AutoParamterConfig::getThreshold(), AutoParamterConfig::getModelLabels());
+                                           AutoParamterConfig::getThreshold(), tempLabels);
 }
 
 void AutoSampleMarkThread::startThread()
@@ -100,6 +106,7 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
     QString saveImageDir = path + "/" + videoName + "_JPEGImages";
     QString saveJsonDir = path + "/" + "Annotations";
     QDir makeDir;
+    int widthCount = QString::number(videoProcess->getFrameCount()).count() + 1;
     if(!makeDir.exists(saveImageDir))
     {
         if(!makeDir.mkdir(saveImageDir))
@@ -126,8 +133,9 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
                     std::vector<Detect2dBox> objectRect;
                     QList<MyObject> objects;
                     detector->processDetect(frame, objectRect);
-                    QString saveJsonPath = saveJsonDir + QString("/%1_%2.json").arg(videoName).arg(currentFrame);
-                    QString saveImagePath = saveImageDir + QString("/%1_%2.png").arg(videoName).arg(currentFrame);
+                    QString saveName = videoName + QString("_%1").arg(currentFrame, widthCount, 10, QLatin1Char('0'));
+                    QString saveJsonPath = saveJsonDir + QString("/%1.json").arg(saveName);
+                    QString saveImagePath = saveImageDir + "/" + saveName + imagePost;
                     objects = toMyObjects(objectRect);
                     jsonProcess.createJSON(saveJsonPath, saveImagePath, videoWidth, videoHeight, objects);
                     // xmlCreator.createXML(savXmlPath, saveImagePath, videoWidth, videoHeight, objects);
@@ -209,6 +217,8 @@ void AutoSampleMarkThread::init()
     skipFrameCount = 1;
     videoWidth = 640;
     videoHeight = 480;
+
+    imagePost = ".png";
 
     videoList.clear();
 

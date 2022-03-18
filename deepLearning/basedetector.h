@@ -6,7 +6,7 @@
 #include <opencv2/dnn.hpp>
 #include <string>
 #include <vector>
-#include <QMap>
+#include <map>
 
 #include "cnn_data_type.h"
 
@@ -18,15 +18,12 @@ public:
 
     virtual int initModel(const std::string modelNet, const std::string modelWeight="") = 0;
     virtual int initDetectorParameters(const int dataWidth, const int dataHeight,
-                                       const float confidenceThreshold, const QMap<int, QString> &labels) = 0;
+                                       const float confidenceThreshold, const std::map<int, std::string> &labels) = 0;
     virtual void processDetect(const cv::Mat &inputImage, std::vector<Detect2dBox> &objectRect) = 0;
-
-    virtual std::string getLabelName(const int indice);
 
 protected:
 
-    std::vector<int> labelIds;
-    std::vector<std::string> labelNames;
+    std::map<int, std::string> labels;
 
     void showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect);
 

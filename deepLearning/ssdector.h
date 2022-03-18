@@ -25,8 +25,6 @@ private:
                                 const int topX, const int topY,
                                 std::vector<Detect2dBox> &objectRect);
 
-    void showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect);
-
     void initData();
 
 private:

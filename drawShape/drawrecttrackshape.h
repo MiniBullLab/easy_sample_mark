@@ -1,4 +1,4 @@
-#ifndef DRAWRECTTRACKSHAPE_H
+﻿#ifndef DRAWRECTTRACKSHAPE_H
 #define DRAWRECTTRACKSHAPE_H
 
 #include "drawshape.h"

@@ -77,7 +77,8 @@ void AutoParamterConfigWindow::initUI()
     thresholdLabel = new QLabel(tr("置信度:"));
     thresholdBox = new QDoubleSpinBox();
     thresholdBox->setSingleStep(0.1);
-    thresholdBox->setMaximum(0);
+    thresholdBox->setMinimum(0);
+    thresholdBox->setMaximum(1);
     thresholdBox->setValue((double)paramterConfig.getThreshold());
 
     QHBoxLayout *topLayout2 = new QHBoxLayout();

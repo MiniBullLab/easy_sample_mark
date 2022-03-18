@@ -9,6 +9,7 @@
 
 #include "helpers/videoprocess.h"
 #include "saveMarkData/xmlprocess.h"
+#include "saveMarkData/jsonprocess.h"
 #include "deepLearning/ssdector.h"
 #include "deepLearning/yolov5dector.h"
 #include "dataType/myobject.h"
@@ -22,7 +23,7 @@ public:
     ~AutoSampleMarkThread();
 
     int initModel(const QString &modelName, const QString &modelPath, const QString &modelBinary="");
-    void initData(const QList<QString> videoList, const int skipFrameCount, const float confidenceThreshold);
+    void initData(const QList<QString> videoList, const int skipFrameCount);
 
     void startThread();//开始线程
     void stopThread();//结束线程
@@ -51,6 +52,7 @@ private:
     std::shared_ptr<BaseDetector> detector;
 
     XMLProcess xmlCreator;
+    JSONProcess jsonProcess;
 
     bool isStart;
     int skipFrameCount;

@@ -16,7 +16,7 @@ static float sigmoid_x(float x)
 
 static int entry_index(int loc, int anchorC, int w, int h, int lWidth, int lHeight)
 {
-    return ((anchorC *(g_classificationCnt+5) + loc) * lHeight * lWidth + h * lWidth + w);
+    return ((anchorC *(3+5) + loc) * lHeight * lWidth + h * lWidth + w);
 }
 
 static float overlap(float x1, float w1, float x2, float w2)
@@ -50,7 +50,6 @@ YoloV5Dector::~YoloV5Dector()
 
 int YoloV5Dector::initModel(const std::string modelNet, const std::string modelWeight)
 {
-    //Import Caffe SSD model
     try
     {
         net = cv::dnn::readNet(modelNet);
@@ -77,6 +76,7 @@ int YoloV5Dector::initDetectorParameters(const int dataWidth, const int dataHeig
         this->labelNames.push_back(iterator.value().toStdString());
     }
     g_classificationCnt = this->labelIds.size();
+    // std::cout << g_classificationCnt << confidenceThreshold << dataWidth << dataHeight <<  std::endl;
     return 0;
 }
 
@@ -85,38 +85,25 @@ void YoloV5Dector::processDetect(const cv::Mat &inputImage, std::vector<Detect2d
     objectRect.clear();
     if(inputImage.empty())
     {
+        std::cout <<"input image empty!" << std::endl;
         return;
     }
     cv::Mat blob;
     cv::Size srcSize(inputImage.cols, inputImage.rows);
     double duration = static_cast<double>(cv::getTickCount());
-    cv::dnn::blobFromImage(inputImage, blob, 1 / 255.0, cv::Size(this->inputDataWidth, this->inputDataHeight), cv::Scalar(0, 0, 0), true, false);
+    cv::dnn::blobFromImage(inputImage.clone(), blob, 1 / 255.0,
+                           cv::Size(this->inputDataWidth, this->inputDataHeight),
+                           cv::Scalar(0, 0, 0), true, false);
     this->net.setInput(blob);
     std::vector<cv::Mat> netOutputImg;
     this->net.forward(netOutputImg, net.getUnconnectedOutLayersNames());
     postprocess(srcSize, netOutputImg, objectRect);
+    std::cout <<"objectRect:" << objectRect.size() << std::endl;
     duration = (static_cast<double>(cv::getTickCount()) - duration) / cv::getTickFrequency();
     std::cout << "time(sec):" << std::fixed << std::setprecision(4) << duration << std::endl;
-//    showDetection(const_cast<cv::Mat&>(image), objectRect, objectClass, objectConfidence);
-//    cv::imshow("yolov5", image);
-//    cv::waitKey(20);
-}
-
-void YoloV5Dector::initData()
-{
-    this->inputDataWidth = 576;
-    this->inputDataHeight = 352;
-    this->confidenceThreshold = 0.3f;
-
-    this->labelIds.clear();
-    this->labelNames.clear();
-
-    this->anchors = {{10.0, 13.0, 16.0, 30.0, 33.0, 23.0}, \
-                     {30.0, 61.0, 62.0, 45.0, 59.0, 119.0}, \
-                     {116.0, 90.0, 156.0, 198.0, 373.0, 326.0}};
-    this->stride = { 8.0, 16.0, 32.0 };
-    this->nmsThreshold = 0.45f;
-    this->objThreshold = 0.3f;
+    //    showDetection(const_cast<cv::Mat&>(image), objectRect);
+    //    cv::imshow("yolov5", image);
+    //    cv::waitKey(20);
 }
 
 int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat> &outputs, std::vector<Detect2dBox> &det_results)
@@ -129,9 +116,8 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
     std::vector<std::vector<float>> boxes;
     float ratio_h = (float)srcSize.height / this->inputDataHeight;
     float ratio_w = (float)srcSize.width / this->inputDataWidth;
-    int net_width = g_classificationCnt + 5;  //输出的网络宽度是类别数+5
 
-    for (int stride =0; stride < 3; stride++)
+    for (int stride = 0; stride < 3; stride++)
     {    //stride
         std::vector<float> box;
         float* pdata = (float*)outputs[stride].data;
@@ -188,9 +174,6 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
         }
     }
 
-    //执行非最大抑制以消除具有较低置信度的冗余重叠框（NMS）
-    // vector<int> nms_result;
-    // NMSBoxes(boxes, confidences, this->confThreshold, this->nmsThreshold, nms_result);
     boxes = applyNMS(boxes, this->nmsThreshold);
     for (int i = 0; i < boxes.size(); i++) {
         Detect2dBox result;
@@ -208,7 +191,7 @@ int YoloV5Dector::postprocess(const cv::Size &srcSize, const std::vector<cv::Mat
         // if (result.x2 >= this->src_width) {result.x2 = this->src_width - 1;}
         result.maxY = boxes[i][1] + boxes[i][3];
         // if (result.y2 >= 1080) {result.y2 = 1080 - 1;}
-        // std::cout << result.x1 << " " << result.y1 << " " << result.x2 << " " << result.y2 << std::endl;
+        // std::cout << result.minX << " " << result.minY << " " << result.maxX << " " << result.maxY << std::endl;
         det_results.push_back(result);
         // }
     }
@@ -255,6 +238,23 @@ std::vector<std::vector<float>> YoloV5Dector::applyNMS(std::vector<std::vector<f
     }
 
     return result;
+}
+
+void YoloV5Dector::initData()
+{
+    this->inputDataWidth = 576;
+    this->inputDataHeight = 352;
+    this->confidenceThreshold = 0.3f;
+
+    this->labelIds.clear();
+    this->labelNames.clear();
+
+    this->anchors = {{10.0, 13.0, 16.0, 30.0, 33.0, 23.0}, \
+                     {30.0, 61.0, 62.0, 45.0, 59.0, 119.0}, \
+                     {116.0, 90.0, 156.0, 198.0, 373.0, 326.0}};
+    this->stride = {8.0f, 16.0f, 32.0f};
+    this->nmsThreshold = 0.45f;
+    this->objThreshold = 0.3f;
 }
 
 void YoloV5Dector::saveConfig()

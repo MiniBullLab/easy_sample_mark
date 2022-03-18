@@ -5,11 +5,11 @@
 #include <QDir>
 #include <QDebug>
 
-#include <pcl/filters/passthrough.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/normal_3d_omp.h>
-#include <pcl/surface/gp3.h>
-#include <pcl/surface/poisson.h>
+//#include <pcl/filters/passthrough.h>
+//#include <pcl/features/normal_3d.h>
+//#include <pcl/features/normal_3d_omp.h>
+//#include <pcl/surface/gp3.h>
+//#include <pcl/surface/poisson.h>
 
 PCDConverterThread::PCDConverterThread()
 {
@@ -178,108 +178,108 @@ void PCDConverterThread::plyConvertToMesh(const QString &saveDir, const QList<QS
 
 void PCDConverterThread::poissonReconstruction(const std::string savePath, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud)
 {
-      pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered(new pcl::PointCloud<pcl::PointXYZRGB>());
-      pcl::PassThrough<pcl::PointXYZRGB> filter;
-      filter.setInputCloud(cloud);
-      filter.filter(*filtered);
-      std::cout << "passthrough filter complete" << std::endl;
+//      pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered(new pcl::PointCloud<pcl::PointXYZRGB>());
+//      pcl::PassThrough<pcl::PointXYZRGB> filter;
+//      filter.setInputCloud(cloud);
+//      filter.filter(*filtered);
+//      std::cout << "passthrough filter complete" << std::endl;
 
-      std::cout << "begin normal estimation" << std::endl;
-      pcl::NormalEstimationOMP<pcl::PointXYZRGB, pcl::Normal> ne;//计算点云法向
-      ne.setNumberOfThreads(8);//设定临近点
-      ne.setInputCloud(filtered);
-      ne.setRadiusSearch(0.01);//设定搜索半径
-      Eigen::Vector4f centroid;
-      compute3DCentroid(*filtered, centroid);//计算点云中心
-      ne.setViewPoint(centroid[0], centroid[1], centroid[2]);//将向量计算原点置于点云中心
+//      std::cout << "begin normal estimation" << std::endl;
+//      pcl::NormalEstimationOMP<pcl::PointXYZRGB, pcl::Normal> ne;//计算点云法向
+//      ne.setNumberOfThreads(8);//设定临近点
+//      ne.setInputCloud(filtered);
+//      ne.setRadiusSearch(0.01);//设定搜索半径
+//      Eigen::Vector4f centroid;
+//      compute3DCentroid(*filtered, centroid);//计算点云中心
+//      ne.setViewPoint(centroid[0], centroid[1], centroid[2]);//将向量计算原点置于点云中心
 
-      pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>());
-      ne.compute(*cloud_normals);
-      std::cout << "normal estimation complete" << std::endl;
-      std::cout << "reverse normals' direction" << std::endl;
+//      pcl::PointCloud<pcl::Normal>::Ptr cloud_normals(new pcl::PointCloud<pcl::Normal>());
+//      ne.compute(*cloud_normals);
+//      std::cout << "normal estimation complete" << std::endl;
+//      std::cout << "reverse normals' direction" << std::endl;
 
-      //将法向量反向
-      for(size_t i = 0; i < cloud_normals->size(); ++i)
-      {
-        cloud_normals->points[i].normal_x *= -1;
-        cloud_normals->points[i].normal_y *= -1;
-        cloud_normals->points[i].normal_z *= -1;
-      }
+//      //将法向量反向
+//      for(size_t i = 0; i < cloud_normals->size(); ++i)
+//      {
+//        cloud_normals->points[i].normal_x *= -1;
+//        cloud_normals->points[i].normal_y *= -1;
+//        cloud_normals->points[i].normal_z *= -1;
+//      }
 
-      //融合RGB点云和法向
-      std::cout << "combine points and normals" << std::endl;
-      pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_smoothed_normals(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-      concatenateFields(*filtered, *cloud_normals, *cloud_smoothed_normals);
+//      //融合RGB点云和法向
+//      std::cout << "combine points and normals" << std::endl;
+//      pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr cloud_smoothed_normals(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+//      concatenateFields(*filtered, *cloud_normals, *cloud_smoothed_normals);
 
-      //泊松重建
-      std::cout << "begin poisson reconstruction" << std::endl;
-      pcl::Poisson<pcl::PointXYZRGBNormal> poisson;
-      poisson.setDegree(2);
-      poisson.setDepth(8);
-      poisson.setSolverDivide(8); //设置求解线性方程组的Gauss-Seidel迭代方法的深度
-      poisson.setIsoDivide(8); //用于提取ISO等值面的算法的深度
-      poisson.setConfidence(false); //是否使用法向量的大小作为置信信息。如果false，所有法向量均归一化。
-      poisson.setManifold(true);
-      poisson.setOutputPolygons(false);
-      poisson.setSamplesPerNode(3.0); //设置落入一个八叉树结点中的样本点的最小数量。无噪声，[1.0-5.0],有噪声[15.-20.]平滑
-      poisson.setScale(1.25);
+//      //泊松重建
+//      std::cout << "begin poisson reconstruction" << std::endl;
+//      pcl::Poisson<pcl::PointXYZRGBNormal> poisson;
+//      poisson.setDegree(2);
+//      poisson.setDepth(8);
+//      poisson.setSolverDivide(8); //设置求解线性方程组的Gauss-Seidel迭代方法的深度
+//      poisson.setIsoDivide(8); //用于提取ISO等值面的算法的深度
+//      poisson.setConfidence(false); //是否使用法向量的大小作为置信信息。如果false，所有法向量均归一化。
+//      poisson.setManifold(true);
+//      poisson.setOutputPolygons(false);
+//      poisson.setSamplesPerNode(3.0); //设置落入一个八叉树结点中的样本点的最小数量。无噪声，[1.0-5.0],有噪声[15.-20.]平滑
+//      poisson.setScale(1.25);
 
-      poisson.setInputCloud(cloud_smoothed_normals);
-      PolygonMesh mesh;
-      poisson.reconstruct(mesh);
+//      poisson.setInputCloud(cloud_smoothed_normals);
+//      PolygonMesh mesh;
+//      poisson.reconstruct(mesh);
 
-      std::cout << "finish poisson reconstruction" << std::endl;
+//      std::cout << "finish poisson reconstruction" << std::endl;
 
-      //给mesh染色
-      pcl::PointCloud<pcl::PointXYZRGB> cloud_color_mesh;
-      pcl::fromPCLPointCloud2(mesh.cloud, cloud_color_mesh);
+//      //给mesh染色
+//      pcl::PointCloud<pcl::PointXYZRGB> cloud_color_mesh;
+//      pcl::fromPCLPointCloud2(mesh.cloud, cloud_color_mesh);
 
-      pcl::KdTreeFLANN<pcl::PointXYZRGB> kdtree;
-      kdtree.setInputCloud (cloud);
-      // K nearest neighbor search
-      int K = 5;
-      std::vector<int> pointIdxNKNSearch(K);
-      std::vector<float> pointNKNSquaredDistance(K);
-      for(int i=0;i<cloud_color_mesh.points.size();++i)
-      {
-         uint8_t r = 0;
-         uint8_t g = 0;
-         uint8_t b = 0;
-         float dist = 0.0;
-         int red = 0;
-         int green = 0;
-         int blue = 0;
-         uint32_t rgb;
+//      pcl::KdTreeFLANN<pcl::PointXYZRGB> kdtree;
+//      kdtree.setInputCloud (cloud);
+//      // K nearest neighbor search
+//      int K = 5;
+//      std::vector<int> pointIdxNKNSearch(K);
+//      std::vector<float> pointNKNSquaredDistance(K);
+//      for(int i=0;i<cloud_color_mesh.points.size();++i)
+//      {
+//         uint8_t r = 0;
+//         uint8_t g = 0;
+//         uint8_t b = 0;
+//         float dist = 0.0;
+//         int red = 0;
+//         int green = 0;
+//         int blue = 0;
+//         uint32_t rgb;
 
-         if ( kdtree.nearestKSearch (cloud_color_mesh.points[i], K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0 )
-         {
-            for (int j = 0; j < pointIdxNKNSearch.size (); ++j)
-            {
+//         if ( kdtree.nearestKSearch (cloud_color_mesh.points[i], K, pointIdxNKNSearch, pointNKNSquaredDistance) > 0 )
+//         {
+//            for (int j = 0; j < pointIdxNKNSearch.size (); ++j)
+//            {
 
-               r = cloud->points[ pointIdxNKNSearch[j] ].r;
-               g = cloud->points[ pointIdxNKNSearch[j] ].g;
-               b = cloud->points[ pointIdxNKNSearch[j] ].b;
+//               r = cloud->points[ pointIdxNKNSearch[j] ].r;
+//               g = cloud->points[ pointIdxNKNSearch[j] ].g;
+//               b = cloud->points[ pointIdxNKNSearch[j] ].b;
 
-               red += int(r);
-               green += int(g);
-               blue += int(b);
-               dist += 1.0/pointNKNSquaredDistance[j];
+//               red += int(r);
+//               green += int(g);
+//               blue += int(b);
+//               dist += 1.0/pointNKNSquaredDistance[j];
 
-               std::cout<<"red: "<<int(r)<<std::endl;
-               std::cout<<"green: "<<int(g)<<std::endl;
-               std::cout<<"blue: "<<int(b)<<std::endl;
-               std::cout << "dis:" << dist << std::endl;
-            }
-         }
+//               std::cout<<"red: "<<int(r)<<std::endl;
+//               std::cout<<"green: "<<int(g)<<std::endl;
+//               std::cout<<"blue: "<<int(b)<<std::endl;
+//               std::cout << "dis:" << dist << std::endl;
+//            }
+//         }
 
-         cloud_color_mesh.points[i].r = int(red/pointIdxNKNSearch.size ()+0.5);
-         cloud_color_mesh.points[i].g = int(green/pointIdxNKNSearch.size ()+0.5);
-         cloud_color_mesh.points[i].b = int(blue/pointIdxNKNSearch.size ()+0.5);
+//         cloud_color_mesh.points[i].r = int(red/pointIdxNKNSearch.size ()+0.5);
+//         cloud_color_mesh.points[i].g = int(green/pointIdxNKNSearch.size ()+0.5);
+//         cloud_color_mesh.points[i].b = int(blue/pointIdxNKNSearch.size ()+0.5);
 
 
-      }
-      toPCLPointCloud2(cloud_color_mesh, mesh.cloud);
-      io::savePLYFile(savePath, mesh);
+//      }
+//      toPCLPointCloud2(cloud_color_mesh, mesh.cloud);
+//      io::savePLYFile(savePath, mesh);
 }
 
 void PCDConverterThread::init()

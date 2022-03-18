@@ -37,12 +37,26 @@ void ModelLabelTableWidget::slotAdd()
     int res = window->exec();
     if (res == QDialog::Accepted)
     {
-        this->insertRow(row);
-        QTableWidgetItem* tableItem0 = new QTableWidgetItem(QString::number(window->getLabelId()));
-        this->setItem(row, 0, tableItem0);
-        QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getLabelName());
-        this->setItem(row, 1, tableItem1);
-        this->setCurrentItem(tableItem1);
+        if(isAddEnd)
+        {
+            int index = this->rowCount();
+            this->insertRow(index);
+            QTableWidgetItem* tableItem0 = new QTableWidgetItem(QString::number(window->getLabelId()));
+            this->setItem(index, 0, tableItem0);
+            QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getLabelName());
+            this->setItem(index, 1, tableItem1);
+            this->setCurrentItem(tableItem1);
+        }
+        else
+        {
+            int index = row + 1;
+            this->insertRow(index);
+            QTableWidgetItem* tableItem0 = new QTableWidgetItem(QString::number(window->getLabelId()));
+            this->setItem(index, 0, tableItem0);
+            QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getLabelName());
+            this->setItem(index, 1, tableItem1);
+            this->setCurrentItem(tableItem1);
+        }
     }
     window->deleteLater();
 }
@@ -81,11 +95,19 @@ void ModelLabelTableWidget::contextMenuEvent(QContextMenuEvent *event)
     QTableWidgetItem *item = this->itemAt(point);
     if(item != NULL)
     {
+        isAddEnd = false;
         popMenu->addAction(addAction);
         popMenu->addAction(editAction);
         popMenu->addAction(deleteAction);
         popMenu->addAction(refreshAction);
 
+        popMenu->exec(QCursor::pos());
+    }
+    else
+    {
+        isAddEnd = true;
+        popMenu->addAction(addAction);
+        popMenu->addAction(refreshAction);
         popMenu->exec(QCursor::pos());
     }
 }
@@ -97,6 +119,7 @@ void ModelLabelTableWidget::createActions()
     deleteAction = new QAction(tr("删除"), this);
     refreshAction = new QAction(tr("刷新"), this);
     refreshAction->setShortcut(QKeySequence::Refresh);
+    isAddEnd = true;
 }
 
 void ModelLabelTableWidget::initConnect()

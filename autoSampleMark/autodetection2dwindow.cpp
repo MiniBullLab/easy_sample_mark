@@ -161,7 +161,7 @@ void AutoDetection2DWindow::slotStart()
     {
         if(isProcessDirBox->isChecked())
         {
-            sampleMarkThread.initData(processVideoList, skipFrameBox->value(), (float)confidenceThresholdBox->value());
+            sampleMarkThread.initData(processVideoList, skipFrameBox->value());
             sampleMarkThread.startThread();
             sampleMarkThread.start();
             startProcessButton->setEnabled(false);
@@ -173,7 +173,7 @@ void AutoDetection2DWindow::slotStart()
             QList<QString> tempVideo;
             currentProcessVideo = videoListWidget->currentItem()->text();
             tempVideo.append(currentProcessVideo);
-            sampleMarkThread.initData(tempVideo, skipFrameBox->value(), (float)confidenceThresholdBox->value());
+            sampleMarkThread.initData(tempVideo, skipFrameBox->value());
             sampleMarkThread.startThread();
             sampleMarkThread.start();
             centerGroundBox->setEnabled(false);
@@ -417,13 +417,6 @@ void AutoDetection2DWindow::initMainUI()
     skipFrameBox->setValue(50);
     skipFrameBox->setMaximum(1000);
 
-    confidenceThresholdLabel = new QLabel(tr("目标检测置信度阈值："));
-    confidenceThresholdBox = new QDoubleSpinBox();
-    confidenceThresholdBox->setMinimum(0.5);
-    confidenceThresholdBox->setMaximum(1.0);
-    confidenceThresholdBox->setValue(0.56);
-    confidenceThresholdBox->setSingleStep(0.01);
-
     QGridLayout *centerTopLayout0 = new QGridLayout();
     centerTopLayout0->setSpacing(30);
     centerTopLayout0->addWidget(isProcessDirBox, 0, 0, 1, 1);
@@ -433,8 +426,6 @@ void AutoDetection2DWindow::initMainUI()
     centerTopLayout0->addWidget(saveImagePostBox, 1, 3, 1, 1);
     centerTopLayout0->addWidget(skipFrameLabel, 2, 0, 1, 1);
     centerTopLayout0->addWidget(skipFrameBox, 2, 1, 1, 1);
-    centerTopLayout0->addWidget(confidenceThresholdLabel, 2, 2, 1, 1);
-    centerTopLayout0->addWidget(confidenceThresholdBox, 2, 3, 1, 1);
 
     videoDirLabel = new QLabel(tr("视频目录："));
     videoDirText = new QLineEdit();

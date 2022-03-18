@@ -32,6 +32,7 @@ int AutoSampleMarkThread::initModel(const QString &modelName, const QString &mod
     }
     else if(modelName == "yolov5")
     {
+        std::cout << "yolov5" << std::endl;
         detector.reset(new YoloV5Dector());
         errorCode = detector->initModel(modelPath.toStdString(),
                                         modelBinary.toStdString());
@@ -39,12 +40,12 @@ int AutoSampleMarkThread::initModel(const QString &modelName, const QString &mod
     return errorCode;
 }
 
-void AutoSampleMarkThread::initData(const QList<QString> videoList, const int skipFrameCount, const float confidenceThreshold)
+void AutoSampleMarkThread::initData(const QList<QString> videoList, const int skipFrameCount)
 {
     this->videoList = videoList;
     this->skipFrameCount = skipFrameCount;
     this->detector->initDetectorParameters(AutoParamterConfig::getInpuDataWidth(), AutoParamterConfig::getInpuDataHeight(),
-                                           confidenceThreshold, AutoParamterConfig::getModelLabels());
+                                           AutoParamterConfig::getThreshold(), AutoParamterConfig::getModelLabels());
 }
 
 void AutoSampleMarkThread::startThread()
@@ -96,8 +97,8 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
     QFileInfo fileInfo(videoPath);
     QString path = fileInfo.path();
     QString videoName = fileInfo.completeBaseName();
-    QString saveImageDir = path + "/" + videoName + "_MultipleTarget";
-    QString saveXMLDir = path + "/" + "Annotations";
+    QString saveImageDir = path + "/" + videoName + "_JPEGImages";
+    QString saveJsonDir = path + "/" + "Annotations";
     QDir makeDir;
     if(!makeDir.exists(saveImageDir))
     {
@@ -106,9 +107,9 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
             std::cout << "make dir fail!" << std::endl;
         }
     }
-    if(!makeDir.exists(saveXMLDir))
+    if(!makeDir.exists(saveJsonDir))
     {
-        if(!makeDir.mkdir(saveXMLDir))
+        if(!makeDir.mkdir(saveJsonDir))
         {
             std::cout << "make dir fail!" << std::endl;
         }
@@ -125,10 +126,11 @@ void AutoSampleMarkThread::markVideo(const QString& videoPath, QString& processI
                     std::vector<Detect2dBox> objectRect;
                     QList<MyObject> objects;
                     detector->processDetect(frame, objectRect);
-                    QString savXmlPath = saveXMLDir + QString("/%1_%2.xml").arg(videoName).arg(currentFrame);
+                    QString saveJsonPath = saveJsonDir + QString("/%1_%2.json").arg(videoName).arg(currentFrame);
                     QString saveImagePath = saveImageDir + QString("/%1_%2.png").arg(videoName).arg(currentFrame);
                     objects = toMyObjects(objectRect);
-                    xmlCreator.createXML(savXmlPath, saveImagePath, videoWidth, videoHeight, objects);
+                    jsonProcess.createJSON(saveJsonPath, saveImagePath, videoWidth, videoHeight, objects);
+                    // xmlCreator.createXML(savXmlPath, saveImagePath, videoWidth, videoHeight, objects);
                     saveImage(saveImagePath, frame);
                     emit signalCurrentFrame(currentFrame + 1);
                 }
@@ -188,11 +190,14 @@ QList<MyObject> AutoSampleMarkThread::toMyObjects(const std::vector<Detect2dBox>
         const Detect2dBox tempObject = objectRect[index];
         const float width = tempObject.maxX - tempObject.minX;
         const float height = tempObject.maxY - tempObject.minY;
+        // std::cout << "width:" << width << "height:" << height << std::endl;
         if(width >= ManualParamterConfig::getMinWidth() && height >= ManualParamterConfig::getMinHeight())
         {
             object.setBox(QRect(QPoint(tempObject.minX, tempObject.minY), \
                                 QPoint(tempObject.maxX, tempObject.maxY)));
             object.setObjectClass(QString::fromStdString(tempObject.objectName));
+            object.setShapeType(ShapeType::RECT_SHAPE);
+            objects.push_back(object);
         }
     }
     return objects;

@@ -33,12 +33,11 @@ private:
 
 private:
 
-    void initData();
-
     int postprocess(const cv::Size &srcSize, const std::vector<cv::Mat> &outputs, std::vector<Detect2dBox> &det_results);
     std::vector<std::vector<float>> applyNMS(std::vector<std::vector<float>>& boxes,
                                     const float thres);
 
+     void initData();
      void saveConfig();
      void loadConfig();
 };

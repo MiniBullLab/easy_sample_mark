@@ -50,7 +50,7 @@ void ModelLabelWindow::slotOk()
     QString name = this->labelNameBox->currentText();
     if(this->modelLabel.keys().contains(id) || this->modelLabel.values().contains(name))
     {
-        QMessageBox::information(this, tr("模型标签参数"), tr("模型标签ID:%d存在,或者标签名称:%s存在").arg(id).arg(name));
+        QMessageBox::information(this, tr("模型标签参数"), tr("模型标签ID:%1存在,或者标签名称:%2存在").arg(id).arg(name));
     }
     else
     {
@@ -72,7 +72,7 @@ void ModelLabelWindow::initUI()
     labelIdBox->setValue(0);
     labelNameLabel = new QLabel(tr("标签名称："));
     labelNameBox = new QComboBox();
-    QList<QString> names = ManualParamterConfig::getMarkClass().values();
+    QList<QString> names = ManualParamterConfig::getMarkClass().keys();
     labelNameBox->addItems(QStringList(names));
     labelNameBox->setCurrentIndex(0);
 

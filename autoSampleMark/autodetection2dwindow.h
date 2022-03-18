@@ -93,9 +93,6 @@ private:
     QLabel *saveImagePostLabel;
     QComboBox *saveImagePostBox;
 
-    QLabel *confidenceThresholdLabel;
-    QDoubleSpinBox *confidenceThresholdBox;
-
     QLabel *videoDirLabel;
     QLineEdit *videoDirText;
     QPushButton *openVideoDirButton;

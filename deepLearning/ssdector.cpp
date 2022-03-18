@@ -1,6 +1,4 @@
 #include "ssdector.h"
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
 #include <iomanip>
 #include <iostream>
 
@@ -99,7 +97,7 @@ void SSDector::processDetect(const cv::Mat &inputImage, std::vector<Detect2dBox>
 
     duration = (static_cast<double>(cv::getTickCount()) - duration) / cv::getTickFrequency();
     std::cout << "time(sec):" << std::fixed << std::setprecision(4) << duration << std::endl;
-//    showDetection(const_cast<cv::Mat&>(image), objectRect, objectClass, objectConfidence);
+//    showDetection(const_cast<cv::Mat&>(image), objectRect);
 //    cv::imshow("SSD", image);
 //    cv::waitKey(20);
 }
@@ -160,24 +158,6 @@ void SSDector::processDetectionObject(const cv::Mat& roi, const cv::Mat& detecti
 //                             << " " << xRightTop
 //                             << " " << yRightTop << std::endl;
         }
-    }
-}
-
-void SSDector::showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect)
-{
-    if(image.empty())
-    {
-        return;
-    }
-
-    int objectColor = 10;
-    for(size_t index = 0; index < objectRect.size(); index++)
-    {
-        cv::Rect tempRect(cv::Point(objectRect[index].minX, objectRect[index].minY),
-                          cv::Point(objectRect[index].maxX, objectRect[index].maxY));
-        cv::rectangle(image, tempRect, cv::Scalar(255 * (objectColor / 100), 255 * ((objectColor / 10) % 10), 255 * (objectColor % 10)));
-        cv::putText(image, objectRect[index].objectName, tempRect.tl(), cv::FONT_HERSHEY_COMPLEX, 0.5,
-                    cv::Scalar(255 * (objectColor / 100), 255 * ((objectColor / 10) % 10), 255 * (objectColor % 10)));
     }
 }
 

@@ -1,6 +1,8 @@
 #ifndef CAFFEDETECTOR_H
 #define CAFFEDETECTOR_H
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/dnn.hpp>
 #include <string>
 #include <vector>
@@ -25,6 +27,8 @@ protected:
 
     std::vector<int> labelIds;
     std::vector<std::string> labelNames;
+
+    void showDetection(cv::Mat &image, std::vector<Detect2dBox> &objectRect);
 
 private:
     virtual void saveConfig() = 0;

@@ -40,11 +40,12 @@ int AutoSampleMarkThread::initModel(const QString &modelName, const QString &mod
     return errorCode;
 }
 
-void AutoSampleMarkThread::initData(const QList<QString> videoList, const int skipFrameCount)
+void AutoSampleMarkThread::initData(const QList<QString> &videoList, const int skipFrameCount, const QString post)
 {
     std::map<int, std::string> tempLabels;
     this->videoList = videoList;
     this->skipFrameCount = skipFrameCount;
+    this->imagePost = post;
     for(QMap<int, QString>::const_iterator iterator = AutoParamterConfig::getModelLabels().constBegin(); \
         iterator != AutoParamterConfig::getModelLabels().constEnd(); ++iterator)
     {

@@ -23,7 +23,7 @@ public:
     ~AutoSampleMarkThread();
 
     int initModel(const QString &modelName, const QString &modelPath, const QString &modelBinary="");
-    void initData(const QList<QString> videoList, const int skipFrameCount);
+    void initData(const QList<QString> &videoList, const int skipFrameCount, const QString post);
 
     void startThread();//开始线程
     void stopThread();//结束线程

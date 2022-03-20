@@ -154,14 +154,13 @@ void AutoDetection2DWindow::slotStart()
     {
         stopProcessButton->setEnabled(false);
         videoListWidget->setEnabled(false);
-        centerGroundBox->setEnabled(false);
         QMessageBox::information(this, tr("检测模型初始化"), tr("检测模型初始化失败"));
     }
     else
     {
         if(isProcessDirBox->isChecked())
         {
-            sampleMarkThread.initData(processVideoList, skipFrameBox->value());
+            sampleMarkThread.initData(processVideoList, skipFrameBox->value(), saveImagePostBox->currentText());
             sampleMarkThread.startThread();
             sampleMarkThread.start();
             startProcessButton->setEnabled(false);
@@ -173,7 +172,7 @@ void AutoDetection2DWindow::slotStart()
             QList<QString> tempVideo;
             currentProcessVideo = videoListWidget->currentItem()->text();
             tempVideo.append(currentProcessVideo);
-            sampleMarkThread.initData(tempVideo, skipFrameBox->value());
+            sampleMarkThread.initData(tempVideo, skipFrameBox->value(), saveImagePostBox->currentText());
             sampleMarkThread.startThread();
             sampleMarkThread.start();
             centerGroundBox->setEnabled(false);
@@ -415,6 +414,7 @@ void AutoDetection2DWindow::initMainUI()
     skipFrameBox = new QSpinBox();
     skipFrameBox->setMinimum(1);
     skipFrameBox->setValue(50);
+    skipFrameBox->setSingleStep(10);
     skipFrameBox->setMaximum(1000);
 
     QGridLayout *centerTopLayout0 = new QGridLayout();

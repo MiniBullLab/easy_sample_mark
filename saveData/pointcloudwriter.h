@@ -24,6 +24,9 @@ public:
     int savePointCloudToTxt(const pcl::PCLPointCloud2::Ptr& srcCloud,
                             const std::string &fileNamePath,
                             const int number);
+    int savePointCloudToCsv(const pcl::PCLPointCloud2::Ptr& srcCloud,
+                            const std::string &fileNamePath,
+                            const int number);
     int savePointCloudToPCD(const pcl::PCLPointCloud2::Ptr& srcCloud,
                             const std::string &fileNamePath);
 

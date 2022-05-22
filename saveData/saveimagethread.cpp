@@ -81,7 +81,7 @@ int SaveImageThread::initSaveImageData(const QString &videoPath, QString imagePo
             this->stopFrame = video->getFrameCount();
             video->setFramePosition(0);
             this->videoProcess = video;
-            this->dirName = info.absolutePath() + "/" + this->videoFileName + "_MultipleTarget";
+            this->dirName = info.absolutePath() + "/" + this->videoFileName;
             if(!makeDir.exists(dirName))
             {
                 if(!makeDir.mkdir(dirName))
@@ -99,7 +99,7 @@ int SaveImageThread::initSaveImageData(const QString &videoPath, QString imagePo
             this->stopFrame = stopPos * video->getFrameFPS();
             video->setFramePosition(startFrame);
             this->videoProcess = video;
-            this->dirName = info.absolutePath() + "/" + this->videoFileName + "_MultipleTarget";
+            this->dirName = info.absolutePath() + "/" + this->videoFileName;
             if(!makeDir.exists(dirName))
             {
                 if(!makeDir.mkdir(dirName))

@@ -601,6 +601,11 @@ int JSONProcess::readRect3Ddata(const QJsonArray &value, QList<MyObject>& object
         rect3d.size[2] = objectData.take("height").toVariant().toFloat();
         rect3d.theta = objectData.take("yaw").toVariant().toFloat();
         className = objectData.take("class").toVariant().toString();
+        if(objectData.contains("id"))
+        {
+            int id = objectData.take("id").toVariant().toInt();
+            object.setID(id);
+        }
         object.setObjectClass(className);
         object.setBox3D(rect3d);
         object.setShapeType(ShapeType::RECT3D_SHAPE);

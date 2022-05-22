@@ -10,6 +10,7 @@
 
 int PointCloudParamterConfig::POINT_SIZE = 2;
 int PointCloudParamterConfig::FIELDS_NUMBER = 3;
+QString PointCloudParamterConfig::COLOR_RENDER_TYPE = "y";
 bool PointCloudParamterConfig::IS_MESH = false;
 PointCloudFileType PointCloudParamterConfig::FILE_TYPE = PointCloudFileType::PCD_FILE;
 
@@ -32,6 +33,11 @@ void PointCloudParamterConfig::setPointSize(int size)
 void PointCloudParamterConfig::setFieldsNumber(int number)
 {
     FIELDS_NUMBER = number;
+}
+
+void PointCloudParamterConfig::setColorRenderType(const QString &type)
+{
+    COLOR_RENDER_TYPE = type;
 }
 
 void PointCloudParamterConfig::setFileType(int type)
@@ -70,6 +76,11 @@ int PointCloudParamterConfig::getFieldsNumber()
     return FIELDS_NUMBER;
 }
 
+QString PointCloudParamterConfig::getColorRenderType()
+{
+    return COLOR_RENDER_TYPE;
+}
+
 bool PointCloudParamterConfig::getIsMesh()
 {
     return IS_MESH;
@@ -100,13 +111,17 @@ int PointCloudParamterConfig::loadConfig()
             if (parseDoucment.isObject())
             {
                 QJsonObject jsonObject = parseDoucment.object();
-                if(jsonObject.contains("PointSize"))
+                if(jsonObject.contains("pointSize"))
                 {
-                    POINT_SIZE = jsonObject.take("PointSize").toVariant().toInt();
+                    POINT_SIZE = jsonObject.take("pointSize").toVariant().toInt();
                 }
                 if(jsonObject.contains("fieldsNumber"))
                 {
                     FIELDS_NUMBER = jsonObject.take("fieldsNumber").toVariant().toInt();
+                }
+                if(jsonObject.contains("colorRenderType"))
+                {
+                    COLOR_RENDER_TYPE = jsonObject.take("colorRenderType").toVariant().toString();
                 }
                 if(jsonObject.contains("isMesh"))
                 {
@@ -153,8 +168,9 @@ int PointCloudParamterConfig::saveConfig()
     {
         return -1;
     }
-    jsonData.insert("PointSize", QString::number(POINT_SIZE));
+    jsonData.insert("pointSize", QString::number(POINT_SIZE));
     jsonData.insert("fieldsNumber", QString::number(FIELDS_NUMBER));
+    jsonData.insert("colorRenderType", COLOR_RENDER_TYPE);
     jsonData.insert("isMesh", QString::number(IS_MESH));
     jsonData.insert("fileType", QString::number(FILE_TYPE));
 

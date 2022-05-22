@@ -32,6 +32,7 @@ void PointCloudMarkParamterWindow::slotOk()
 {
     paramterConfig.setPointSize(this->pointSizeBox->value());
     paramterConfig.setFieldsNumber(this->fieldsNumberBox->value());
+    paramterConfig.setColorRenderType(this->colorTypeBox->currentText());
     paramterConfig.setIsMesh(this->isShowMeshBox->isChecked());
     paramterConfig.setFileType(this->formatBox->currentData().toInt());
     paramterConfig.saveConfig();
@@ -52,13 +53,13 @@ void PointCloudMarkParamterWindow::init()
 
 void PointCloudMarkParamterWindow::initUI()
 {
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->setSpacing(30);
+    QHBoxLayout *layout0 = new QHBoxLayout();
+    layout0->setSpacing(30);
     formatLabel = new QLabel(tr("读取文件格式:"));
     formatBox = new QComboBox();
     initFileType();
-    layout->addWidget(formatLabel);
-    layout->addWidget(formatBox);
+    layout0->addWidget(formatLabel);
+    layout0->addWidget(formatBox);
 
     fieldsNumberLabel = new QLabel(tr("读取字段数:"));
     fieldsNumberBox = new QSpinBox();
@@ -75,6 +76,16 @@ void PointCloudMarkParamterWindow::initUI()
     isShowMeshBox = new QCheckBox(tr("是否显示Mesh"));
     isShowMeshBox->setChecked(paramterConfig.getIsMesh());
 
+    colorTypeLabel = new QLabel(tr("点云渲染颜色方式:"));
+    colorTypeBox = new QComboBox();
+    colorTypeBox->addItem("x");
+    colorTypeBox->addItem("y");
+    colorTypeBox->addItem("z");
+    colorTypeBox->addItem("intensity");
+    colorTypeBox->addItem("rgb");
+    colorTypeBox->addItem("random");
+    colorTypeBox->setCurrentText(paramterConfig.getColorRenderType());
+
     pointSizeLabel = new QLabel(tr("显示点云大小:"));
     pointSizeBox = new QSpinBox();
     pointSizeBox->setMinimum(1);
@@ -83,8 +94,9 @@ void PointCloudMarkParamterWindow::initUI()
     pointSizeBox->setSingleStep(1);
 
     QHBoxLayout *layout2 = new QHBoxLayout();
-    layout2->setSpacing(30);
-    layout2->addWidget(isShowMeshBox);
+    layout2->setSpacing(20);
+    layout2->addWidget(colorTypeLabel);
+    layout2->addWidget(colorTypeBox);
     layout2->addWidget(pointSizeLabel);
     layout2->addWidget(pointSizeBox);
 
@@ -105,15 +117,16 @@ void PointCloudMarkParamterWindow::initUI()
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
-    mainLayout->addLayout(layout);
+    mainLayout->addLayout(layout0);
     mainLayout->addLayout(layout1);
+    mainLayout->addWidget(isShowMeshBox);
     mainLayout->addLayout(layout2);
     mainLayout->addWidget(infoLabel);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(420, 280);
-    this->setMinimumSize(420, 280);
+    this->setMaximumSize(480, 420);
+    this->setMinimumSize(420, 420);
     this->setWindowTitle(tr("点云标注参数配置"));
 }
 
@@ -129,7 +142,7 @@ void PointCloudMarkParamterWindow::initFileType()
     formatBox->addItem("PCD", PointCloudFileType::PCD_FILE);
     formatBox->addItem("BIN", PointCloudFileType::BIN_FILE);
     formatBox->addItem("PLY", PointCloudFileType::PLY_FILE);
-    formatBox->addItem("OBJ", PointCloudFileType::OBJ_FILE);
+    // formatBox->addItem("OBJ", PointCloudFileType::OBJ_FILE);
 
     formatBox->setCurrentIndex(static_cast<int>(paramterConfig.getFileType()));
 }

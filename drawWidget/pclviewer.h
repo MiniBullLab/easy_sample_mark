@@ -7,6 +7,7 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QCursor>
+#include <QString>
 
 #include "saveData/pointcloudreader.h"
 
@@ -63,18 +64,20 @@ protected:
     void leaveEvent(QEvent *e);
     void mouseDoubleClickEvent(QMouseEvent *e);
     void clickedPointCallback(const pcl::visualization::PointPickingEvent& event);
+    void clickedAreaCallback(const pcl::visualization::AreaPickingEvent& event);
 
 private:
 
     void drawPolygonMesh();
-    void drawRandomColorPointCloud();
+    void drawTypeColorPointCloud();
     void drawRGBPointCloud();
-    void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
-    void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud);
+
     void drawCircle();
 
     void drawShape(const QList<MyObject> &obejcts);
     void drawObject(const MyObject &object, int id);
+
+    void convertRGBPointCloud(const pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
 
     void initData();
     void initConnect();
@@ -83,7 +86,6 @@ private:
 private:
 
     PointCloudReader pcReader;
-
     ColorHandlerPtr colorHandler;
     GeometryHandlerPtr geometryHandler;
     pcl::visualization::PCLVisualizer::Ptr viewer;
@@ -94,9 +96,9 @@ private:
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr rgbCloud;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr clickedPoints;
 
-    pcl::PolygonMesh::Ptr srcMesh;
+    int dataFlag;
 
-    pcl::search::KdTree<pcl::PointXYZ> search;
+    pcl::PolygonMesh::Ptr srcMesh;
 
     QString sampleClass;
 

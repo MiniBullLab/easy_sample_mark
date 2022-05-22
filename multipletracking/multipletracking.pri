@@ -1,4 +1,16 @@
 HEADERS += \
+    $$PWD/deepsort/datatype.h \
+    $$PWD/deepsort/deepsort.h \
+    $$PWD/deepsort/featuretensor.h \
+    $$PWD/deepsort/hungarianoper.h \
+    $$PWD/deepsort/kalmanfilter.h \
+    $$PWD/deepsort/linear_assignment.h \
+    $$PWD/deepsort/matrix.h \
+    $$PWD/deepsort/model.hpp \
+    $$PWD/deepsort/munkres.h \
+    $$PWD/deepsort/nn_matching.h \
+    $$PWD/deepsort/track.h \
+    $$PWD/deepsort/tracker.h \
     $$PWD/utility/assignmentproblemsolver.h \
     $$PWD/kalman_tracker/mykalmanfilter.h \
     $$PWD/kalman_tracker/kalmantracker.h \
@@ -18,6 +30,15 @@ HEADERS += \
 
 
 SOURCES += \
+    $$PWD/deepsort/deepsort.cpp \
+    $$PWD/deepsort/featuretensor.cpp \
+    $$PWD/deepsort/hungarianoper.cpp \
+    $$PWD/deepsort/kalmanfilter.cpp \
+    $$PWD/deepsort/linear_assignment.cpp \
+    $$PWD/deepsort/munkres.cpp \
+    $$PWD/deepsort/nn_matching.cpp \
+    $$PWD/deepsort/track.cpp \
+    $$PWD/deepsort/tracker.cpp \
     $$PWD/utility/assignmentproblemsolver.cpp \
     $$PWD/kalman_tracker/mykalmanfilter.cpp \
     $$PWD/kalman_tracker/kalmantracker.cpp \

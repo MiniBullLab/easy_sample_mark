@@ -19,11 +19,13 @@ public:
 
     void setPointSize(int size);
     void setFieldsNumber(int number);
+    void setColorRenderType(const QString &type);
     void setFileType(int type);
     void setIsMesh(bool is);
 
     static int getPointSize();
     static int getFieldsNumber();
+    static QString getColorRenderType();
     static bool getIsMesh();
     static PointCloudFileType getFileType();
 
@@ -33,6 +35,7 @@ public:
 private:
     static int POINT_SIZE;
     static int FIELDS_NUMBER;
+    static QString COLOR_RENDER_TYPE;
     static bool IS_MESH;
     static PointCloudFileType FILE_TYPE;
 

@@ -31,22 +31,42 @@ void PCDConverterThread::run()
         saveDirName += "/";
         if(suffix.contains("pcd") && format.contains("bin"))
         {
-            pcdConvertToBin(saveDirName, pcdList);
+            pcdConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
+        }
+        else if(suffix.contains("pcd") && format.contains("txt"))
+        {
+            // std::cout << "convert txt" << std::endl;
+            pcdConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
+        }
+        else if(suffix.contains("pcd") && format.contains("csv"))
+        {
+            // std::cout << "convert txt" << std::endl;
+            pcdConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
         }
         else if(suffix.contains("ply") && format.contains("bin"))
         {
-            plyConvertToBin(saveDirName, pcdList);
+            plyConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
         }
         else if(suffix.contains("ply") && format.contains("txt"))
         {
-            std::cout << "convert txt" << std::endl;
-            plyConvertToTxt(saveDirName, pcdList);
+            // std::cout << "convert txt" << std::endl;
+            plyConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
         }
-        else if(suffix.contains("ply") && format.contains("mesh"))
+        else if(suffix.contains("ply") && format.contains("csv"))
         {
-            plyConvertToMesh(saveDirName, pcdList);
+            plyConvert(saveDirName, pcdList);
+            emit signalFinish(saveDirName);
         }
-        emit signalFinish(saveDirName);
+        else
+        {
+            QString info = suffix + "  can not convert to " + format;
+            emit signalFinish(info);
+        }
     }
 }
 
@@ -91,7 +111,8 @@ bool PCDConverterThread::myMakeDir(const QString& pathDir)
     return true;
 }
 
-void PCDConverterThread::pcdConvertToBin(const QString &saveDir, const QList<QString> &dataList)
+void PCDConverterThread::pcdConvert(const QString &saveDir,
+                                    const QList<QString> &dataList)
 {
     for (int i = 0; i< dataList.size(); ++i)
     {
@@ -107,12 +128,29 @@ void PCDConverterThread::pcdConvertToBin(const QString &saveDir, const QList<QSt
         {
             continue;
         }
-        pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
-                                     this->fieldsNumber);
+        if(format.contains("txt"))
+        {
+            pcWriter.savePointCloudToTxt(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
+        }
+        else if(format.contains("csv"))
+        {
+            pcWriter.savePointCloudToCsv(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
+        }
+        else if(format.contains("bin"))
+        {
+            pcWriter.savePointCloudToBin(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
+        }
     }
 }
 
-void PCDConverterThread::plyConvertToBin(const QString &saveDir, const QList<QString> &dataList)
+void PCDConverterThread::plyConvert(const QString &saveDir,
+                                    const QList<QString> &dataList)
 {
     for (int i = 0; i< dataList.size(); ++i)
     {
@@ -128,29 +166,24 @@ void PCDConverterThread::plyConvertToBin(const QString &saveDir, const QList<QSt
         {
             continue;
         }
-        pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
-                                     this->fieldsNumber);
-    }
-}
-
-void PCDConverterThread::plyConvertToTxt(const QString &saveDir, const QList<QString> &dataList)
-{
-    for (int i = 0; i< dataList.size(); ++i)
-    {
-        if (!isStart)
+        if(format.contains("txt"))
         {
-            break;
+            pcWriter.savePointCloudToTxt(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
         }
-        QFileInfo fileInfo(dataList[i]);
-        QString fileName = fileInfo.completeBaseName();
-        QString saveFileName = saveDir + fileName + format;
-        pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
-        if(pcReader.plyRead(dataList[i].toStdString(), srcCloud) < 0)
+        else if(format.contains("csv"))
         {
-            continue;
+            pcWriter.savePointCloudToCsv(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
         }
-        pcWriter.savePointCloudToTxt(srcCloud, saveFileName.toStdString(),
-                                     this->fieldsNumber);
+        else if(format.contains("bin"))
+        {
+            pcWriter.savePointCloudToBin(srcCloud,
+                                         saveFileName.toStdString(),
+                                         this->fieldsNumber);
+        }
     }
 }
 

@@ -120,7 +120,7 @@ void PCDConverterWindow::initUI()
     dstFormatBox = new QComboBox();
     dstFormatBox->addItem(tr(".bin"));
     dstFormatBox->addItem(tr(".txt"));
-    dstFormatBox->addItem(tr(".mesh"));
+    dstFormatBox->addItem(tr(".csv"));
 
     layout0->addWidget(srcFormatLabel);
     layout0->addWidget(srcFormatBox);

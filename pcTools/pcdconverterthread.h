@@ -44,9 +44,8 @@ private:
     void init();
     bool myMakeDir(const QString& pathDir);
 
-    void pcdConvertToBin(const QString &saveDir, const QList<QString> &dataList);
-    void plyConvertToBin(const QString &saveDir, const QList<QString> &dataList);
-    void plyConvertToTxt(const QString &saveDir, const QList<QString> &dataList);
+    void pcdConvert(const QString &saveDir, const QList<QString> &dataList);
+    void plyConvert(const QString &saveDir, const QList<QString> &dataList);
     void plyConvertToMesh(const QString &saveDir, const QList<QString> &dataList);
 
     void poissonReconstruction(const std::string savePath, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud);

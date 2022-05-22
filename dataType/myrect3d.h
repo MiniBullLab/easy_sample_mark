@@ -14,6 +14,7 @@ public:
 
     Eigen::Vector3f center;
     Eigen::Vector3f size;
+    Eigen::Vector3f rotation;
     float theta;
 };
 

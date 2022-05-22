@@ -36,6 +36,8 @@ private:
     QComboBox *formatBox;
     QLabel* fieldsNumberLabel;
     QSpinBox* fieldsNumberBox;
+    QLabel *colorTypeLabel;
+    QComboBox *colorTypeBox;
     QCheckBox* isShowMeshBox;
     QLabel* pointSizeLabel;
     QSpinBox* pointSizeBox;

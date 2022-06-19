@@ -94,7 +94,7 @@ void PointCloudMarkParamterWindow::initUI()
     pointSizeBox->setSingleStep(1);
 
     QHBoxLayout *layout2 = new QHBoxLayout();
-    layout2->setSpacing(20);
+    layout2->setSpacing(10);
     layout2->addWidget(colorTypeLabel);
     layout2->addWidget(colorTypeBox);
     layout2->addWidget(pointSizeLabel);
@@ -125,8 +125,8 @@ void PointCloudMarkParamterWindow::initUI()
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(480, 420);
-    this->setMinimumSize(420, 420);
+    this->setMaximumSize(500, 420);
+    this->setMinimumSize(500, 420);
     this->setWindowTitle(tr("点云标注参数配置"));
 }
 

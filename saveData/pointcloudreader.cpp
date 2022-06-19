@@ -14,7 +14,7 @@ PointCloudReader::~PointCloudReader()
 int PointCloudReader::pcdRead(const std::string &pcdPath, pcl::PCLPointCloud2::Ptr &resultCloud)
 {
     int ret = 0;
-    resultCloud.reset();
+    resultCloud.reset(new pcl::PCLPointCloud2);
     try {
         if(pcdReader.read(pcdPath, *resultCloud) < 0)
         {

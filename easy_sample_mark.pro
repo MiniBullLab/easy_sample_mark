@@ -544,9 +544,9 @@ LIBS+=D:\opencv\opencv451\build\x64\vc14\lib\opencv_world451.lib
 
 unix{
 
-INCLUDEPATH+= /home/lpj/Software/opencv45/include/opencv4
+INCLUDEPATH+= /home/lpj/software/opencv451/include/opencv4
 
-LIBS+=-L/home/lpj/Software/opencv45/lib \
+LIBS+=-L/home/lpj/software/opencv451/lib \
     -lopencv_stitching \
     -lopencv_superres \
     -lopencv_videostab \
@@ -565,7 +565,6 @@ LIBS+=-L/home/lpj/Software/opencv45/lib \
     -lopencv_reg \
     -lopencv_rgbd \
     -lopencv_saliency \
-    -lopencv_sfm \
     -lopencv_stereo \
     -lopencv_structured_light \
     -lopencv_phase_unwrapping \
@@ -601,12 +600,11 @@ INCLUDEPATH += /usr/include/boost
 LIBS += /usr/lib/x86_64-linux-gnu/libboost_*.so
 
 #VTK
-INCLUDEPATH += /home/lpj/Software/vtk_8_1_2/include/vtk-8.1
-LIBS += /home/lpj/Software/vtk_8_1_2/lib/libvtk*.so
+INCLUDEPATH += /home/lpj/software/vtk820/include/vtk-8.2
+LIBS += /home/lpj/software/vtk820/lib/libvtk*.so
 
 #PCL Header
-INCLUDEPATH += /home/lpj/Software/pcl_1_9/include/pcl-1.9
-LIBS += /home/lpj/Software/pcl_1_9/lib/libpcl_*.so
+INCLUDEPATH += /home/lpj/software/PCL_1_11_1/include/pcl-1.11
+LIBS += /home/lpj/software/PCL_1_11_1/lib/libpcl_*.so
 
-LIBS += -llz4
 }

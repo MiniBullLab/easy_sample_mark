@@ -9,11 +9,11 @@
 
 ## Depend
 * 编译器支持：
-    * 1.[MSVC2015_64](https://www.visualstudio.com/zh-hans/downloads/)
+    * 1.[MSVC2017_64](https://www.visualstudio.com/zh-hans/downloads/)
     * 2.[gcc](http://gcc.gnu.org/index.html)
 * [Qt5](https://www.qt.io/download-open-source/#section-2)
-* [OpenCV>=3.4.6+opencv_contrib](https://github.com/opencv/opencv)
-* [PCL>=1.8+VTK](https://github.com/PointCloudLibrary/pcl/releases)
+* [OpenCV>=3.5.1+opencv_contrib](https://github.com/opencv/opencv)
+* [PCL>=1.9.1+VTK](https://github.com/PointCloudLibrary/pcl/releases)
 * [C++11](https://en.wikipedia.org/wiki/C%2B%2B11)
 
 ## Discuss

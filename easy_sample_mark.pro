@@ -20,6 +20,7 @@ include(saveData/saveData.pri)
 include(baseAlgorithm/baseAlgorithm.pri)
 include(deepLearning/deepLearning.pri)
 include(multipletracking/multipletracking.pri)
+include(calibration/calibration.pri)
 
 SOURCES += main.cpp\
         controlwindow.cpp \
@@ -81,13 +82,13 @@ SOURCES += main.cpp\
     dataType/ocrobject.cpp \
     drawShape/drawrecttrackshape.cpp \
     selectMarkInfo/selectmarktrackingwindow.cpp \
-    calibration/birdviewprocess.cpp \
-    calibration/imagelabel.cpp \
     drawWidget/tracking2dlabel.cpp \
     imagetrackingcontrolwindow.cpp \
     sampleMarkParam/autoparamterconfig.cpp \
     paramWindow/autoparamterconfigwindow.cpp \
-    autoSampleMark/autodetection2dwindow.cpp
+    autoSampleMark/autodetection2dwindow.cpp \
+    calibrationTools/birdviewprocess.cpp \
+    calibrationTools/imagelabel.cpp
 
 HEADERS  += controlwindow.h \
     mainwindow.h \
@@ -150,13 +151,13 @@ HEADERS  += controlwindow.h \
     dataType/ocrobject.h \
     drawShape/drawrecttrackshape.h \
     selectMarkInfo/selectmarktrackingwindow.h \
-    calibration/birdviewprocess.h \
-    calibration/imagelabel.h \
     drawWidget/tracking2dlabel.h \
     imagetrackingcontrolwindow.h \
     sampleMarkParam/autoparamterconfig.h \
     paramWindow/autoparamterconfigwindow.h \
-    autoSampleMark/autodetection2dwindow.h
+    autoSampleMark/autodetection2dwindow.h \
+    calibrationTools/birdviewprocess.h \
+    calibrationTools/imagelabel.h
 
 RESOURCES += \
     style.qrc \

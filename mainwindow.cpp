@@ -586,7 +586,7 @@ void MainWindow::initAction()
     pcdFilterAction = new QAction(tr("PCD文件过滤"), this);
     pcdFilterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
 
-    birdViewProcessAction = new QAction(tr("鸟瞰图标定"), this);
+    birdViewCalibratAction = new QAction(tr("鸟瞰图标定"), this);
 
     //about
     aboutAction = new QAction(tr("关于"), this);
@@ -649,9 +649,10 @@ void MainWindow::initMenuBar()
     toolMenu->addSeparator();
     toolMenu->addAction(pcdConverterAction);
     toolMenu->addAction(pcdFilterAction);
-    toolMenu->addSeparator();
-    toolMenu->addAction(birdViewProcessAction);
 #endif
+    // calibration
+    calibrationMenu = new QMenu(tr("传感器标定"), this);
+    calibrationMenu->addAction(birdViewCalibratAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -663,6 +664,7 @@ void MainWindow::initMenuBar()
     this->menuBar()->addMenu(autoMarkMenu);
 #endif
     this->menuBar()->addMenu(toolMenu);
+    this->menuBar()->addMenu(calibrationMenu);
     this->menuBar()->addMenu(aboutMenu);
 
     this->statusBar()->hide();
@@ -752,7 +754,8 @@ void MainWindow::initConnect()
     connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
     connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
 
-    connect(birdViewProcessAction, &QAction::triggered, this, &MainWindow::slotBirdViewProcess);
+    // calibration
+    connect(birdViewCalibratAction, &QAction::triggered, this, &MainWindow::slotBirdViewProcess);
 
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);

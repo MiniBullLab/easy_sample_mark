@@ -21,7 +21,7 @@
 #include "videoTools/qcamerawindow.h"
 #include "pcTools/pcdconverterwindow.h"
 #include "pcTools/pcdfilterwindow.h"
-#include "calibration/birdviewprocess.h"
+#include "calibrationTools/birdviewprocess.h"
 #include "autoSampleMark/autodetection2dwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -117,7 +117,8 @@ private:
     QAction *cameraAction;
     QAction *pcdConverterAction;
     QAction *pcdFilterAction;
-    QAction *birdViewProcessAction;
+    //calibration
+    QAction *birdViewCalibratAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -127,6 +128,7 @@ private:
     QMenu *settingMenu;
     QMenu *autoMarkMenu;
     QMenu *toolMenu;
+    QMenu *calibrationMenu;
     QMenu *aboutMenu;
 
     //ToolBar
@@ -156,6 +158,7 @@ private:
     PCDConverterWindow *pcdConverterWindow;
     PCDFilterWindow *pcdFilterWindow;
 
+    // calibration
     BirdViewProcess *birdViewPorcess;
 
     MarkDataType loadDataType;

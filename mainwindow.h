@@ -22,6 +22,7 @@
 #include "pcTools/pcdconverterwindow.h"
 #include "pcTools/pcdfilterwindow.h"
 #include "calibrationTools/birdviewprocess.h"
+#include "calibrationTools/cameraintrinsicswindow.h"
 #include "autoSampleMark/autodetection2dwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -72,7 +73,9 @@ public slots:
     void slotPcdConverter();
     void slotPcdFilter();
 
+    // calibration
     void slotBirdViewProcess();
+    void slotCameraIntrinsics();
 
     //about
     void slotAbout();
@@ -119,6 +122,7 @@ private:
     QAction *pcdFilterAction;
     //calibration
     QAction *birdViewCalibratAction;
+    QAction *cameraIntrinsicsAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -160,6 +164,7 @@ private:
 
     // calibration
     BirdViewProcess *birdViewPorcess;
+    CameraIntrinsicsWindow * cameraIntrinsicsWindow;
 
     MarkDataType loadDataType;
     MyShape imgShape;

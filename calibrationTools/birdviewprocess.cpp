@@ -248,7 +248,7 @@ void BirdViewProcess::initUI()
     this->setLayout(mainLayout);
     //this->setMaximumSize(700,520);
     this->setMinimumSize(1000, 600);
-    this->setWindowTitle(tr("标定"));
+    this->setWindowTitle(tr("birdview标定"));
 }
 
 void BirdViewProcess::initConnect()

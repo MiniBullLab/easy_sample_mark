@@ -15,6 +15,7 @@ public:
     QList<QString> getDirFileName(const QString& pathDir);
 	//filter << "*.jpg";
     QList<QString> getDirFileName(const QString &pathDir, const QString filterPostfix);
+    QList<QString> getDirFileName(const QString &pathDir, const QStringList filtersPostfix);
     void getDirAllFileName(const QString &pathDir, const QString filterPostfix, QList<QString> &allFileName);
 
     void modifyDirFileName(const QString &pathDir, const QString &rePathDir);

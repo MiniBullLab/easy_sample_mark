@@ -360,6 +360,15 @@ void MainWindow::slotBirdViewProcess()
     birdViewPorcess = nullptr;
 }
 
+void MainWindow::slotCameraIntrinsics()
+{
+    cameraIntrinsicsWindow = new CameraIntrinsicsWindow();
+    cameraIntrinsicsWindow->setModal(true);
+    cameraIntrinsicsWindow->exec();
+    cameraIntrinsicsWindow->deleteLater();
+    cameraIntrinsicsWindow = nullptr;
+}
+
 void MainWindow::slotAbout()
 {
     QMessageBox::about(this, tr("样本标注系统"), tr("样本标注系统 版本 %1").arg(qApp->applicationVersion()));
@@ -511,6 +520,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         pcdFilterWindow->close();
     if(birdViewPorcess != nullptr)
         birdViewPorcess->close();
+    if(cameraIntrinsicsWindow != nullptr)
+        cameraIntrinsicsWindow->close();
     if(centerWidget != nullptr)
     {
         centerWidget->currentWidget()->close();
@@ -534,6 +545,7 @@ void MainWindow::initData()
     pcdFilterWindow = nullptr;
 
     birdViewPorcess = nullptr;
+    cameraIntrinsicsWindow = nullptr;
 
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
@@ -587,6 +599,7 @@ void MainWindow::initAction()
     pcdFilterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
 
     birdViewCalibratAction = new QAction(tr("鸟瞰图标定"), this);
+    cameraIntrinsicsAction = new QAction(tr("相机内参标定"), this);
 
     //about
     aboutAction = new QAction(tr("关于"), this);
@@ -653,6 +666,7 @@ void MainWindow::initMenuBar()
     // calibration
     calibrationMenu = new QMenu(tr("传感器标定"), this);
     calibrationMenu->addAction(birdViewCalibratAction);
+    calibrationMenu->addAction(cameraIntrinsicsAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -756,6 +770,7 @@ void MainWindow::initConnect()
 
     // calibration
     connect(birdViewCalibratAction, &QAction::triggered, this, &MainWindow::slotBirdViewProcess);
+    connect(cameraIntrinsicsAction, &QAction::triggered, this, &MainWindow::slotCameraIntrinsics);
 
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);

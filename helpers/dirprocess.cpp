@@ -73,6 +73,30 @@ QList<QString> DirProcess::getDirFileName(const QString &pathDir,const QString f
     return allFileName;
 }
 
+QList<QString> DirProcess::getDirFileName(const QString &pathDir, const QStringList filtersPostfix)
+{
+    QList<QString> allFileName;
+    QDir dir(pathDir);
+    allFileName.clear();
+    if(dir.exists())
+    {
+        QFileInfoList fileList = dir.entryInfoList(filtersPostfix, QDir::Files | QDir::NoSymLinks);
+        for(int loop = 0; loop < fileList.size(); loop++)
+        {
+            //qDebug()<<fileInfo->at(loop).absoluteFilePath();
+            if((!fileList.at(loop).isHidden()) && (!fileList.at(loop).fileName().startsWith(".")))
+            {
+                allFileName.append(fileList.at(loop).absoluteFilePath().trimmed());
+            }
+        }
+    }
+    else
+    {
+        qDebug() << pathDir << " not exists!";
+    }
+    return allFileName;
+}
+
 void DirProcess::getDirAllFileName(const QString &pathDir, const QString filterPostfix, QList<QString> &allFileName)
 {
     QDir dir(pathDir);

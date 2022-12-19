@@ -23,7 +23,7 @@ include(multipletracking/multipletracking.pri)
 include(calibration/calibration.pri)
 
 SOURCES += main.cpp\
-        controlwindow.cpp \
+    controlwindow.cpp \
     mainwindow.cpp \
     autoSampleMark/autosamplemarkthread.cpp \
     videoTools/croppingvideothread.cpp \
@@ -88,7 +88,8 @@ SOURCES += main.cpp\
     paramWindow/autoparamterconfigwindow.cpp \
     autoSampleMark/autodetection2dwindow.cpp \
     calibrationTools/birdviewprocess.cpp \
-    calibrationTools/imagelabel.cpp
+    calibrationTools/imagelabel.cpp \
+    calibrationTools/cameraintrinsicswindow.cpp
 
 HEADERS  += controlwindow.h \
     mainwindow.h \
@@ -157,7 +158,8 @@ HEADERS  += controlwindow.h \
     paramWindow/autoparamterconfigwindow.h \
     autoSampleMark/autodetection2dwindow.h \
     calibrationTools/birdviewprocess.h \
-    calibrationTools/imagelabel.h
+    calibrationTools/imagelabel.h \
+    calibrationTools/cameraintrinsicswindow.h
 
 RESOURCES += \
     style.qrc \

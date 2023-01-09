@@ -15,7 +15,7 @@
 #include "helpers/convertcvqimage.h"
 #include "utilityGUI/customWindow/mytextbrowser.h"
 #include "imagelabel.h"
-#include "calibration/cameraintrinscalibration.h"
+#include "calibration/camera_intrinsic/cameraintrinscalibration.h"
 
 class CameraIntrinsicsWindow : public QDialog
 {
@@ -49,6 +49,7 @@ private:
     QLabel *cameraModelLabel;
     QComboBox *cameraModelBox;
     QCheckBox *isSaveUndistortBox;
+    QCheckBox *isSelectCornersImageBox;
 
     ImageLabel *imageShow;
     QScrollArea *scrollArea;//滚动区域

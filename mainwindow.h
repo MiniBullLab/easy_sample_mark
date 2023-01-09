@@ -23,6 +23,7 @@
 #include "pcTools/pcdfilterwindow.h"
 #include "calibrationTools/birdviewprocess.h"
 #include "calibrationTools/cameraintrinsicswindow.h"
+#include "calibrationTools/cameraverificationwindow.h"
 #include "autoSampleMark/autodetection2dwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -76,6 +77,7 @@ public slots:
     // calibration
     void slotBirdViewProcess();
     void slotCameraIntrinsics();
+    void slotCameraVerification();
 
     //about
     void slotAbout();
@@ -123,6 +125,7 @@ private:
     //calibration
     QAction *birdViewCalibratAction;
     QAction *cameraIntrinsicsAction;
+    QAction *cameraVerificationAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -165,6 +168,7 @@ private:
     // calibration
     BirdViewProcess *birdViewPorcess;
     CameraIntrinsicsWindow * cameraIntrinsicsWindow;
+    CameraVerificationWindow *cameraVerificationWindow;
 
     MarkDataType loadDataType;
     MyShape imgShape;

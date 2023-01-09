@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 
+#define MIN_CALI_IMAGE_NUM (15)
+
 class CameraIntrinsCalibration
 {
 public:

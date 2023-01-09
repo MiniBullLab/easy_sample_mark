@@ -1,4 +1,5 @@
 #include "cameraintrinscalibration.h"
+#include "AutoImagePicker.hpp"
 #include <sstream>
 
 CameraIntrinsCalibration::CameraIntrinsCalibration()
@@ -13,7 +14,7 @@ CameraIntrinsCalibration::CameraIntrinsCalibration()
     camera_model = 1;
 
     intrinsic_matrix = cv::Matx33f::zeros();
-//    distortion_coeffs = cv::Vec4d(0.0, 0.0, 0.0, 0.0);
+    distortion_coeffs = cv::Vec4d(0.0, 0.0, 0.0, 0.0);
 
     pinhole_distortion_coeffs = cv::Mat(1,5,CV_32FC1, cv::Scalar::all(0)); /* 摄像机的5个畸变系数：k1,k2,p1,p2,k3 */
 }
@@ -56,7 +57,7 @@ bool CameraIntrinsCalibration::calibrating(const std::vector<std::string> &image
 
     if(is_use.size() > 1)
     {
-        std::cout << "temp:" << object_points[0].size() << " " << point_counts[0] << " " << use_image_corners[0].size() << std::endl;
+        // std::cout << "temp:" << object_points[0].size() << " " << point_counts[0] << " " << use_image_corners[0].size() << std::endl;
         if(this->camera_model == 1)
         {
             cv::calibrateCamera(object_points, use_image_corners, image_size,
@@ -197,7 +198,7 @@ void CameraIntrinsCalibration::saveUndistortImage(const std::vector<std::string>
         std::stringstream StrStm;
         StrStm << saveResultDir << "/"<< i + 1;
         StrStm >> imageFileName;
-        imageFileName += "_d.png";
+        imageFileName += "_undistort.png";
         cv::imwrite(imageFileName, result);
     }
 }
@@ -206,6 +207,8 @@ void CameraIntrinsCalibration::getCorners(const std::vector<std::string> &images
 {
     int image_count = images_list.size();
     int count = 0;
+    AutoImagePicker image_selector(image_size.width, image_size.height,
+                                       board_size.width, board_size.height);
     corners_Seq.clear();
     is_use.clear();
     for (int i = 0; i < image_count; i++)
@@ -225,7 +228,7 @@ void CameraIntrinsCalibration::getCorners(const std::vector<std::string> &images
             is_use.push_back(false);
             std::cout << "找不到角点，需删除图片文件" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
         }
-        else
+        else if (image_selector.addImage(corners))
         {
             /* 亚像素精确化 */
 //            cv::cornerSubPix(imageGray, corners, cv::Size(11, 11), cv::Size(-1, -1),
@@ -236,6 +239,9 @@ void CameraIntrinsCalibration::getCorners(const std::vector<std::string> &images
             is_use.push_back(true);
             std::cout << "Frame corner#" << i + 1 << "...end" << std::endl;
         }
+
+        if (image_selector.status())
+            break;
     }
 }
 
@@ -329,13 +335,14 @@ std::string  CameraIntrinsCalibration::calibrationEvaluate(const std::vector<cv:
     }
     result << "相机内参数矩阵：" << std::endl;
     result << intrinsic_matrix << std::endl;
-    result << "畸变系数：\n";
     if(this->camera_model == 1)
     {
+        result << "畸变系数(k1,k2,p1,p2,k3)：\n";
         result << pinhole_distortion_coeffs << std::endl;
     }
     else if(this->camera_model == 2)
     {
+        result << "畸变系数(k1,k2,p1,p2)：\n";
         result << distortion_coeffs << std::endl;
     }
     return result.str();

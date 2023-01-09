@@ -23,6 +23,9 @@ include(multipletracking/multipletracking.pri)
 include(calibration/calibration.pri)
 
 SOURCES += main.cpp\
+    calibrationTools/cameraverificationwindow.cpp \
+    calibrationTools/lidarcameracalibratwindow.cpp \
+    calibrationTools/pointcloudviewer.cpp \
     controlwindow.cpp \
     mainwindow.cpp \
     autoSampleMark/autosamplemarkthread.cpp \
@@ -92,6 +95,9 @@ SOURCES += main.cpp\
     calibrationTools/cameraintrinsicswindow.cpp
 
 HEADERS  += controlwindow.h \
+    calibrationTools/cameraverificationwindow.h \
+    calibrationTools/lidarcameracalibratwindow.h \
+    calibrationTools/pointcloudviewer.h \
     mainwindow.h \
     autoSampleMark/autosamplemarkthread.h \
     videoTools/croppingvideothread.h \

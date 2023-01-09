@@ -107,8 +107,28 @@ void CameraIntrinsicsWindow::slotCalibrate()
     if(calibrationProcess.calibrating(images_list, err_result))
     {
         this->commandText->append(QString::fromStdString(err_result));
-        undistortButton->setEnabled(true);
-        saveResultButton->setEnabled(true);
+        if(calibrationProcess.getSuccessImage() < MIN_CALI_IMAGE_NUM)
+        {
+            QMessageBox::StandardButton button;
+            button = QMessageBox::question(this, tr("Calibration"), tr("可以检测到角点的图像（%1张）少于 %2！ 是否增加图片重新标定").arg(calibrationProcess.getSuccessImage())
+                                         .arg(MIN_CALI_IMAGE_NUM), QMessageBox::Yes|QMessageBox::No);
+            if(button==QMessageBox::No)
+            {
+                undistortButton->setEnabled(true);
+                saveResultButton->setEnabled(true);
+            }
+            else if(button==QMessageBox::Yes)
+            {
+                calibrationButton->setEnabled(false);
+                undistortButton->setEnabled(false);
+                saveResultButton->setEnabled(false);
+            }
+        }
+        else
+        {
+            undistortButton->setEnabled(true);
+            saveResultButton->setEnabled(true);
+        }
     }
     else
     {
@@ -142,6 +162,16 @@ void CameraIntrinsicsWindow::slotSaveCalibrateResult()
         }
         calibrationProcess.saveUndistortImage(images_list);
     }
+    if(this->isSelectCornersImageBox->isChecked())
+    {
+        std::vector<std::string> images_list;
+        for(int index = 0; index < processDataList.size(); index++)
+        {
+            images_list.push_back(processDataList[index].toStdString());
+        }
+        calibrationProcess.saveDrawCornerImage(images_list);
+    }
+    this->commandText->append(tr("Save result success!"));
 }
 
 void CameraIntrinsicsWindow::init()
@@ -200,13 +230,17 @@ void CameraIntrinsicsWindow::initUI()
     cameraModelLayout->addWidget(cameraModelBox);
 
     isSaveUndistortBox = new QCheckBox(tr("是否保存反畸变图像"));
+    isSelectCornersImageBox = new QCheckBox(tr("是否保存角点图像"));
+    QHBoxLayout *savelLayout = new QHBoxLayout();
+    savelLayout->addWidget(isSaveUndistortBox);
+    savelLayout->addWidget(isSelectCornersImageBox);
 
     QGridLayout *centerTopLayout = new QGridLayout();
     centerTopLayout->setSpacing(20);
     centerTopLayout->addLayout(boardLayout, 0, 0, 1, 1);
     centerTopLayout->addLayout(squareLayout, 1, 0, 1, 1);
     centerTopLayout->addLayout(cameraModelLayout, 0, 1, 1, 1);
-    centerTopLayout->addWidget(isSaveUndistortBox, 1, 1, 1, 1);
+    centerTopLayout->addLayout(savelLayout, 1, 1, 1, 1);
     paramGroupBox = new QGroupBox(tr("参数设置"));
     paramGroupBox->setLayout(centerTopLayout);
 

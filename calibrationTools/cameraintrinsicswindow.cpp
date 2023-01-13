@@ -207,11 +207,13 @@ void CameraIntrinsicsWindow::initUI()
     squareSizeWidthBox->setValue(20);
     squareSizeWidthBox->setMinimum(1);
     squareSizeWidthBox->setSingleStep(1);
+    squareSizeWidthBox->setMaximum(10000);
     squareSizeWidthBox->setPrefix("w:");
     squareSizeWidthBox->setSuffix("mm");
     squareSizeHeightBox = new QSpinBox();
     squareSizeHeightBox->setValue(20);
     squareSizeHeightBox->setMinimum(1);
+    squareSizeHeightBox->setMaximum(10000);
     squareSizeHeightBox->setSingleStep(1);
     squareSizeHeightBox->setPrefix("h:");
     squareSizeHeightBox->setSuffix("mm");

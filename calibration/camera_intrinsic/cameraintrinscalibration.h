@@ -52,6 +52,7 @@ private:
     cv::Mat pinhole_distortion_coeffs;
     std::vector<cv::Vec3d> rotation_vectors;                           /* 每幅图像的旋转向量 */
     std::vector<cv::Vec3d> translation_vectors;                        /* 每幅图像的平移向量 */
+    std::vector<double> error_list;
     std::vector<std::vector<cv::Point2f>> corners_Seq;
     std::vector<bool> is_use;
 

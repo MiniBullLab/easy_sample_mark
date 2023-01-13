@@ -10,7 +10,7 @@
 
 int PointCloudParamterConfig::POINT_SIZE = 2;
 int PointCloudParamterConfig::FIELDS_NUMBER = 3;
-QString PointCloudParamterConfig::COLOR_RENDER_TYPE = "y";
+QString PointCloudParamterConfig::COLOR_RENDER_TYPE = "x";
 bool PointCloudParamterConfig::IS_MESH = false;
 PointCloudFileType PointCloudParamterConfig::FILE_TYPE = PointCloudFileType::PCD_FILE;
 

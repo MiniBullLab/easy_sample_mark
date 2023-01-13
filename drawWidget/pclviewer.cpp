@@ -272,8 +272,7 @@ void PCLViewer::drawTypeColorPointCloud()
 {
     viewer->removePointCloud("srcCloud");
     geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
-    if(PointCloudParamterConfig::getColorRenderType() == "intensity" && \
-       PointCloudParamterConfig::getFieldsNumber() >= 4)
+    if(PointCloudParamterConfig::getColorRenderType() == "intensity")
     {
         colorHandler.reset(new pcl::visualization::PointCloudColorHandlerGenericField<pcl::PCLPointCloud2>(srcCloud,
                                                                                                            "intensity"));

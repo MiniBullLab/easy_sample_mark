@@ -10,6 +10,7 @@ CameraIntrinsCalibration::CameraIntrinsCalibration()
     is_use.clear();
     rotation_vectors.clear();
     translation_vectors.clear();
+    error_list.clear();
     corners_Seq.clear();
     camera_model = 1;
 
@@ -37,6 +38,7 @@ void CameraIntrinsCalibration::setInitData(const int camera_model, const cv::Siz
     rotation_vectors.clear();
     translation_vectors.clear();
     corners_Seq.clear();
+    error_list.clear();
 }
 
 bool CameraIntrinsCalibration::calibrating(const std::vector<std::string> &images_list, std::string &err_result)
@@ -55,7 +57,7 @@ bool CameraIntrinsCalibration::calibrating(const std::vector<std::string> &image
     getCorners(images_list);
     getCornersCoordinate(object_points, point_counts, use_image_corners);
 
-    if(is_use.size() > 1)
+    if(getSuccessImage() > 1)
     {
         // std::cout << "temp:" << object_points[0].size() << " " << point_counts[0] << " " << use_image_corners[0].size() << std::endl;
         if(this->camera_model == 1)
@@ -97,16 +99,18 @@ void CameraIntrinsCalibration::saveCalibrationResult()
     std::ofstream fout(saveResultPath);
     cv::Mat rotation_matrix = cv::Mat(3, 3, CV_32FC1, cv::Scalar::all(0)); /* 保存每幅图像的旋转矩阵 */
     int successImageNum = 0;
+    double total_err = 0;
 
     fout << "相机内参数矩阵：" << std::endl;
     fout << intrinsic_matrix << std::endl;
-    fout << "畸变系数：\n";
     if(this->camera_model == 1)
     {
+        fout << "畸变系数(k1,k2,p1,p2,k3)：\n";
         fout << pinhole_distortion_coeffs << std::endl;
     }
     else if(this->camera_model == 2)
     {
+        fout << "畸变系数(k1,k2,p1,p2)：\n";
         fout << distortion_coeffs << std::endl;
     }
     for(size_t i = 0; i < is_use.size(); i++)
@@ -122,9 +126,13 @@ void CameraIntrinsCalibration::saveCalibrationResult()
             fout << rotation_matrix << std::endl;
             fout << "第" << i + 1 << "幅图像的平移向量：" << std::endl;
             fout << translation_vectors[successImageNum] << std::endl;
+            fout << "第" << i + 1 << "幅图像的平均误差：" << error_list[successImageNum] << "像素" << std::endl;
             successImageNum++;
+            total_err += error_list[successImageNum];
         }
     }
+    if(successImageNum > 0)
+        fout << "总体平均误差：" << total_err / successImageNum << "像素" << std::endl;
     fout << std::endl;
 }
 
@@ -205,6 +213,7 @@ void CameraIntrinsCalibration::saveUndistortImage(const std::vector<std::string>
 
 void CameraIntrinsCalibration::getCorners(const std::vector<std::string> &images_list)
 {
+    bool use_sb = true;
     int image_count = images_list.size();
     int count = 0;
     AutoImagePicker image_selector(image_size.width, image_size.height,
@@ -217,31 +226,70 @@ void CameraIntrinsCalibration::getCorners(const std::vector<std::string> &images
         std::vector<cv::Point2f> corners;
         cv::Mat image = cv::imread(images_list[i]);
         /* 提取角点 */
-        cv::Mat imageGray;
-        cv::cvtColor(image, imageGray, cv::COLOR_BGR2GRAY);
-        bool patternfound = cv::findChessboardCorners(image, board_size, corners, cv::CALIB_CB_ADAPTIVE_THRESH +
-                                                      cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
-        if (!patternfound)
+        if(use_sb)
         {
-            corners.clear();
-            corners_Seq.push_back(corners);
-            is_use.push_back(false);
-            std::cout << "找不到角点，需删除图片文件" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
+            bool patternfound = cv::findChessboardCornersSB(image, board_size, corners,
+                                                            cv::CALIB_CB_EXHAUSTIVE | cv::CALIB_CB_ACCURACY);
+            if (!patternfound)
+            {
+                corners.clear();
+                corners_Seq.push_back(corners);
+                is_use.push_back(false);
+                std::cout << "找不到角点，需删除图片文件" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
+            }
+            else if (image_selector.addImage(corners))
+            {
+                count = count + corners.size();
+                corners_Seq.push_back(corners);
+                is_use.push_back(true);
+                std::cout << "Frame corner#" << i + 1 << "...end" << std::endl;
+            }
+            else
+            {
+                corners.clear();
+                corners_Seq.push_back(corners);
+                is_use.push_back(false);
+                std::cout << "找到角点不可使用:" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
+            }
+
+            if (image_selector.status())
+                break;
         }
-        else if (image_selector.addImage(corners))
+        else
         {
-            /* 亚像素精确化 */
-//            cv::cornerSubPix(imageGray, corners, cv::Size(11, 11), cv::Size(-1, -1),
-//                             cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
-            cv::find4QuadCornerSubpix(imageGray, corners, cv::Size(11, 11));
-            count = count + corners.size();
-            corners_Seq.push_back(corners);
-            is_use.push_back(true);
-            std::cout << "Frame corner#" << i + 1 << "...end" << std::endl;
+            bool patternfound = cv::findChessboardCorners(image, board_size, corners, cv::CALIB_CB_ADAPTIVE_THRESH +
+                                                          cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+            if (!patternfound)
+            {
+                corners.clear();
+                corners_Seq.push_back(corners);
+                is_use.push_back(false);
+                std::cout << "找不到角点，需删除图片文件" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
+            }
+            else if (image_selector.addImage(corners))
+            {
+                cv::Mat imageGray;
+                cv::cvtColor(image, imageGray, cv::COLOR_BGR2GRAY);
+                /* 亚像素精确化 */
+    //            cv::cornerSubPix(imageGray, corners, cv::Size(11, 11), cv::Size(-1, -1),
+    //                             cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
+                cv::find4QuadCornerSubpix(imageGray, corners, cv::Size(11, 11));
+                count = count + corners.size();
+                corners_Seq.push_back(corners);
+                is_use.push_back(true);
+                std::cout << "Frame corner#" << i + 1 << "...end" << std::endl;
+            }
+            else
+            {
+                corners.clear();
+                corners_Seq.push_back(corners);
+                is_use.push_back(false);
+                std::cout << "找到角点不可使用:" << images_list[i] << "重新排列文件名，再次标定" << std::endl;
+            }
+            if (image_selector.status())
+                break;
         }
 
-        if (image_selector.status())
-            break;
     }
 }
 
@@ -325,6 +373,7 @@ std::string  CameraIntrinsCalibration::calibrationEvaluate(const std::vector<cv:
             }
             err = cv::norm(image_points2Mat, tempImagePointMat, cv::NORM_L2);
             total_err += err /= point_counts[successImageNum];
+            error_list.push_back(err);
             result << "第" << i + 1 << "幅图像的平均误差：" << err << "像素" << std::endl;
             successImageNum++;
         }

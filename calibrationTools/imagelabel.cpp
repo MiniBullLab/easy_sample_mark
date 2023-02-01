@@ -11,6 +11,7 @@ ImageLabel::ImageLabel(QWidget *parent): QLabel(parent)
     myDrawCursor = QCursor(QPixmap(tr(":/images/images/cross.png")));
     this->setMouseTracking(true);
     this->setCursor(myDrawCursor);
+    this->zoomValue = 100;
 }
 
 ImageLabel::~ImageLabel()
@@ -21,7 +22,14 @@ ImageLabel::~ImageLabel()
 void ImageLabel::setNewQImage(QImage &image)
 {
     pointList.clear();
+    this->zoomValue = 100;
     tempPixmap = QPixmap::fromImage(image.copy());
+    this->update();
+}
+
+void ImageLabel::setScaleImage(const int value)
+{
+    this->zoomValue = value;
     this->update();
 }
 
@@ -70,6 +78,7 @@ void ImageLabel::mouseReleaseEvent(QMouseEvent *e)
         painter.end();
         pointList.append(point);
         this->update();
+        emit signalSelectPoint(point);
     }
     QLabel::mouseReleaseEvent(e);
 }
@@ -92,10 +101,12 @@ void ImageLabel::paintEvent(QPaintEvent *e)
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::HighQualityAntialiasing);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        float scale = this->zoomValue / 100.0f;
+        painter.scale(scale, scale);
         painter.translate(this->offsetToCenter());
         painter.drawPixmap(QPoint(0,0), tempPixmap);
         painter.end();
-        this->resize(tempPixmap.width(), tempPixmap.height());
+        this->resize(tempPixmap.width() * scale, tempPixmap.height() * scale);
         this->setAutoFillBackground(true);
     }
     QLabel::paintEvent(e);
@@ -104,19 +115,20 @@ void ImageLabel::paintEvent(QPaintEvent *e)
 QPointF ImageLabel::offsetToCenter()
 {
     QSize area = this->size();
-    float w = this->tempPixmap.width();
-    float h = this->tempPixmap.height();
+    float scale = this->zoomValue / 100.0f;
+    float w = this->tempPixmap.width() * scale;
+    float h = this->tempPixmap.height() * scale;
     float aw = area.width();
     float ah = area.height();
     float x = 0;
     float y = 0;
     if(aw > w)
     {
-        x = (aw - w) / (2);
+        x = (aw - w) / (2 * scale);
     }
     if(ah > h)
     {
-        y = (ah - h) / (2);
+        y = (ah - h) / (2 * scale);
     }
     return QPointF(x, y);
 }

@@ -1,10 +1,10 @@
 HEADERS += \
-    $$PWD/geometryalgorithm.h \
-    $$PWD/curvealgorithm.h \
     $$PWD/common_transform.h \
-    $$PWD/common_type.h
+    $$PWD/coordinate_transform.h \
+    $$PWD/geometryalgorithm.h \
+    $$PWD/curvealgorithm.h
 
 SOURCES += \
+    $$PWD/coordinate_transform.cpp \
     $$PWD/geometryalgorithm.cpp \
-    $$PWD/curvealgorithm.cpp \
-    $$PWD/common_transform.cpp
+    $$PWD/curvealgorithm.cpp

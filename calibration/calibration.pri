@@ -3,7 +3,9 @@ HEADERS += \
     $$PWD/camera_intrinsic/CalibrationHarp.hpp \
     $$PWD/camera_intrinsic/LSD.hpp \
     $$PWD/camera_intrinsic/cameraintrinscalibration.h \
-    $$PWD/camera_intrinsic/common.hpp
+    $$PWD/camera_intrinsic/common.hpp \
+    $$PWD/radar_camera/birdview.hpp \
+    $$PWD/radar_camera/projector_radar.hpp
 
 
 SOURCES += \

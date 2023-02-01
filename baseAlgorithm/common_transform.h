@@ -1,12 +1,20 @@
 #ifndef COMMON_TRANSFORM_H
 #define COMMON_TRANSFORM_H
 
-#include "common_type.h"
-
-using namespace algorithm_common;
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 class Transform
 {
+ public:
+    typedef Eigen::Matrix<float, 6, 1> Vector6;
+    typedef Eigen::Quaternionf Rotation;
+    typedef Eigen::AngleAxisf  AngleRotation;
+    typedef Eigen::Vector3f  VectorRotation;
+    typedef Eigen::Vector3f Translation;
+    typedef Eigen::Matrix<float, 4, 4> Matrix;
+    typedef Eigen::Affine3f Affine;
+
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -30,7 +38,7 @@ public:
 
     void setTransform(const Matrix &matrix)
     {
-        rotation_ = Rotation( matrix.topLeftCorner<3, 3>());
+        rotation_ = Rotation(matrix.topLeftCorner<3, 3>());
         translation_ = matrix.topRightCorner<3, 1>();
     }
 
@@ -58,9 +66,9 @@ public:
                          rotation_ * rhs.rotation());
     }
 
-    Transform exp(const Vector6& vector)
+    static Transform exp(const Vector6& vector)
     {
-        constexpr float kEpsilon = static_cast<float>(1e-8);
+        constexpr float kEpsilon = 1e-8;
         const float norm = vector.tail<3>().norm();
         if (norm < kEpsilon) {
             return Transform(vector.head<3>(), Rotation::Identity());
@@ -75,8 +83,6 @@ public:
         Eigen::AngleAxisf angle_axis(rotation_);
         return (Vector6() << translation_, angle_axis.angle() * angle_axis.axis()).finished();
     }
-
-    Rotation getRotation(float angularX, float angularY, float angularZ);
 
 private:
     Rotation rotation_;

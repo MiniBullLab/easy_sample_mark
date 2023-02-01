@@ -7,11 +7,13 @@
 #include <QScrollArea>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QHeaderView>
+#include <QTableWidget>
 #include <QImage>
 #include "helpers/convertcvqimage.h"
 #include "utilityGUI/customWindow/mytextbrowser.h"
+#include "utilityGUI/customWindow/editnumberitemdelegate.h"
 #include "imagelabel.h"
 
 #include <opencv2/core.hpp>
@@ -34,7 +36,10 @@ public slots:
     void slotSelectPoint();
     void slotBirdCalibration();
     void slotBirdView();
+    void slotSaveResult();
     void slotComputeDistance();
+
+    void slotAddBirdPoint(QPoint point);
 
 private:
 
@@ -43,32 +48,27 @@ private:
     MyTextBrowser *commandText;//输出黑匣子指令
 
     QPushButton *openImageButton;
-
-    QGroupBox *paramGroundBox;
-    QLabel *boxWidthLable;
-    QDoubleSpinBox *boxWidthBox;
-    QLabel *boxHeightLable;
-    QDoubleSpinBox *boxHeightBox;
-    QLabel *ratioLabel;
-    QSpinBox *ratioBox;
-
-    QLabel *chessboardSizeLabel;
-    QDoubleSpinBox *chessboardSizeBox;
-    QLabel *chessboardCountLabel;
-    QSpinBox *chessboardWBox;
-    QSpinBox *chessboardHBox;
-
     QPushButton *selectPointButton;
     QPushButton *birdCalibrationButton;
     QPushButton *birdViewButton;
+    QPushButton *saveResultButton;
     QPushButton *distanceButton;
+
+    QTableWidget *birdPointTable;
+
+    QGroupBox *paramGroundBox;
+    QLabel *ratioLabel;
+    QSpinBox *ratioBox;
 
     QImage currentImage;
     QImage birdViewImage;
 
     ConvertCVQImage convertImage;
 
-    std::vector<std::vector<cv::Point2f>> allCorners;
+    QString openDataDir;
+
+    QList<QPoint> pointList;
+    std::vector<cv::Point2f> birdPointList;
     cv::Mat homography;
 
     void init();

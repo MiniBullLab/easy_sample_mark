@@ -34,7 +34,7 @@ VTK_MODULE_INIT(vtkInteractionStyle);
 #include <QVTKWidget.h>
 
 #include "dataType/myobject.h"
-#include "baseAlgorithm/common_transform.h"
+#include "baseAlgorithm/coordinate_transform.h"
 
 class PCLViewer : public QVTKWidget
 {
@@ -105,7 +105,7 @@ private:
     QCursor myDrawCursor;
     bool isSelect;
 
-    Transform transform;
+    CoordinateTransform transform;
 };
 
 #endif // PCLVIEWER_H

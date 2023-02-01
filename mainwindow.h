@@ -24,6 +24,7 @@
 #include "calibrationTools/birdviewprocess.h"
 #include "calibrationTools/cameraintrinsicswindow.h"
 #include "calibrationTools/cameraverificationwindow.h"
+#include "calibrationTools/radarcameramanualwindow.h"
 #include "autoSampleMark/autodetection2dwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -78,6 +79,7 @@ public slots:
     void slotBirdViewProcess();
     void slotCameraIntrinsics();
     void slotCameraVerification();
+    void slotRadarCameraManual();
 
     //about
     void slotAbout();
@@ -126,6 +128,7 @@ private:
     QAction *birdViewCalibratAction;
     QAction *cameraIntrinsicsAction;
     QAction *cameraVerificationAction;
+    QAction *radarCameraManualCalibratAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -169,6 +172,7 @@ private:
     BirdViewProcess *birdViewPorcess;
     CameraIntrinsicsWindow * cameraIntrinsicsWindow;
     CameraVerificationWindow *cameraVerificationWindow;
+    RadarCameraManualWindow *radarCameraManualWindow;
 
     MarkDataType loadDataType;
     MyShape imgShape;

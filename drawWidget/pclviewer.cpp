@@ -392,7 +392,7 @@ void PCLViewer::drawObject(const MyObject &object, int id)
     pcl::PointXYZ point;
     const MyRect3D rect3d = object.getBox3D();
     QString boxId = QString("box_%1").arg(id);
-    Rotation yaw = transform.getRotation(0, 0, rect3d.theta);
+    Eigen::Quaternionf yaw = transform.getRotation(0, 0, rect3d.theta);
     double length = static_cast<double>(rect3d.size[0]);
     double width = static_cast<double>(rect3d.size[1]);
     double height = static_cast<double>(rect3d.size[2]);

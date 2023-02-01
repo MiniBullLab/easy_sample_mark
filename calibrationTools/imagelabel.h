@@ -15,8 +15,12 @@ public:
     ~ImageLabel();
 
      void setNewQImage(QImage &image);
+     void setScaleImage(const int value);
 
      QList<QPoint> getPointList() const;
+
+signals:
+    void signalSelectPoint(QPoint point);
 
 protected:
      void mouseMoveEvent(QMouseEvent *e) override;
@@ -31,6 +35,8 @@ private:
     QList<QPoint> pointList;
 
     QCursor myDrawCursor;
+
+    int zoomValue;
 
     QPointF offsetToCenter();
 };

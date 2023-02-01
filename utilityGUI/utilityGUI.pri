@@ -1,5 +1,6 @@
 HEADERS += \
     $$PWD/customWindow/customanimation.h \
+    $$PWD/customWindow/editnumberitemdelegate.h \
     $$PWD/customWindow/myhelper.h \
     $$PWD/customWindow/wexpand.h \
     $$PWD/QtAwesome/QtAwesome.h \
@@ -13,6 +14,7 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/customWindow/customanimation.cpp \
+    $$PWD/customWindow/editnumberitemdelegate.cpp \
     $$PWD/customWindow/myhelper.cpp \
     $$PWD/customWindow/wexpand.cpp \
     $$PWD/QtAwesome/QtAwesome.cpp \

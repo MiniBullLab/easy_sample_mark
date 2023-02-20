@@ -10,6 +10,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QDebug>
+
+#include <Eigen/Dense>
 
 BirdViewProcess::BirdViewProcess(QDialog *parent) : QDialog(parent)
 {
@@ -34,12 +37,42 @@ void BirdViewProcess::slotOpenImage()
     {
         QFileInfo imageFileInfo(fileName);
         openDataDir = imageFileInfo.path();
+        QString paramPath = openDataDir + "/homography.json";
         imageShow->setNewQImage(currentImage);
-        selectPointButton->setEnabled(true);
-        birdCalibrationButton->setEnabled(false);
-        birdViewButton->setEnabled(false);
-        saveResultButton->setEnabled(false);
-        distanceButton->setEnabled(false);
+        if(loadHomographyParam(paramPath))
+        {
+            imageShow->setPointList(pointList);
+            for(size_t i = 0; i < birdPointList.size(); i++)
+            {
+                int index = birdPointTable->rowCount();
+                birdPointTable->insertRow(index);
+                for (int col = 0; col < 3; ++col)
+                {
+                    QTableWidgetItem *item = new QTableWidgetItem("");
+                    birdPointTable->setItem(index, col, item);
+                    birdPointTable->setCurrentItem(item);
+                }
+                birdPointTable->setItemDelegateForRow(index, new EditNumberItemDelegate(this));
+
+                birdPointTable->item(index, 0)->setData(Qt::EditRole, QVariant(birdPointList[i].x));
+                birdPointTable->item(index, 1)->setData(Qt::EditRole, QVariant(birdPointList[i].y));
+                birdPointTable->item(index, 2)->setData(Qt::EditRole, QVariant(0));
+            }
+
+            selectPointButton->setEnabled(true);
+            birdCalibrationButton->setEnabled(true);
+            birdViewButton->setEnabled(true);
+            saveResultButton->setEnabled(true);
+            distanceButton->setEnabled(true);
+        }
+        else
+        {
+            selectPointButton->setEnabled(true);
+            birdCalibrationButton->setEnabled(false);
+            birdViewButton->setEnabled(false);
+            saveResultButton->setEnabled(false);
+            distanceButton->setEnabled(false);
+        }
     }
     else
     {
@@ -52,7 +85,7 @@ void BirdViewProcess::slotSelectPoint()
     if(selectPointButton->text() == QString(tr("开始选择点")))
     {
         imageShow->setNewQImage(currentImage);
-        while(birdPointTable->rowCount()>0)
+        while(birdPointTable->rowCount() > 0)
         {
             birdPointTable->removeRow(0);
         }
@@ -100,7 +133,7 @@ void BirdViewProcess::slotBirdCalibration()
         for(int i = 0; i < pointList.count(); i++)
         {
             cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
-            dst_pts.push_back(birdPointList[i]);
+            dst_pts.push_back(cv::Point2f(birdPointList[i].x * 100, birdPointList[i].y * 100));
             src_pts.push_back(src_pt);
         }
 
@@ -132,10 +165,44 @@ void BirdViewProcess::slotBirdCalibration()
 void BirdViewProcess::slotBirdView()
 {
     QImage image = currentImage.convertToFormat(QImage::Format_RGB888);
-    cv::Mat imageInput = convertImage.QImageTocvMat(image);
+    cv::Mat imageInput = convertImage.QImageTocvMat(image).clone();
     cv::Mat birdImage;
     cv::Mat rgbFrame;
-    cv::warpPerspective(imageInput, birdImage, homography, cv::Size(imageInput.cols, imageInput.rows) , \
+    Eigen::Matrix3f img2ground_hmat_;
+    std::vector<cv::Point2f> ground_pts;
+    std::vector<cv::Point2f> src_pts;
+    cv::Mat h = cv::Mat(3, 3, CV_32F, cv::Scalar::all (0));
+    img2ground_hmat_(0, 0) = homography.at<float>(0, 0);
+    img2ground_hmat_(0, 1) = homography.at<float>(0, 1);
+    img2ground_hmat_(0, 2) = homography.at<float>(0, 2);
+    img2ground_hmat_(1, 0) = homography.at<float>(1, 0);
+    img2ground_hmat_(1, 1) = homography.at<float>(1, 1);
+    img2ground_hmat_(1, 2) = homography.at<float>(1, 2);
+    img2ground_hmat_(2, 0) = homography.at<float>(2, 0);
+    img2ground_hmat_(2, 1) = homography.at<float>(2, 1);
+    img2ground_hmat_(2, 2) = homography.at<float>(2, 2);
+    for (int i = 0; i < pointList.count(); i++) {
+      Eigen::Vector3f ground_pt = img2ground_hmat_ * \
+          Eigen::Vector3f(pointList[i].x(), pointList[i].y(), 1);
+      ground_pt /= ground_pt(2);
+      ground_pts.push_back(cv::Point2f(ground_pt(0), ground_pt(1)));
+      cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
+      src_pts.push_back(src_pt);
+    }
+    h = cv::findHomography(src_pts, ground_pts);
+//    cv::Rect boundingRect;
+//    std::vector<cv::Point2f> dst_pts;
+//    std::vector<cv::Point2f> src_pts;
+//    for(int i = 0; i < pointList.count(); i++)
+//    {
+//        cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
+//        dst_pts.push_back(cv::Point2f(birdPointList[i].x, birdPointList[i].y));
+//        src_pts.push_back(src_pt);
+//    }
+//    boundingRect = cv::boundingRect(src_pts);
+//    h = cv::getPerspectiveTransform(dst_pts, src_pts);
+    // cv::imwrite("image.jpg", imageInput);
+    cv::warpPerspective(imageInput, birdImage, h, imageInput.size() , \
                         cv::INTER_LINEAR + cv::WARP_INVERSE_MAP + cv::WARP_FILL_OUTLIERS);
     cv::cvtColor(birdImage, rgbFrame, cv::COLOR_BGR2RGB);
     birdViewImage = QImage((uchar*)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, QImage::Format_RGB888);
@@ -347,4 +414,81 @@ void BirdViewProcess::initConnect()
     connect(distanceButton, &QPushButton::clicked, this, &BirdViewProcess::slotComputeDistance);
 
     connect(imageShow, &ImageLabel::signalSelectPoint, this, &BirdViewProcess::slotAddBirdPoint);
+}
+
+bool BirdViewProcess::loadHomographyParam(const QString &filePath)
+{
+    bool result = false;
+    QByteArray data;
+    QFile file;
+    file.setFileName(filePath);
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        return result;
+    }
+    data = file.readAll();
+    file.close();
+    QJsonParseError jsonError;
+    QJsonDocument parseDoucment = QJsonDocument::fromJson(QString(data).toUtf8(), &jsonError);
+
+    if(jsonError.error == QJsonParseError::NoError)
+    {
+        if (!(parseDoucment.isNull() || parseDoucment.isEmpty()))
+        {
+            if (parseDoucment.isObject())
+            {
+                QJsonObject allData = parseDoucment.object();
+                pointList.clear();
+                birdPointList.clear();
+                if(allData.contains("src_quad"))
+                {
+                    QJsonArray dataList = allData.take("src_quad").toArray();
+                    for(int index = 0; index < dataList.size(); index++)
+                    {
+                        QJsonObject tempData = dataList.at(index).toObject();
+                        int x = tempData.take("x").toVariant().toInt();
+                        int y = tempData.take("y").toVariant().toInt();
+                        pointList.append(QPoint(x, y));
+                    }
+                }
+                if(allData.contains("dst_quad"))
+                {
+                    QJsonArray dataList = allData.take("dst_quad").toArray();
+                    for(int index = 0; index < dataList.size(); index++)
+                    {
+                        QJsonObject tempData = dataList.at(index).toObject();
+                        float x = tempData.take("x").toVariant().toFloat();
+                        float y = tempData.take("y").toVariant().toFloat();
+                        birdPointList.push_back(cv::Point2f(x, y));
+                    }
+                }
+                if(allData.contains("camera_homography"))
+                {
+                    QJsonArray paramObject = allData.take("camera_homography").toArray();
+                    int tempIndex = 0;
+                    for(int r = 0; r < homography.rows; r++)
+                    {
+                        for(int c = 0; c < homography.cols; c++)
+                        {
+                            homography.at<float>(r, c) = static_cast<float>(paramObject.at(tempIndex++).toDouble());
+                        }
+                    }
+                    result = true;
+                }
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "error:" << jsonError.errorString() << endl;
+    }
+    if(static_cast<int>(birdPointList.size()) == pointList.size())
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+    return result;
 }

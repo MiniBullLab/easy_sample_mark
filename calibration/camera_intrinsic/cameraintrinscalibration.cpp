@@ -145,6 +145,7 @@ cv::Mat CameraIntrinsCalibration::getUndistortImage(const std::string &image_pat
     cv::Mat result = image.clone();
     if(this->camera_model == 1)
     {
+         // 摄像机的5个畸变系数，(k1,k2,p1,p2[,k3[,k4,k5,k6]])
 //        cv::initUndistortRectifyMap(intrinsic_matrix, pinhole_distortion_coeffs,
 //                                    R, intrinsic_matrix,image_size, CV_32FC1, mapx, mapy);
 //        cv::remap(image, result, mapx, mapy, cv::INTER_LINEAR);

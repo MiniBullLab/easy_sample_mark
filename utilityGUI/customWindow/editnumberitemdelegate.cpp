@@ -15,6 +15,7 @@ QWidget *EditNumberItemDelegate::createEditor(QWidget *parent, const QStyleOptio
     Q_UNUSED(index)
     QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
     editor->setValue(0);
+    editor->setMinimum(-10000);
     editor->setMaximum(10000);
     editor->setSingleStep(1);
     editor->setSuffix("m");

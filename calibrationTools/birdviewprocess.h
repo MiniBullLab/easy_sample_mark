@@ -74,6 +74,8 @@ private:
     void init();
     void initUI();
     void initConnect();
+
+    bool loadHomographyParam(const QString &filePath);
 };
 
 #endif // BIRDVIEWPROCESS_H

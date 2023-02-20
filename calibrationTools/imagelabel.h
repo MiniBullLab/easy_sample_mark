@@ -17,6 +17,7 @@ public:
      void setNewQImage(QImage &image);
      void setScaleImage(const int value);
 
+     void setPointList(const QList<QPoint> &pointList);
      QList<QPoint> getPointList() const;
 
 signals:

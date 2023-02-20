@@ -4,6 +4,7 @@
 #include "imagelabel.h"
 #include <QPaintEvent>
 #include <QPainter>
+#include <QDebug>
 
 ImageLabel::ImageLabel(QWidget *parent): QLabel(parent)
 {
@@ -30,6 +31,21 @@ void ImageLabel::setNewQImage(QImage &image)
 void ImageLabel::setScaleImage(const int value)
 {
     this->zoomValue = value;
+    this->update();
+}
+
+void ImageLabel::setPointList(const QList<QPoint> &pointList)
+{
+    this->pointList = pointList;
+    for(int i = 0; i < pointList.count(); i++)
+    {
+        // qDebug() << pointList[i] << endl;
+        QPainter painter;
+        painter.begin(&tempPixmap);
+        painter.setBrush(QColor("#3CFF55"));
+        painter.drawEllipse(pointList[i], 2, 2);
+        painter.end();
+    }
     this->update();
 }
 

@@ -41,13 +41,8 @@ void RadarCameraManualWindow::slotLoadIntrinsic()
     {
         intrinsicText->setText(fileName);
         std::ostringstream tempStr;
-        tempStr << "Intrinsic:\n" << intrinsic_matrix_ << "\n";
-        tempStr << "Distortion:\n";
-        for(size_t i = 0; i < distortion.size(); i++)
-        {
-            tempStr << distortion[i] << " ";
-        }
-        tempStr << "\n";
+        tempStr << "Intrinsic:\n" << cameraInstrinsics << "\n";
+        tempStr << "Distortion:\n" << distortionCoefficients << "\n";
         this->commandText->append(QString::fromStdString(tempStr.str()));
         isLoadIntrinsic = true;
     }
@@ -72,17 +67,9 @@ void RadarCameraManualWindow::slotLoadHomography()
     if(loadCameraHomography(fileName))
     {
         homographyText->setText(fileName);
-        QString tempStr = "Homography:\n";
-        for(int r = 0; r < homography.rows; r++)
-        {
-            for(int c = 0; c < homography.cols; c++)
-            {
-                tempStr += QString::number(homography.at<float>(r, c));
-                tempStr += ",";
-            }
-            tempStr += "\n";
-        }
-        commandText->append(tempStr);
+        std::ostringstream tempStr;
+        tempStr << "Homography:\n" << homography << "\n";
+        this->commandText->append(QString::fromStdString(tempStr.str()));
         isLoadHomography = true;
     }
     else
@@ -198,7 +185,7 @@ void RadarCameraManualWindow::slotSelectPoint()
             int bv_width = width / 2;
             int bv_height = height;
             projector.init(currentMat, homography, bv_width, bv_height, picked_points);
-            projector.loadPointCloud(radarPointList);
+            projector.loadPointCloud(point3DList);
 
             showCalibrationButton->setEnabled(true);
             paramGroundBox->setEnabled(true);
@@ -223,9 +210,12 @@ void RadarCameraManualWindow::slotShowCalibration()
         cv::Mat bv_frame;
         cv::Mat rgb_bv;
         Eigen::Matrix4f temp = calibration_matrix_ * modification_matrix_;
-        projector.ProjectToRawImage(currentMat, intrinsic_matrix_,
-                                    distortion, temp,
-                                    current_frame, bv_frame);
+        Transform transform;
+        transform.setTransform(temp);
+        projector.ProjectImage(currentMat, cameraInstrinsics,
+                               distortionCoefficients, transform,
+                               current_frame);
+        projector.ProjectBirdView(transform, bv_frame);
     //    cv::imwrite("image.jpg", current_frame);
     //    cv::imwrite("bv_image.jpg", bv_frame);
         cv::cvtColor(current_frame, rgbFrame, cv::COLOR_BGR2RGB);
@@ -265,6 +255,7 @@ void RadarCameraManualWindow::slotDegreeParamChange(double value)
     modification_matrix_.block(0, 0, 3, 3) = rot_tmp;
 
     temp = calibration_matrix_ * modification_matrix_;
+    Transform transform;
     transform.setTransform(temp);
     Transform::Vector6 T_log = transform.log();
     // std::cout << "T_log:" << T_log << std::endl;
@@ -306,6 +297,7 @@ void RadarCameraManualWindow::slotSaveResult()
 {
     std::ostringstream tempStr;
     Eigen::Matrix4f temp = calibration_matrix_ * modification_matrix_;
+    Transform transform;
     transform.setTransform(temp);
     tempStr << "Extrinsic:" << std::endl;
     Transform::Rotation R = transform.rotation();
@@ -328,13 +320,13 @@ void RadarCameraManualWindow::init()
     isInit = false;
     this->currentImage = QImage(tr(":/images/images/play.png"));
     this->birdViewImage = QImage(tr(":/images/images/play.png"));
-    intrinsic_matrix_.setIdentity();
-    distortion.clear();
+    cameraInstrinsics = cv::Mat(3, 3, CV_32FC1, cv::Scalar::all(0));
+    distortionCoefficients = cv::Mat(5, 1,CV_32FC1, cv::Scalar::all(0));
     homography = cv::Mat(3, 3, CV_32F, cv::Scalar::all (0));
     calibration_matrix_.setIdentity();
     orign_calibration_matrix_.setIdentity();
     modification_matrix_.setIdentity();
-    radarPointList.clear();
+    point3DList.clear();
     selectPointList.clear();
 }
 
@@ -624,7 +616,7 @@ void RadarCameraManualWindow::calibrationInit()
 //    std::cout << "yaw  = " << angleypr(0) << std::endl;
 //    std::cout << "pitch  = " << angleypr(1) << std::endl;
 //    std::cout << "roll  = " << angleypr(2) << std::endl;
-
+    Transform transform;
     transform.setTransform(orign_calibration_matrix_);
 //    Eigen::AngleAxisf angle_axis(transform.rotation());
 //    std::cout << "angle:" << angle_axis.angle() << std::endl;
@@ -671,36 +663,25 @@ bool RadarCameraManualWindow::loadCameraIntrinsic(const QString &filePath)
             if (parseDoucment.isObject())
             {
                 QJsonObject jsonObject = parseDoucment.object();
-                if(jsonObject.contains("camera-intrinsic"))
+                if(jsonObject.contains("camera_intrinsic") && jsonObject.contains("camera_distortion"))
                 {
-                    QJsonObject rootObject = jsonObject.take("camera-intrinsic").toObject();
-                    if(rootObject.contains("param"))
+                    QJsonArray intrinsicList = jsonObject.take("camera_intrinsic").toArray();
+                    for(int index = 0; index < intrinsicList.size(); index++)
                     {
-                        QJsonObject paramObject = rootObject.take("param").toObject();
-                        if(paramObject.contains("cam_K"))
-                        {
-                            QJsonObject kObject = paramObject.take("cam_K").toObject();
-                            QJsonArray dataList = kObject.take("data").toArray();
-                            for(int index = 0; index < dataList.size(); index++)
-                            {
-                                QJsonArray rowData = dataList.at(index).toArray();
-                                intrinsic_matrix_(index, 0) = static_cast<float>(rowData.at(0).toDouble());
-                                intrinsic_matrix_(index, 1) = static_cast<float>(rowData.at(1).toDouble());
-                                intrinsic_matrix_(index, 2) = static_cast<float>(rowData.at(2).toDouble());
-                            }
-                            result = true;
-                        }
-                        if(paramObject.contains("cam_dist"))
-                        {
-                            QJsonObject distObject = paramObject.take("cam_dist").toObject();
-                            QJsonArray dataList = distObject.take("data").toArray().at(0).toArray();
-                            distortion.clear();
-                            for(int index = 0; index < dataList.size(); index++)
-                            {
-                                distortion.push_back(static_cast<float>(dataList.at(index).toDouble()));
-                            }
-                        }
+                        QJsonArray rowData = intrinsicList.at(index).toArray();
+                        cameraInstrinsics.at<float>(index, 0) = static_cast<float>(rowData.at(0).toDouble());
+                        cameraInstrinsics.at<float>(index, 1) = static_cast<float>(rowData.at(1).toDouble());
+                        cameraInstrinsics.at<float>(index, 2) = static_cast<float>(rowData.at(2).toDouble());
                     }
+
+                    QJsonArray distList = jsonObject.take("camera_distortion").toArray();
+                    int count = std::min(5, distList.size());
+                    for(int index = 0; index < count; index++)
+                    {
+                        distortionCoefficients.at<float>(index, 0) = static_cast<float>(distList.at(index).toDouble());
+                    }
+
+                    result = true;
                 }
             }
         }
@@ -816,7 +797,7 @@ bool RadarCameraManualWindow::loadExtrinsic(const QString &filePath)
 
 bool RadarCameraManualWindow::loadRadarData(const QString &filePath)
 {
-    radarPointList.clear();
+    point3DList.clear();
     std::ifstream file(filePath.toStdString());
     if (!file.is_open())
     {
@@ -846,7 +827,7 @@ bool RadarCameraManualWindow::loadRadarData(const QString &filePath)
                 } else {
                     long long gap = std::stoll(time_str) - std::stoll(first_time_str);
                     if (gap > 15 * 1e6) {
-                        std::cout << "radar point size: " << radarPointList.size() << std::endl;
+                        std::cout << "radar point size: " << point3DList.size() << std::endl;
                         return true;
                     }
                 }
@@ -859,17 +840,18 @@ bool RadarCameraManualWindow::loadRadarData(const QString &filePath)
             index++;
         }
 
-        cv::Point2f radar_point;
+        cv::Point3f radar_point;
         radar_point.x = std::atof(position_x_str.c_str());
         radar_point.y = std::atof(position_y_str.c_str());
+        radar_point.z = 0;
         if (std::abs(radar_point.x) < 1e-6 || std::abs(radar_point.y) < 1e-6)
         {
             continue;
         }
-        radarPointList.push_back(radar_point);
+        point3DList.push_back(radar_point);
     }
 
-    if(radarPointList.size() > 0)
+    if(point3DList.size() > 0)
     {
         return true;
     }

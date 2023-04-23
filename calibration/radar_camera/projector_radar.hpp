@@ -3,12 +3,16 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <string>
-
 #include <vector>
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
+
 #include "birdview.hpp"
+#include "baseAlgorithm/common_transform.h"
 
 struct Pt {
   cv::Point point;
@@ -19,7 +23,7 @@ struct Pt {
 class Projector {
 public:
   cv::Mat oriCloud;
-  const float ROI[6] = {-4, 3.5, 5.0, 10.0, -2.1, 3.0};
+  std::vector<cv::Point3f> point3DList;
   int point_size_ = 6;
   Eigen::Matrix3d homograph_;
   BirdView bv_handler;
@@ -39,35 +43,17 @@ public:
     bv_handler.init(img, bv_w, bv_h, homograph_, picked_points);
   }
 
-  void ROIFilter() {
-    cv::Mat temp(cv::Size(oriCloud.cols, oriCloud.rows), CV_32FC1);
-    int cnt = 0;
-    for (int i = 0; i < oriCloud.cols; ++i) {
-      float x = oriCloud.at<float>(0, i);
-      float y = oriCloud.at<float>(1, i);
-      float z = oriCloud.at<float>(2, i);
-      if (x > ROI[0] && x < ROI[1] && y > ROI[2] && y < ROI[3] && z > ROI[4] &&
-          z < ROI[5]) {
-        temp.at<float>(0, cnt) = x;
-        temp.at<float>(1, cnt) = y;
-        temp.at<float>(2, cnt) = z;
-        ++cnt;
-      }
-    }
-    oriCloud = temp.colRange(0, cnt);
-  }
-
   void setPointSize(int size) { point_size_ = size; }
 
-  bool loadPointCloud(const std::vector<cv::Point2f> &radarList) {
-    oriCloud = cv::Mat(cv::Size(radarList.size(), 3), CV_32FC1);
-    for (size_t i = 0; i < radarList.size(); ++i) {
-      oriCloud.at<float>(0, i) = radarList[i].x;
-      oriCloud.at<float>(1, i) = radarList[i].y;
-      oriCloud.at<float>(2, i) = 0;
-    }
-    // ROIFilter();
-    return true;
+  bool loadPointCloud(const std::vector<cv::Point3f> &radarList) {
+      point3DList = radarList;
+      oriCloud = cv::Mat(cv::Size(radarList.size(), 3), CV_32FC1);
+      for (size_t i = 0; i < radarList.size(); ++i) {
+          oriCloud.at<float>(0, i) = radarList[i].x;
+          oriCloud.at<float>(1, i) = radarList[i].y;
+          oriCloud.at<float>(2, i) = 0;
+      }
+      return true;
   }
 
   cv::Scalar fakeColor(float value) {
@@ -103,111 +89,113 @@ public:
     return cv::Scalar(color[0], color[1], color[2]);
   }
 
-  void ProjectToRawMat(cv::Mat img, cv::Mat K, cv::Mat D, cv::Mat R, cv::Mat T,
-                       cv::Mat &current_frame, cv::Mat &bv_frame) {
-    cv::Mat I = cv::Mat::eye(3, 3, CV_32FC1);
-    cv::Mat mapX, mapY;
-    cv::Mat outImg = cv::Mat(img.size(), CV_32FC3);
-    cv::initUndistortRectifyMap(K, D, I, K, img.size(), CV_32FC1, mapX, mapY);
-    cv::remap(img, outImg, mapX, mapY, cv::INTER_LINEAR);
-    cv::Mat dist = oriCloud.rowRange(0, 1).mul(oriCloud.rowRange(0, 1)) +
-                   oriCloud.rowRange(1, 2).mul(oriCloud.rowRange(1, 2)) +
-                   oriCloud.rowRange(2, 3).mul(oriCloud.rowRange(2, 3));
-    cv::Mat R_ = R;
-    cv::Mat T_ = T;
-
-    // cv::Mat projCloud2d =
-    //     K * (R_ * oriCloud + repeat(T_, 1, oriCloud.cols));
-    cv::Mat transCloud2d = R_ * oriCloud + repeat(T_, 1, oriCloud.cols);
-    float maxDist = 0;
-    float maxx = 0;
-    std::vector<Pt> points;
-    std::vector<cv::Point2f> bv_radar_pts;
-    for (int32_t i = 0; i < transCloud2d.cols; ++i) {
-      float x = transCloud2d.at<float>(0, i);
-      float y = transCloud2d.at<float>(1, i);
-      float z = transCloud2d.at<float>(2, i);
-
-      Eigen::Vector3d world_pt(x, z, 1);
-      // x, z, 1???
-      Eigen::Vector3d bv_pt = homograph_.inverse().eval() * world_pt;
-      bv_pt /= bv_pt(2);
-      // cv::Point result(cvRound(bv_pt(0)), cvRound(bv_pt(1)));
-      int x2d = cvRound(bv_pt(0));
-      int y2d = cvRound(bv_pt(1));
-      float d = sqrt(dist.at<float>(0, i));
-      if (x2d >= 0 && y2d >= 0 && x2d < img.cols && y2d < img.rows && z > 0) {
-        maxx = std::max(maxx, std::fabs(x));
-        maxDist = std::max(maxDist, d);
-        points.push_back(Pt{cv::Point(x2d, y2d), d, std::fabs(x)});
-        bv_radar_pts.push_back(cv::Point2f(x, z));
+  void ProjectImage(const cv::Mat &img, const cv::Mat &K, const cv::Mat &D,
+               const Transform &transform, cv::Mat &current_frame) {
+      cv::Mat outImg = img.clone();
+      std::vector<cv::Point2f> tempResult;
+      std::vector<cv::Point2f> projectPoints;
+      cv::Mat rotationVector; // Rotation vector
+      cv::Mat translationVector; // Translation vector
+      if(point3DList.size() <= 0)
+      {
+          return;
       }
-    }
+      Transform::VectorRotation vectorRotation = transform.vectorRation();
+      Transform::Translation T = transform.translation();
+      rotationVector = (cv::Mat_<float>(1, 3) << vectorRotation[0], vectorRotation[1], vectorRotation[2]);
+      std::cout << rotationVector << std::endl;
+      translationVector = (cv::Mat_<float>(1, 3) << T[0], T[1], T[2]);
+      cv::projectPoints(point3DList, rotationVector, translationVector, K, D, tempResult);
 
-    bv_frame = bv_handler.drawProjectBirdView(point_size_, bv_radar_pts);
-
-    sort(points.begin(), points.end(),
-         [](const Pt &a, const Pt &b) { return a.dist > b.dist; });
-    for (size_t i = 0; i < points.size(); ++i) {
-      cv::Scalar color;
-      // distance
-      float d = points[i].dist;
-      float x = points[i].x;
-      // color = fakeColor(d / maxDist);
-      color = fakeColor(x / maxx);
-      circle(outImg, points[i].point, point_size_, color, -1);
-    }
-    current_frame = outImg;
+      for(const cv::Point2f& point: tempResult)
+      {
+          if((point.x >= 0 && point.x < img.cols)
+                  && (point.y >= 0 && point.y < img.rows))
+          {
+              projectPoints.push_back(point);
+          }
+      }
+      for(const auto &point: projectPoints)
+      {
+          cv::circle(outImg, cv::Point(point.x, point.y), point_size_, cv::Scalar(0, 0, 255), -1);
+      }
+      current_frame = outImg;
   }
 
-  // cv::Mat ProjectToRawImage(cv::Mat img,
-  //                           Eigen::Matrix3d K,
-  //                           std::vector<double> D,
-  //                           Eigen::Matrix4d json_param) {
-  void ProjectToRawImage(const cv::Mat &img, const Eigen::Matrix3f &K,
-                         const std::vector<float> &D,
-                         const Eigen::Matrix4f &json_param,
-                         cv::Mat &current_frame, cv::Mat &bv_frame) {
-    cv::Mat K1, D1, R1, T1;
-    float k[9], d[8], r[9], t[3];
+  void ProjectBirdView(const Transform &transform, cv::Mat &bv_frame) {
+      if(point3DList.size() <= 0)
+      {
+          return;
+      }
+      std::vector<cv::Point3f> bv_pts;
+      for(size_t i = 0; i < point3DList.size(); i++)
+      {
+          Eigen::Vector3f tempPoint(point3DList[i].x, point3DList[i].y, point3DList[i].z);
+          Eigen::Affine3f tempTransform(transform.matrix());
+          Eigen::Vector3f ransformPoint = tempTransform * tempPoint;
+          bv_pts.push_back(cv::Point3f(ransformPoint(0), ransformPoint(1), 1));
+      }
+      bv_frame = bv_handler.drawProjectBirdView(point_size_, bv_pts);
+  }
 
-    k[0] = K(0, 0);
-    k[1] = K(0, 1);
-    k[2] = K(0, 2);
-    k[3] = K(1, 0);
-    k[4] = K(1, 1);
-    k[5] = K(1, 2);
-    k[6] = K(2, 0);
-    k[7] = K(2, 1);
-    k[8] = K(2, 2);
+  void ProjectToRawMat(const cv::Mat &img, const cv::Mat &K, const cv::Mat &D,
+                       const Eigen::Matrix4f &matrix,
+                       cv::Mat &current_frame, cv::Mat &bv_frame) {
+      cv::Mat I = cv::Mat::eye(3, 3, CV_32FC1);
+      cv::Mat mapX, mapY;
+      cv::Mat outImg = cv::Mat(img.size(), CV_32FC3);
+      cv::initUndistortRectifyMap(K, D, I, K, img.size(), CV_32FC1, mapX, mapY);
+      cv::remap(img, outImg, mapX, mapY, cv::INTER_LINEAR);
+      cv::Mat dist = oriCloud.rowRange(0, 1).mul(oriCloud.rowRange(0, 1)) +
+              oriCloud.rowRange(1, 2).mul(oriCloud.rowRange(1, 2)) +
+              oriCloud.rowRange(2, 3).mul(oriCloud.rowRange(2, 3));
+      cv::Mat R_ = (cv::Mat_<float>(3, 3) << matrix(0, 0), matrix(0, 1), matrix(0, 2),
+                                             matrix(1, 0), matrix(1, 1), matrix(1, 2),
+                                             matrix(2, 0), matrix(1, 2), matrix(2, 2));
+      cv::Mat T_ = (cv::Mat_<float>(3, 1) << matrix(0, 3) , matrix(1, 3) , matrix(2, 3));
 
-    // d[0] = D(0);
-    // d[1] = D(1);
-    // d[2] = D(2);
-    // d[3] = D(3);
-    for (size_t i = 0; i < D.size(); i++) {
-      d[i] = D[i];
-    }
+      // cv::Mat projCloud2d =
+      //     K * (R_ * oriCloud + repeat(T_, 1, oriCloud.cols));
+      cv::Mat transCloud2d = R_ * oriCloud + repeat(T_, 1, oriCloud.cols);
+      float maxDist = 0;
+      float maxx = 0;
+      std::vector<Pt> points;
+      std::vector<cv::Point3f> bv_radar_pts;
+      for (int32_t i = 0; i < transCloud2d.cols; ++i) {
+          float x = transCloud2d.at<float>(0, i);
+          float y = transCloud2d.at<float>(1, i);
+          float z = transCloud2d.at<float>(2, i);
 
-    r[0] = json_param(0, 0);
-    r[1] = json_param(0, 1);
-    r[2] = json_param(0, 2);
-    r[3] = json_param(1, 0);
-    r[4] = json_param(1, 1);
-    r[5] = json_param(1, 2);
-    r[6] = json_param(2, 0);
-    r[7] = json_param(2, 1);
-    r[8] = json_param(2, 2);
+          Eigen::Vector3d world_pt(x, z, 1);
+          // x, z, 1???
+          Eigen::Vector3d bv_pt = homograph_.inverse().eval() * world_pt;
+          bv_pt /= bv_pt(2);
+          // cv::Point result(cvRound(bv_pt(0)), cvRound(bv_pt(1)));
+          int x2d = cvRound(bv_pt(0));
+          int y2d = cvRound(bv_pt(1));
+          float d = sqrt(dist.at<float>(0, i));
+          if (x2d >= 0 && y2d >= 0 && x2d < img.cols && y2d < img.rows && z > 0) {
+              maxx = std::max(maxx, std::fabs(x));
+              maxDist = std::max(maxDist, d);
+              points.push_back(Pt{cv::Point(x2d, y2d), d, std::fabs(x)});
+              bv_radar_pts.push_back(cv::Point3f(x, z, 1));
+          }
+      }
 
-    t[0] = json_param(0, 3);
-    t[1] = json_param(1, 3);
-    t[2] = json_param(2, 3);
+      bv_frame = bv_handler.drawProjectBirdView(point_size_, bv_radar_pts);
 
-    K1 = cv::Mat(3, 3, CV_32FC1, k);
-    D1 = cv::Mat(D.size(), 1, CV_32FC1, d);
-    R1 = cv::Mat(3, 3, CV_32FC1, r);
-    T1 = cv::Mat(3, 1, CV_32FC1, t);
-    ProjectToRawMat(img, K1, D1, R1, T1, current_frame, bv_frame);
+      sort(points.begin(), points.end(),
+           [](const Pt &a, const Pt &b) { return a.dist > b.dist; });
+      for (size_t i = 0; i < points.size(); ++i) {
+          cv::Scalar color;
+          // distance
+          float d = points[i].dist;
+          float x = points[i].x;
+          // color = fakeColor(d / maxDist);
+          color = fakeColor(x / maxx);
+          circle(outImg, points[i].point, point_size_, color, -1);
+      }
+      current_frame = outImg;
   }
 
   cv::Mat ProjectToFisheyeMat(cv::Mat img, cv::Mat K, cv::Mat D, cv::Mat R,
@@ -252,6 +240,7 @@ public:
     }
     return outImg;
   }
+
   cv::Mat ProjectToFisheyeImage(std::string imgName, cv::Mat K, cv::Mat D,
                                 cv::Mat R, cv::Mat T) {
     cv::Mat img = cv::imread(imgName);

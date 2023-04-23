@@ -66,6 +66,7 @@ private:
 
     QList<QString> processDataList;
     QString openDataDir;
+    QString saveDir;
 
     CameraIntrinsCalibration calibrationProcess;
 };

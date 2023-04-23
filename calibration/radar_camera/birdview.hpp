@@ -83,7 +83,7 @@ public:
   }
 
   cv::Mat drawProjectBirdView(const int &point_size,
-                              const std::vector<cv::Point2f> &grount_pts) {
+                              const std::vector<cv::Point3f> &grount_pts) {
     cv::Mat output;
     output = grid_image_.clone();
 

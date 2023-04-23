@@ -8,10 +8,16 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
+#include <QFileInfo>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QDebug>
 #include "helpers/dirprocess.h"
+#include <iostream>
+#include <iomanip>
 
-CameraIntrinsicsWindow::CameraIntrinsicsWindow(QDialog *parent) : QDialog(parent)
+CameraIntrinsicsWindow::CameraIntrinsicsWindow(QDialog *parent) : QDialog(parent), calibrationProcess()
 {
     init();
     initUI();
@@ -35,6 +41,7 @@ void CameraIntrinsicsWindow::slotOpenImageDir()
     else
     {
         QStringList filter;
+        saveDir = this->openDataDir + "/result";
         filter << "*.png" << "*.jpg" << "*.jpeg" << "*.bmp";
         processDataList = dirProcess.getDirFileName(this->openDataDir, filter);
         imageListWidget->clear();
@@ -87,7 +94,7 @@ void CameraIntrinsicsWindow::slotCalibrate()
     cv::Size image_size(currentImage.width(), currentImage.height());
     cv::Size board_size(boardSizeWidthBox->value(), boardSizeHeightBox->value());
     cv::Size square_size(squareSizeWidthBox->value(), squareSizeHeightBox->value());
-    QString saveDir = this->openDataDir + "/result";
+
     if(!makeDir.exists(saveDir))
     {
         if(!makeDir.mkdir(saveDir))
@@ -95,6 +102,7 @@ void CameraIntrinsicsWindow::slotCalibrate()
             qDebug() << saveDir << " fail!" << endl;
         }
     }
+
     std::string err_result;
     std::vector<std::string> images_list;
     calibrationProcess.setInitData(cameraModelBox->currentData().toInt(), \
@@ -152,7 +160,58 @@ void CameraIntrinsicsWindow::slotShowUndistortImage()
 
 void CameraIntrinsicsWindow::slotSaveCalibrateResult()
 {
+    QString saveJsonPath = saveDir + "/" + "camera_intrinsic" + ".json";
+    cv::Matx33f intrinsic;
+    std::vector<float> distortion;
+    QJsonDocument doc;
+    QByteArray data;
+    QJsonObject jsonData;
+    QJsonObject allData;
+    QFile file(saveJsonPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
+    {
+        return;
+    }
+
+    calibrationProcess.getIntrinsicParam(intrinsic, distortion);
     calibrationProcess.saveCalibrationResult();
+
+    jsonData.insert("device_type", "camera");
+    jsonData.insert("camera_model", cameraModelBox->currentText());
+    if(cameraModelBox->currentData().toInt() == 1)
+    {
+        QJsonArray tempData;
+        tempData << "k1" << "k2" << "p1" << "p2" << "k3";
+        jsonData.insert("distortion_name", tempData);
+    }
+    else if(cameraModelBox->currentData().toInt() == 2)
+    {
+        QJsonArray tempData;
+        tempData << "k1" << "k2" << "p1" << "p2";
+        jsonData.insert("distortion_name", tempData);
+    }
+    QJsonArray distortionData;
+    for(size_t i = 0; i < distortion.size(); i++)
+    {
+        distortionData << distortion[i];
+    }
+    jsonData.insert("camera_distortion", distortionData);
+    QJsonArray intrinsicData;
+    for(int r = 0; r < intrinsic.rows; r++)
+    {
+        QJsonArray tempData;
+        for(int c = 0; c < intrinsic.cols; c++)
+        {
+            tempData.append(intrinsic(r, c));
+        }
+        intrinsicData.append(tempData);
+    }
+    jsonData.insert("camera_intrinsic", intrinsicData);
+    doc.setObject(jsonData);
+    data = doc.toJson();
+    file.write(data);
+    file.close();
+
     if(this->isSaveUndistortBox->isChecked())
     {
         std::vector<std::string> images_list;
@@ -179,6 +238,7 @@ void CameraIntrinsicsWindow::init()
     this->currentImage = QImage(tr(":/images/images/play.png"));
     currentImagePath = "";
     openDataDir = ".";
+    saveDir = ".";
     processDataList.clear();
 }
 

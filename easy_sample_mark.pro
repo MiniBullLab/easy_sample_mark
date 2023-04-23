@@ -29,6 +29,7 @@ SOURCES += main.cpp\
     calibrationTools/pointcloudviewer.cpp \
     calibrationTools/radarcameramanualwindow.cpp \
     controlwindow.cpp \
+    drawShape/drawpointsshape.cpp \
     mainwindow.cpp \
     autoSampleMark/autosamplemarkthread.cpp \
     videoTools/croppingvideothread.cpp \
@@ -102,6 +103,7 @@ HEADERS  += controlwindow.h \
     calibrationTools/lidarcameracalibratwindow.h \
     calibrationTools/pointcloudviewer.h \
     calibrationTools/radarcameramanualwindow.h \
+    drawShape/drawpointsshape.h \
     mainwindow.h \
     autoSampleMark/autosamplemarkthread.h \
     videoTools/croppingvideothread.h \

@@ -76,6 +76,8 @@ private:
     void initConnect();
 
     bool loadHomographyParam(const QString &filePath);
+
+    float computeDistance(const cv::Point2f &point1, const cv::Point2f &point2);
 };
 
 #endif // BIRDVIEWPROCESS_H

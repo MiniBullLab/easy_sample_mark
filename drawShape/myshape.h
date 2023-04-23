@@ -20,7 +20,8 @@ typedef enum ShapeType{
     OCR_POLYGON_SHAPE = 8,
     MAX_IMAGE_SHAPE_TYPE = 9,
     RECT3D_SHAPE = 10,
-    MAX_SHAPE_TYPE = 11
+    POINT_SHAPE = 11,
+    MAX_SHAPE_TYPE = 12
 }ShapeType;
 
 class MyShape

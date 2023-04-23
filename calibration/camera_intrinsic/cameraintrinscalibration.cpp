@@ -1,3 +1,6 @@
+#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "cameraintrinscalibration.h"
 #include "AutoImagePicker.hpp"
 #include <sstream>
@@ -17,7 +20,7 @@ CameraIntrinsCalibration::CameraIntrinsCalibration()
     intrinsic_matrix = cv::Matx33f::zeros();
     distortion_coeffs = cv::Vec4d(0.0, 0.0, 0.0, 0.0);
 
-    pinhole_distortion_coeffs = cv::Mat(1,5,CV_32FC1, cv::Scalar::all(0)); /* 摄像机的5个畸变系数：k1,k2,p1,p2,k3 */
+    pinhole_distortion_coeffs = cv::Mat(1, 5, CV_64FC1, cv::Scalar::all(0)); /* 摄像机的5个畸变系数：k1,k2,p1,p2,k3 */
 }
 
 CameraIntrinsCalibration::~CameraIntrinsCalibration()
@@ -33,7 +36,7 @@ void CameraIntrinsCalibration::setInitData(const int camera_model, const cv::Siz
     this->board_size = board_size;
     this->square_size = square_size;
     this->saveResultDir = save_result_dir;
-    this->saveResultPath = save_result_dir + "/" + "calibration_result.txt";
+    this->saveResultPath = save_result_dir + "/" + "calibration_intrinsic_error.txt";
     is_use.clear();
     rotation_vectors.clear();
     translation_vectors.clear();
@@ -127,8 +130,8 @@ void CameraIntrinsCalibration::saveCalibrationResult()
             fout << "第" << i + 1 << "幅图像的平移向量：" << std::endl;
             fout << translation_vectors[successImageNum] << std::endl;
             fout << "第" << i + 1 << "幅图像的平均误差：" << error_list[successImageNum] << "像素" << std::endl;
-            successImageNum++;
             total_err += error_list[successImageNum];
+            successImageNum++;
         }
     }
     if(successImageNum > 0)
@@ -209,6 +212,33 @@ void CameraIntrinsCalibration::saveUndistortImage(const std::vector<std::string>
         StrStm >> imageFileName;
         imageFileName += "_undistort.png";
         cv::imwrite(imageFileName, result);
+    }
+}
+
+void CameraIntrinsCalibration::getIntrinsicParam(cv::Matx33f &intrinsic, std::vector<float> &distortion)
+{
+    distortion.clear();
+    intrinsic = intrinsic_matrix;
+    if(this->camera_model == 1)
+    {
+        const double *data = pinhole_distortion_coeffs.ptr<double>(0);
+        distortion.push_back(data[0]);
+        // std::cout << data[0] << std::endl;
+        distortion.push_back(data[1]);
+        // std::cout << data[1] << std::endl;
+        distortion.push_back(data[2]);
+        // std::cout << data[2] << std::endl;
+        distortion.push_back(data[3]);
+        // std::cout << data[3] << std::endl;
+        distortion.push_back(data[4]);
+        // std::cout << data[4] << std::endl;
+    }
+    else if(this->camera_model == 2)
+    {
+        distortion.push_back(distortion_coeffs[0]);
+        distortion.push_back(distortion_coeffs[1]);
+        distortion.push_back(distortion_coeffs[2]);
+        distortion.push_back(distortion_coeffs[3]);
     }
 }
 

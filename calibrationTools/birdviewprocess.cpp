@@ -11,6 +11,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QDebug>
+#include <cmath>
+#include <sstream>
 
 #include <Eigen/Dense>
 
@@ -41,6 +43,9 @@ void BirdViewProcess::slotOpenImage()
         imageShow->setNewQImage(currentImage);
         if(loadHomographyParam(paramPath))
         {
+            std::ostringstream tempStr;
+            tempStr << "Homography:\n" << homography << "\n";
+            this->commandText->append(QString::fromStdString(tempStr.str()));
             imageShow->setPointList(pointList);
             for(size_t i = 0; i < birdPointList.size(); i++)
             {
@@ -133,22 +138,14 @@ void BirdViewProcess::slotBirdCalibration()
         for(int i = 0; i < pointList.count(); i++)
         {
             cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
-            dst_pts.push_back(cv::Point2f(birdPointList[i].x * 100, birdPointList[i].y * 100));
+            dst_pts.push_back(cv::Point2f(birdPointList[i].x, birdPointList[i].y));
             src_pts.push_back(src_pt);
         }
 
         homography = cv::findHomography(src_pts, dst_pts);
-        QString tempStr = "";
-        for(int r = 0; r < homography.rows; r++)
-        {
-            for(int c = 0; c < homography.cols; c++)
-            {
-                tempStr += QString::number(homography.at<float>(r, c));
-                tempStr += ",";
-            }
-            tempStr += "\n";
-        }
-        commandText->append(tempStr);
+        std::ostringstream tempStr;
+        tempStr << "Homography:\n" << homography << "\n";
+        commandText->append(QString::fromStdString(tempStr.str()));
 
         selectPointButton->setEnabled(true);
         birdCalibrationButton->setEnabled(true);
@@ -168,41 +165,83 @@ void BirdViewProcess::slotBirdView()
     cv::Mat imageInput = convertImage.QImageTocvMat(image).clone();
     cv::Mat birdImage;
     cv::Mat rgbFrame;
-    Eigen::Matrix3f img2ground_hmat_;
-    std::vector<cv::Point2f> ground_pts;
-    std::vector<cv::Point2f> src_pts;
-    cv::Mat h = cv::Mat(3, 3, CV_32F, cv::Scalar::all (0));
-    img2ground_hmat_(0, 0) = homography.at<float>(0, 0);
-    img2ground_hmat_(0, 1) = homography.at<float>(0, 1);
-    img2ground_hmat_(0, 2) = homography.at<float>(0, 2);
-    img2ground_hmat_(1, 0) = homography.at<float>(1, 0);
-    img2ground_hmat_(1, 1) = homography.at<float>(1, 1);
-    img2ground_hmat_(1, 2) = homography.at<float>(1, 2);
-    img2ground_hmat_(2, 0) = homography.at<float>(2, 0);
-    img2ground_hmat_(2, 1) = homography.at<float>(2, 1);
-    img2ground_hmat_(2, 2) = homography.at<float>(2, 2);
-    for (int i = 0; i < pointList.count(); i++) {
-      Eigen::Vector3f ground_pt = img2ground_hmat_ * \
-          Eigen::Vector3f(pointList[i].x(), pointList[i].y(), 1);
-      ground_pt /= ground_pt(2);
-      ground_pts.push_back(cv::Point2f(ground_pt(0), ground_pt(1)));
-      cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
-      src_pts.push_back(src_pt);
-    }
-    h = cv::findHomography(src_pts, ground_pts);
+//    cv::Mat h = cv::Mat(3, 3, CV_32F, cv::Scalar::all (0));
 //    cv::Rect boundingRect;
 //    std::vector<cv::Point2f> dst_pts;
 //    std::vector<cv::Point2f> src_pts;
 //    for(int i = 0; i < pointList.count(); i++)
 //    {
 //        cv::Point2f src_pt(pointList[i].x(), pointList[i].y());
-//        dst_pts.push_back(cv::Point2f(birdPointList[i].x, birdPointList[i].y));
 //        src_pts.push_back(src_pt);
 //    }
 //    boundingRect = cv::boundingRect(src_pts);
+//    int width = boundingRect.width;
+//    int height = boundingRect.height;
+//    cv::Point center;
+//    cv::Point2f point1(center.x, center.y);
+//    cv::Point2f point2(center.x, center.y);
+//    cv::Point2f point3(center.x, center.y);
+//    cv::Point2f point4(center.x, center.y);
+//    center.x = boundingRect.tl().x + width / 2;
+//    center.y = boundingRect.tl().y + height / 2;
+//    for(int i = 0; i < pointList.count(); i++)
+//    {
+//        int x = pointList[i].x();
+//        int y = pointList[i].y();
+//        float temp1 = computeDistance(cv::Point2f(x, y), center);
+//        if(x < center.x && y < center.y)
+//        {
+//            float temp2 = computeDistance(point1, center);
+//            if(temp1 > temp2)
+//            {
+//                point1 = cv::Point2f(x, y);
+//            }
+//        }
+//        else if(x > center.x && y < center.y)
+//        {
+//            float temp2 = computeDistance(point2, center);
+//            if(temp1 > temp2)
+//            {
+//                point2 = cv::Point2f(x, y);
+//            }
+//        }
+//        else if(x > center.x && y > center.y)
+//        {
+//            float temp2 = computeDistance(point3, center);
+//            if(temp1 > temp2)
+//            {
+//                point3 = cv::Point2f(x, y);
+//            }
+//        }
+//        else if(x < center.x && y > center.y)
+//        {
+//            float temp2 = computeDistance(point4, center);
+//            if(temp1 > temp2)
+//            {
+//                point4 = cv::Point2f(x, y);
+//            }
+//        }
+//    }
+//    src_pts.clear();
+//    dst_pts.clear();
+//    src_pts.push_back(point1);
+//    src_pts.push_back(point2);
+//    src_pts.push_back(point3);
+//    src_pts.push_back(point4);
+//    dst_pts.push_back(cv::Point(0, 0));
+//    dst_pts.push_back(cv::Point(width, 0));
+//    dst_pts.push_back(cv::Point(width, 0));
+//    dst_pts.push_back(cv::Point(width, height));
+
+//    for(size_t i = 0; i < src_pts.size(); i++)
+//    {
+//        cv::circle(imageInput, cv::Point(src_pts[i].x, src_pts[i].y), 3, cv::Scalar(0, 0, 255), -1);
+//    }
+//    cv::imwrite("image.jpg", imageInput);
+
 //    h = cv::getPerspectiveTransform(dst_pts, src_pts);
-    // cv::imwrite("image.jpg", imageInput);
-    cv::warpPerspective(imageInput, birdImage, h, imageInput.size() , \
+
+    cv::warpPerspective(imageInput, birdImage, homography, imageInput.size() , \
                         cv::INTER_LINEAR + cv::WARP_INVERSE_MAP + cv::WARP_FILL_OUTLIERS);
     cv::cvtColor(birdImage, rgbFrame, cv::COLOR_BGR2RGB);
     birdViewImage = QImage((uchar*)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, QImage::Format_RGB888);
@@ -491,4 +530,12 @@ bool BirdViewProcess::loadHomographyParam(const QString &filePath)
         result = false;
     }
     return result;
+}
+
+float BirdViewProcess::computeDistance(const cv::Point2f &point1, const cv::Point2f &point2)
+{
+    float distance;
+    distance = powf((point1.x - point2.x), 2) + powf((point1.y - point2.y), 2);
+    distance = sqrtf(distance);
+    return distance;
 }

@@ -29,7 +29,7 @@ public:
 
     const Rotation& rotation() const { return rotation_; }
 
-    VectorRotation vectorRation()
+    VectorRotation vectorRation() const
     {
         AngleRotation angleAxis(rotation_);
         VectorRotation vector = angleAxis.angle() * angleAxis.axis();

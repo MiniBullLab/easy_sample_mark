@@ -95,7 +95,6 @@ private:
     cv::Mat currentMat;
 
     ConvertCVQImage convertImage;
-    Transform transform;
 
     Projector projector;
 
@@ -105,13 +104,13 @@ private:
     bool isLoadExtrinsic;
     bool isInit;
 
-    Eigen::Matrix3f intrinsic_matrix_;
-    std::vector<float> distortion;
+    cv::Mat cameraInstrinsics;
+    cv::Mat distortionCoefficients;
     cv::Mat homography;
     Eigen::Matrix4f calibration_matrix_;
     Eigen::Matrix4f orign_calibration_matrix_;
     Eigen::Matrix4f modification_matrix_;
-    std::vector<cv::Point2f> radarPointList;
+    std::vector<cv::Point3f> point3DList;
 
     QList<QPoint> selectPointList;
 
